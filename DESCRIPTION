@@ -1,0 +1,11 @@
+Package: scul
+Title: Runs synthetic control using lasso (SCUL) procedure from Hollingsworth and Wing (2019)
+Version: 0.0.0.1
+Authors@R: person("Alex", "Hollingsworth", email = "hollinal@indiana.edu", role = c("aut", "cre"))
+Maintainer: Alex Hollingsworth <hollinal@indiana.edu>
+Date: 2019-02-17
+Description: TBD. See Hollingsworth and Wing (2019).
+Depends: R (>= 3.4.3)
+License: Not sure.
+Encoding: UTF-8
+RoxygenNote: 6.1.1
