@@ -2,7 +2,7 @@
 #'
 #' Plot standardized differences of all placebo goods and target good. 
 #' 
-#' @param  y.StandardizedDifference The standardized difference between target data and synthetic data series across time. Default is SCUL.inference$y.StandardizedDifference.
+#' @param  y.StandardizedDifference The standardized difference between target data and synthetic data series across time. Default is SCUL.pvalue$y.StandardizedDifference.
 #' @param  y.placebo.StandardizedDifference Standardized difference between each placebo data series and its synthetic prediction across time. Default is SCUL.inference$y.placebo.StandardizedDifference.
 #' @param  time The time variable across. Default is SCUL.input$time.
 #' @param  OutputFilePath Output file path. Default is SCUL.input$OutputFilePath.
@@ -12,7 +12,7 @@
 #' @import ggplot2
 #' @export
 SmokePlot <- function(
-                    y.StandardizedDifference=SCUL.inference$y.StandardizedDifference,
+                    y.StandardizedDifference=SCUL.pvalue$y.StandardizedDifference,
                     y.placebo.StandardizedDifference=SCUL.inference$y.placebo.StandardizedDifference,
                     time = SCUL.input$time,
                     OutputFilePath = SCUL.input$OutputFilePath

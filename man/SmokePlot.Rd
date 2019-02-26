@@ -5,12 +5,12 @@
 \title{Make smoke plot}
 \usage{
 
-  SmokePlot(y.StandardizedDifference = SCUL.inference$y.StandardizedDifference,
+  SmokePlot(y.StandardizedDifference = SCUL.pvalue$y.StandardizedDifference,
   y.placebo.StandardizedDifference = SCUL.inference$y.placebo.StandardizedDifference,
   time = SCUL.input$time, OutputFilePath = SCUL.input$OutputFilePath)
 }
 \arguments{
-\item{y.StandardizedDifference}{The standardized difference between target data and synthetic data series across time. Default is SCUL.inference$y.StandardizedDifference.}
+\item{y.StandardizedDifference}{The standardized difference between target data and synthetic data series across time. Default is SCUL.pvalue$y.StandardizedDifference.}
 
 \item{y.placebo.StandardizedDifference}{Standardized difference between each placebo data series and its synthetic prediction across time. Default is SCUL.inference$y.placebo.StandardizedDifference.}
 

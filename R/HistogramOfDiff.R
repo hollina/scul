@@ -17,7 +17,7 @@
 #' @import ggplot2
 #' @export
 HistogramOfDiff <- function(
-                            y.StandardizedDifference=SCUL.inference$y.StandardizedDifference,
+                            y.StandardizedDifference=SCUL.pvalue$y.StandardizedDifference,
                             y.placebo.StandardizedDifference=SCUL.inference$y.placebo.StandardizedDifference,
                             time = SCUL.input$time,
                             TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,

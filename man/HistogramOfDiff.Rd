@@ -5,7 +5,7 @@
 \title{Make histogram of null with effect size}
 \usage{
 
-  HistogramOfDiff(y.StandardizedDifference = SCUL.inference$y.StandardizedDifference,
+  HistogramOfDiff(y.StandardizedDifference = SCUL.pvalue$y.StandardizedDifference,
   y.placebo.StandardizedDifference = SCUL.inference$y.placebo.StandardizedDifference,
   time = SCUL.input$time,
   TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
