@@ -31,8 +31,8 @@ SmokePlot <- function(
   
   
   BasePlot <- BasePlot +
-    geom_line(data = y.StandardizedDifference, aes(x=y.StandardizedDifference[,1] ,y = y.StandardizedDifference$y,color='outline'),size=1.1,linetype = 1) +
-    geom_line(data = y.StandardizedDifference, aes(x=y.StandardizedDifference[,1] ,y = y.StandardizedDifference$y,color='fill'),size=.75,linetype = 1) +
+    geom_line(data = y.StandardizedDifference, aes(x=y.StandardizedDifference[,1] ,y = y.StandardizedDifference[,2],color='outline'),size=1.1,linetype = 1) +
+    geom_line(data = y.StandardizedDifference, aes(x=y.StandardizedDifference[,1] ,y = y.StandardizedDifference[,2],color='fill'),size=.75,linetype = 1) +
     scale_colour_manual(name = 'the colour', values =c('outline'='black','fill'='darkorange2'))
   
   
