@@ -16,9 +16,10 @@
 #' @param NumberInitialTimePeriods An integer indicating the minimum number of pre-treatment time periods to be 
 #'                              included in the trainging data for the first cross-validation run.
 #'                             Default is the length of the post-treatment time period.
+#' @param TrainingPostPeriodLength The number of timer periods post-treatment for training data. Defaults to all time since treatment begins. 
 #' @param x.PlaceboPool A (T by J) data frame containing all products that you wish to include in the placebo distribution
 #'         Must be sorted by time. Default is to be the same as x. 
-#' @param  OutputFilePath A file path to store output. Default is current working directory
+#' @param OutputFilePath A file path to store output. Default is current working directory
 #' @param TimeFormat A lubridate-style time format that indicates the format of the time variable. This is helpful for graphing results. TODO (hollina). Add this feature.
 #'
 #' @return InputDataForSCUL A list of items that will be called on for running the SCUL procedure.
@@ -32,6 +33,7 @@ OrganizeDataAndSetup <- function(
                                   CohensDThreshold=0.25,
                                   NumberInitialTimePeriods=nrow(y)-TreatmentBeginsAt+1,
                                   x.PlaceboPool=x.DonorPool,
+                                  TrainingPostPeriodLength = nrow(y)-TreatmentBeginsAt+1,
                                   OutputFilePath=getwd()
                                 ) {
   # Function: Creates data products necessary for scul procedure and takes inputs needed for later procedures 
@@ -78,21 +80,24 @@ OrganizeDataAndSetup <- function(
                       TreatmentBeginsAt,
                       NumberInitialTimePeriods,
                       PostPeriodLength,
-                      PrePeriodLength
+                      PrePeriodLength,
+                      TrainingPostPeriodLength
                       ) 
   x.DonorPool<-PreprocessSubset(
                                 x.DonorPool,
                                 TreatmentBeginsAt,
                                 NumberInitialTimePeriods,
                                 PostPeriodLength,
-                                PrePeriodLength
+                                PrePeriodLength,
+                                TrainingPostPeriodLength
                                  ) 
   x.PlaceboPool<-PreprocessSubset(
                                   x.PlaceboPool,
                                   TreatmentBeginsAt,
                                   NumberInitialTimePeriods,
                                   PostPeriodLength,
-                                  PrePeriodLength
+                                  PrePeriodLength,
+                                  TrainingPostPeriodLength
                                   ) 
   # Create pre treatment datasets
   y.PreTreatment <- as.matrix(y[(1:TreatmentBeginsAt-1),])
@@ -119,7 +124,8 @@ OrganizeDataAndSetup <- function(
     x.PlaceboPoolPreTreatment = x.PlaceboPoolPreTreatment,
     y.PostTreatment = y.PostTreatment,
     x.DonorPool.PostTreatment =  x.DonorPool.PostTreatment, 
-    x.PlaceboPool.PostTreatment =  x.PlaceboPool.PostTreatment
+    x.PlaceboPool.PostTreatment =  x.PlaceboPool.PostTreatment,
+    TrainingPostPeriodLength = TrainingPostPeriodLength
   )
   
   # Return list

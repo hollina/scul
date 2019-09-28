@@ -7,6 +7,7 @@
 OrganizeDataAndSetup(time, y, TreatmentBeginsAt, x.DonorPool,
   CohensDThreshold = 0.25, NumberInitialTimePeriods = nrow(y) -
   TreatmentBeginsAt + 1, x.PlaceboPool = x.DonorPool,
+  TrainingPostPeriodLength = nrow(y) - TreatmentBeginsAt + 1,
   OutputFilePath = getwd())
 }
 \arguments{
@@ -30,6 +31,8 @@ Default is the length of the post-treatment time period.}
 
 \item{x.PlaceboPool}{A (T by J) data frame containing all products that you wish to include in the placebo distribution
 Must be sorted by time. Default is to be the same as x.}
+
+\item{TrainingPostPeriodLength}{The number of timer periods post-treatment for training data. Defaults to all time since treatment begins.}
 
 \item{OutputFilePath}{A file path to store output. Default is current working directory}
 

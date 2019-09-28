@@ -22,7 +22,8 @@
 #'         Default is taken from SCUL.input$y      
 #' @param  TreatmentBeginsAt An integer indicating which row begins treatment. 
 #'         Default is to begin this at SCUL.input$TreatmentBeginsAt.
-#'         
+#' @param TrainingPostPeriodLength The number of timer periods post-treatment for training data. Defaults to all time since treatment begins. 
+#'           
 #' @return OutputDataSCUL  A list with the synthetic series, weights used to construct the series, and measures of fit.
 #' @import glmnet
 #' @export
@@ -36,12 +37,14 @@ SCUL <- function(
                   x.DonorPool = SCUL.input$x.DonorPool, 
                   time = SCUL.input$time,
                   y.actual = SCUL.input$y, 
-                  TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt
-                ) {
-  # Calculate the maximum number of possible runs given the previous three choices
-  MaxCrossValidations <- PrePeriodLength-NumberInitialTimePeriods-PostPeriodLength+1
+                  TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
+                  TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength
+) 
+{
   
-  # Determine stopping point
+  # Determine the maximum number of rolling-origin k-fold cross validations that can occur
+  MaxCrossValidations <- PrePeriodLength-NumberInitialTimePeriods-TrainingPostPeriodLength+1
+  # Determine the last position of the largest possible training dataset that only uses pre-treatment data
   StoppingPoint <- NumberInitialTimePeriods+MaxCrossValidations-1
   
   # Initialize a matrix of 0's, that is 1 by max # of C.V. runs
@@ -49,10 +52,12 @@ SCUL <- function(
   
   # Preform the task once for the correct number of times
   for (i in NumberInitialTimePeriods:StoppingPoint){
+    #i <- NumberInitialTimePeriods
     j = i -NumberInitialTimePeriods + 1
-    # Specify training data
-    x.training <-x.DonorPool.PreTreatment[1:i,]
-    y.training <-y.PreTreatment[1:i,]
+    
+    # Specify training data 
+    x.training <-x.DonorPool.PreTreatment[1:i,] # this had me switch row and column. Why?
+    y.training <-y.PreTreatment[1:i] # this had me switch row and column. Why?
     
     # Run a lasso with only the training data. It will run on for a grid of lambdas by default
     fit=glmnet(x.training,y.training)
@@ -64,7 +69,7 @@ SCUL <- function(
     BeginingOfTestData = i +1
     
     # Determine when the testing data ends for this CV run
-    EndOfTestData = i + PostPeriodLength
+    EndOfTestData = i + TrainingPostPeriodLength
     
     # Specify testing data
     x.testing <-x.DonorPool.PreTreatment[BeginingOfTestData:EndOfTestData,]

@@ -26,7 +26,7 @@ ConvexHullCheck <- function(
   # Get the set of variables that survived the lasso
   
   # Create a copy of the coefficient matrix
-  SurvivingVariables<-coef.exact[-1,]
+  SurvivingVariables<-as.matrix(coef.exact[-1,])
   
   # If it's non-zero, just replace it with one
   SurvivingVariables[abs(SurvivingVariables)>0]<-1

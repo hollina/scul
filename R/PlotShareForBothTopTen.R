@@ -107,48 +107,92 @@ PlotShareForBothTopTen <- function(
   # Initialize the graph
   graph <- ggplot(data=ShareOfPredictionForPlot.long[1:20,],aes(x=share, y=order,label=RowNames, color=factor(sign)))
   
-  # Create a forloop to generate custome "minor grid-lines." The allows us to stop them so they don't get in the way of reading the variable names   
-  for (i in seq(from=max(ShareOfPredictionForPlot.long$order)-10, to=max(ShareOfPredictionForPlot.long$order), by=5)) {
-    graph <- graph + geom_segment(x=-0.01, y=i, xend=(floor(max(ShareOfPredictionForPlot.long$share)/.05)+1)*.05, yend=i, linetype="dashed", color="grey")
+  if (nrow(ShareOfPredictionForPlot.long)>=5) {
+    # Create a forloop to generate custome "minor grid-lines." The allows us to stop them so they don't get in the way of reading the variable names   
+    for (i in seq(from=max(ShareOfPredictionForPlot.long$order)-10, to=max(ShareOfPredictionForPlot.long$order), by=5)) {
+      graph <- graph + geom_segment(x=-0.01, y=i, xend=(floor(max(ShareOfPredictionForPlot.long$share)/.05)+1)*.05, yend=i, linetype="dashed", color="grey")
+    }
+    
+    for (i in seq(from=.025, to=(floor(max(ShareOfPredictionForPlot.long$share)/.05)+1)*.05, by=.025)) {
+      graph <- graph + geom_segment(x=i, y=max(ShareOfPredictionForPlot.long$order)-10, xend=i, yend=max(ShareOfPredictionForPlot.long$order), linetype="solid", color="grey")
+    }
+    graph <- graph +
+      geom_segment(x=0, y=max(ShareOfPredictionForPlot.long$order)-10, xend=0, yend=max(ShareOfPredictionForPlot.long$order)+1, linetype="solid", color="black")
+    
+    graph <- graph +
+      geom_segment(x=0, y=max(ShareOfPredictionForPlot.long$order)-9.45, xend=(floor(max(ShareOfPredictionForPlot.long$share)/.05)+1)*.05, yend=max(ShareOfPredictionForPlot.long$order)-9.45, linetype="solid", color="black")
+    
+    # Continue with the graph, adding both points and the labels
+    graph <- graph +
+      geom_point(aes(shape=time_period, fill=factor(sign)), size = 6, alpha=.6) +
+      geom_text(data = ShareOfPredictionForPlot.long[1:20,], aes(x=ShareOfPredictionForPlot.long$zero[1:20],y=ShareOfPredictionForPlot.long$order[1:20], label = ShareOfPredictionForPlot.long$RowNames[1:20]), size = 6, adj=1, color="black")
+    
+    # Continue with the graph, altering the appearance, axes, and limits
+    graph <- graph +
+      theme_bw(base_size = 22) +
+      theme(panel.border = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
+      theme(axis.title.y=element_blank(),axis.text.y=element_blank(),axis.line=element_blank(),axis.ticks.y=element_blank()) 
+    
+    # Continue with the graph, altering the shapes, legends, titles, etc
+    graph <- graph +
+      ylab("") +
+      xlab("Contribution Percent [0-1]") +
+      ggtitle("Contribution of Each Donor Variable to Synthetic Prediction") +
+      theme(legend.position="bottom") 
+    
+    
+    # Continue with the graph, altering the color
+    ShareForBothTopTen  <- graph +
+      scale_shape_manual(values=c(24, 21),name="Treatment Period", labels=c("First", "Most Recent")) +
+      scale_fill_manual(values = c("white", "black"),name="Direction of Contribution", labels=c("Positive", "Negative")) +
+      guides(fill = guide_legend(override.aes=list(shape=22),title.position = "top",title.theme = element_text(size = 20,angle = 0))) + guides(shape = guide_legend(title.position = "top",title.theme = element_text(size = 20,angle = 0))) +
+      scale_color_manual(values = c("black", "black"),name="Direction of Contribution", labels=c("Positive", "Negative")) +
+      theme(legend.key.size = unit(2, 'lines')) +
+      scale_x_continuous( breaks=seq(0,(floor(max(ShareOfPredictionForPlot.long$share)/.05)+1)*.05,.05), limits=c(-.15,max(ShareOfPredictionForPlot.long$share[1:20])))
   }
-  
-  for (i in seq(from=.025, to=(floor(max(ShareOfPredictionForPlot.long$share)/.05)+1)*.05, by=.025)) {
-    graph <- graph + geom_segment(x=i, y=max(ShareOfPredictionForPlot.long$order)-10, xend=i, yend=max(ShareOfPredictionForPlot.long$order), linetype="solid", color="grey")
+  if (nrow(ShareOfPredictionForPlot.long)<5) {
+    # Create a forloop to generate custome "minor grid-lines." The allows us to stop them so they don't get in the way of reading the variable names   
+    for (i in seq(from=max(ShareOfPredictionForPlot.long$order)-10, to=max(ShareOfPredictionForPlot.long$order), by=nrow(ShareOfPredictionForPlot.long))) {
+      graph <- graph + geom_segment(x=-0.01, y=i, xend=(floor(max(ShareOfPredictionForPlot.long$share)/.05)+1)*.05, yend=i, linetype="dashed", color="grey")
+    }
+    
+    for (i in seq(from=.025, to=(floor(max(ShareOfPredictionForPlot.long$share)/.05)+1)*.05, by=.025)) {
+      graph <- graph + geom_segment(x=i, y=max(ShareOfPredictionForPlot.long$order)-10, xend=i, yend=max(ShareOfPredictionForPlot.long$order), linetype="solid", color="grey")
+    }
+    graph <- graph +
+      geom_segment(x=0, y=max(ShareOfPredictionForPlot.long$order)-10, xend=0, yend=max(ShareOfPredictionForPlot.long$order)+1, linetype="solid", color="black")
+    
+    graph <- graph +
+      geom_segment(x=0, y=max(ShareOfPredictionForPlot.long$order)-9.45, xend=(floor(max(ShareOfPredictionForPlot.long$share)/.05)+1)*.05, yend=max(ShareOfPredictionForPlot.long$order)-9.45, linetype="solid", color="black")
+    
+    # Continue with the graph, adding both points and the labels
+    graph <- graph +
+      geom_point(aes(shape=time_period, fill=factor(sign)), size = 6, alpha=.6) +
+      geom_text(data = ShareOfPredictionForPlot.long[1:20,], aes(x=ShareOfPredictionForPlot.long$zero[1:20],y=ShareOfPredictionForPlot.long$order[1:20], label = ShareOfPredictionForPlot.long$RowNames[1:20]), size = 6, adj=1, color="black")
+    
+    # Continue with the graph, altering the appearance, axes, and limits
+    graph <- graph +
+      theme_bw(base_size = 22) +
+      theme(panel.border = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
+      theme(axis.title.y=element_blank(),axis.text.y=element_blank(),axis.line=element_blank(),axis.ticks.y=element_blank()) 
+    
+    # Continue with the graph, altering the shapes, legends, titles, etc
+    graph <- graph +
+      ylab("") +
+      xlab("Contribution Percent [0-1]") +
+      ggtitle("Contribution of Each Donor Variable to Synthetic Prediction") +
+      theme(legend.position="bottom") 
+    
+    
+    # Continue with the graph, altering the color
+    ShareForBothTopTen  <- graph +
+      scale_shape_manual(values=c(24, 21),name="Treatment Period", labels=c("First", "Most Recent")) +
+      scale_fill_manual(values = c("white", "black"),name="Direction of Contribution", labels=c("Positive", "Negative")) +
+      guides(fill = guide_legend(override.aes=list(shape=22),title.position = "top",title.theme = element_text(size = 20,angle = 0))) + guides(shape = guide_legend(title.position = "top",title.theme = element_text(size = 20,angle = 0))) +
+      scale_color_manual(values = c("black", "black"),name="Direction of Contribution", labels=c("Positive", "Negative")) +
+      theme(legend.key.size = unit(2, 'lines')) +
+      scale_x_continuous( breaks=seq(0,(floor(max(ShareOfPredictionForPlot.long$share)/.05)+1)*.05,.05), limits=c(-.15,max(ShareOfPredictionForPlot.long$share[1:20])))
   }
-  graph <- graph +
-    geom_segment(x=0, y=max(ShareOfPredictionForPlot.long$order)-10, xend=0, yend=max(ShareOfPredictionForPlot.long$order)+1, linetype="solid", color="black")
-  
-  graph <- graph +
-    geom_segment(x=0, y=max(ShareOfPredictionForPlot.long$order)-9.45, xend=(floor(max(ShareOfPredictionForPlot.long$share)/.05)+1)*.05, yend=max(ShareOfPredictionForPlot.long$order)-9.45, linetype="solid", color="black")
-  
-  # Continue with the graph, adding both points and the labels
-  graph <- graph +
-    geom_point(aes(shape=time_period, fill=factor(sign)), size = 6, alpha=.6) +
-    geom_text(data = ShareOfPredictionForPlot.long[1:20,], aes(x=ShareOfPredictionForPlot.long$zero[1:20],y=ShareOfPredictionForPlot.long$order[1:20], label = ShareOfPredictionForPlot.long$RowNames[1:20]), size = 6, adj=1, color="black")
-  
-  # Continue with the graph, altering the appearance, axes, and limits
-  graph <- graph +
-    theme_bw(base_size = 22) +
-    theme(panel.border = element_blank(),panel.grid.major = element_blank(), panel.grid.minor = element_blank(), axis.line = element_line(colour = "black")) +
-    theme(axis.title.y=element_blank(),axis.text.y=element_blank(),axis.line=element_blank(),axis.ticks.y=element_blank()) 
-  
-  # Continue with the graph, altering the shapes, legends, titles, etc
-  graph <- graph +
-    ylab("") +
-    xlab("Contribution Percent [0-1]") +
-    ggtitle("Contribution of Each Donor Variable to Synthetic Prediction") +
-    theme(legend.position="bottom") 
-  
-  
-  # Continue with the graph, altering the color
-  ShareForBothTopTen  <- graph +
-    scale_shape_manual(values=c(24, 21),name="Treatment Period", labels=c("First", "Most Recent")) +
-    scale_fill_manual(values = c("white", "black"),name="Direction of Contribution", labels=c("Positive", "Negative")) +
-    guides(fill = guide_legend(override.aes=list(shape=22),title.position = "top",title.theme = element_text(size = 20,angle = 0))) + guides(shape = guide_legend(title.position = "top",title.theme = element_text(size = 20,angle = 0))) +
-    scale_color_manual(values = c("black", "black"),name="Direction of Contribution", labels=c("Positive", "Negative")) +
-    theme(legend.key.size = unit(2, 'lines')) +
-    scale_x_continuous( breaks=seq(0,(floor(max(ShareOfPredictionForPlot.long$share)/.05)+1)*.05,.05), limits=c(-.15,max(ShareOfPredictionForPlot.long$share[1:20])))
-  
   ShareForBothTopTen
   
   # Save graph

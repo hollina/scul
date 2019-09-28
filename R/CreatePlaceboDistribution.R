@@ -16,7 +16,8 @@
 #'        Default is the stated amount in SCUL.input data. 
 #' @param x.PlaceboPool A (T by J) data frame containing all products that you wish to include in the placebo distribution
 #'         Must be sorted by time. Default is SCUL.input$x.PlaceboPool.
-#'        
+#' @param TrainingPostPeriodLength The number of timer periods post-treatment for training data. Defaults to all time since treatment begins. 
+
 #' @return list  A list of standardized placbo effect sizes
 #' @import glmnet
 #' 
@@ -30,7 +31,8 @@ CreatePlaceboDistribution <- function(
                                       NumberInitialTimePeriods = SCUL.input$NumberInitialTimePeriods,
                                       OutputFilePath = SCUL.input$OutputFilePath, 
                                       CohensDThreshold = SCUL.input$CohensDThreshold,
-                                      y.scul = SCUL.output$y.scul
+                                      y.scul = SCUL.output$y.scul, 
+                                      TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength
                                     ) {
 
 
@@ -43,7 +45,7 @@ CreatePlaceboDistribution <- function(
   # Set up variables that are constant across all runs
   
   # Initialize a matrix of 0's, that is 1 by max # of C.V. runs
-  MaxCrossValidations <- PrePeriodLength-NumberInitialTimePeriods-PostPeriodLength+1
+  MaxCrossValidations <- PrePeriodLength-NumberInitialTimePeriods-TrainingPostPeriodLength+1
   
   # Determine stopping point
   StoppingPoint <- NumberInitialTimePeriods+MaxCrossValidations-1
@@ -93,7 +95,7 @@ CreatePlaceboDistribution <- function(
       BeginingOfTestData = i +1
       
       # Determine when the testing data ends for this CV run
-      EndOfTestData = i + PostPeriodLength
+      EndOfTestData = i + TrainingPostPeriodLength
       
       # Specify testing data
       placebo.x.testing <-x.PlaceboPool.PreTreatment[BeginingOfTestData:EndOfTestData,]

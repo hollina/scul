@@ -12,7 +12,8 @@ SCUL(PostPeriodLength = nrow(SCUL.input$y) - SCUL.input$TreatmentBeginsAt
   y.PreTreatment = SCUL.input$y.PreTreatment,
   x.DonorPool = SCUL.input$x.DonorPool, time = SCUL.input$time,
   y.actual = SCUL.input$y,
-  TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt)
+  TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
+  TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength)
 }
 \arguments{
 \item{PostPeriodLength}{An integer that indicates the length of the post-treatment period.
@@ -44,6 +45,8 @@ Default is taken from SCUL.input$y}
 
 \item{TreatmentBeginsAt}{An integer indicating which row begins treatment. 
 Default is to begin this at SCUL.input$TreatmentBeginsAt.}
+
+\item{TrainingPostPeriodLength}{The number of timer periods post-treatment for training data. Defaults to all time since treatment begins.}
 }
 \value{
 OutputDataSCUL  A list with the synthetic series, weights used to construct the series, and measures of fit.

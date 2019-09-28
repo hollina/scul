@@ -11,7 +11,8 @@ CreatePlaceboDistribution(x.PlaceboPool = SCUL.input$x.PlaceboPool,
   NumberInitialTimePeriods = SCUL.input$NumberInitialTimePeriods,
   OutputFilePath = SCUL.input$OutputFilePath,
   CohensDThreshold = SCUL.input$CohensDThreshold,
-  y.scul = SCUL.output$y.scul)
+  y.scul = SCUL.output$y.scul,
+  TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength)
 }
 \arguments{
 \item{x.PlaceboPool}{A (T by J) data frame containing all products that you wish to include in the placebo distribution
@@ -32,6 +33,8 @@ Default is the stated amount in SCUL.input data.}
 
 \item{CohensDThreshold}{A real number greater than 0, indicating the Cohen's D threshold at which
 fit is determined to be "poor". The difference is in standard deviation units. Default is SCUL.input$CohensDThreshold.}
+
+\item{TrainingPostPeriodLength}{The number of timer periods post-treatment for training data. Defaults to all time since treatment begins.}
 }
 \value{
 list  A list of standardized placbo effect sizes

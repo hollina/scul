@@ -6,7 +6,8 @@
 \usage{
 PreprocessSubset(z, TreatmentBeginsAt, NumberInitialTimePeriods = nrow(z)
   - TreatmentBeginsAt + 1, PostPeriodLength = nrow(z) - TreatmentBeginsAt
-  + 1, PrePeriodLength = TreatmentBeginsAt - 1)
+  + 1, PrePeriodLength = TreatmentBeginsAt - 1,
+  TrainingPostPeriodLength = nrow(z) - TreatmentBeginsAt + 1)
 }
 \arguments{
 \item{z}{A matrix or a data frame.}
@@ -18,6 +19,8 @@ PreprocessSubset(z, TreatmentBeginsAt, NumberInitialTimePeriods = nrow(z)
 \item{PostPeriodLength}{The number of timer periods post-treatment. Defaults to all time since treatment begins.}
 
 \item{PrePeriodLength}{The number of time periods before treatment (i.e. the length of the entire training dataset). Defaults to time before treatment begins.}
+
+\item{TrainingPostPeriodLength}{The number of timer periods post-treatment for training data. Defaults to all time since treatment begins.}
 }
 \value{
 A cleaned matrix or data frame with violating columns dropped.
