@@ -1,0 +1,106 @@
+---
+title: "Traditional synthetic control v. synethic control using lasso (SCUL)"
+author: "Alex Hollingsworth"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{scm-v-scul}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, include = FALSE}
+library(scul)
+```
+
+--------
+
+# Traditional synthetic control methods 
+
+Synthetic control methods are used to estimate the counterfactual for a treated group following treatment. 
+Often synthetic control methods are used with time-series data where only a small number of units are treated, but neither of these features is required. Thus the goal of most synthetic control exercises is to compare a counterfactual estimate (what would have happened to a treated group in the absence of treatment) to actual data (what actually happened following treatment) using time-series data. 
+
+## Donor weights
+
+Typical synthetic control methods use a weighted average of untreated "donor" units to compose the counterfactual. In the traditional method, each donor receieves a single weight, which must be non-negative and between zero and one. The weights for all untreated donor units must sum to one. The set of weights across all donor units are chosen such that they minimize an importance weighted combination of
+
+  1. the distance between pre-treatment syntethic predictions and actual pre-treatment data
+  1. and the difference between a set of predicted and actual *summary statistics* chosen by the researcher. 
+    - the *summary statistics* as we call them here can refer to any number of things that the researcher would normally consider in a balance table. There could be a great number of them; (a particular value of the target variable in the pre-period, four values of another important variable from different pre-period years, the standard deviation of yet another variable). 
+    
+The importance weights for each *summary statistic* in (2) and for the cumulative donor weights (1) are determined in an iterative procedure. The nature of this procedure limits the combined number of potential donor units (and the number user-chosen summary statistics) to be less than the number of obervations for the treated unit. 
+
+  
+## Treatment effect estimation and inference
+
+The treatment effect can be estimated in a variety of different ways, but a common strategy is to consider the treatment effect to be the average difference between the synethic and actual prediction for the treated unit during the post-treatment period. 
+
+Statistical inference for syntethic control methods is often performed by running a similar synethetic control procedure on each untreated donor unit, where a two-sided p-value is contructed by comparing the rank of the absolute value of the estimated treatment effect for the treated unit against the absolute value of the estimated treatment effect for each untreated unit. 
+
+# Synthetic control using lasso
+
+The syntetic control method presented here differs from the typical method in a number of ways. 
+First, it allows for the possibility of having more candidate control groups than observations of the treated variable. 
+Second, it allows for negative weigts. 
+Third, to make the analysis manageable and coherent, we have attempted to impose a study design is consistent across outcomes, and provides a credible platform for statistical inference. 
+That is, we have applied the same model selection procedure to each placebo 
+
+# Advantages of SCUL
+
+## Why might one want to allow for more choices?
+
+### Model selection
+
+### More choices --> Better fit --> More power
+
+## Why might one want non-negative weights?
+
+## Why might one want weights that do not sum to one?
+
+## Why might one want convex-hull
+
+## Why might one to use Cohen's D to match in the pre-period. 
+
+# Dis-advantages of SCUL
+
+## Requires high-dimensional data
+
+
+# Application: Abadie and Cigarettes
+
+## Background
+
+## Data
+
+## Results
+
+
+
+* Bulleted list
+* Item 2
+    * Nested bullets need a 4-space indent.
+    * Item 2b
+    
+* It's possible to put multiple paragraphs of text in a list item. 
+
+    But to do that, the second and subsequent paragraphs must be
+    indented by four or more spaces. It looks better if the first
+    bullet is also indented.
+    
+Definition
+  : a statement of the exact meaning of a word, especially in a dictionary.
+  
+List 
+  : a number of connected items or names written or printed consecutively, 
+    typically one below the other. 
+  : barriers enclosing an area for a jousting tournament.
