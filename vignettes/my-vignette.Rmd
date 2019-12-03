@@ -24,6 +24,23 @@ library(scul)
 ```
 
 --------
+# Abstract
+
+- Explain traditional synthetic control in one or two sentences. Introducing terminology/concepts to understand our contribution. 
+  - It has been around for a decade.
+  - We are moving to second stage
+  - Moving from low-dimensionality to high-dimensionality settings
+  - Has a lot of "researcher-degrees-of-freedom"
+  - A hallmark of the next generation of studies is more explicit assumptions and clarity regarding statisical inference
+- What do we do here. 
+  - We introduce a new method that extends original syntethic control to high dimensionality and removes some researcher degrees of freedom
+- What do we add with the SCUL
+- Why is lasso beneficial?
+- Other than lasso, what do we contribute to empirical processes. 
+- Application: 
+  - in vignette: cigarettes (be the appendix example)
+  - in paper: marijuana and alcohol
+
 
 # Traditional synthetic control methods 
 
