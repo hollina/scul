@@ -4,11 +4,17 @@
 \alias{OrganizeDataAndSetup}
 \title{Set up data for SCUL procedure}
 \usage{
-OrganizeDataAndSetup(time, y, TreatmentBeginsAt, x.DonorPool,
-  CohensDThreshold = 0.25, NumberInitialTimePeriods = nrow(y) -
-  TreatmentBeginsAt + 1, x.PlaceboPool = x.DonorPool,
+OrganizeDataAndSetup(
+  time,
+  y,
+  TreatmentBeginsAt,
+  x.DonorPool,
+  CohensDThreshold = 0.25,
+  NumberInitialTimePeriods = nrow(y) - TreatmentBeginsAt + 1,
+  x.PlaceboPool = x.DonorPool,
   TrainingPostPeriodLength = nrow(y) - TreatmentBeginsAt + 1,
-  OutputFilePath = getwd())
+  OutputFilePath = getwd()
+)
 }
 \arguments{
 \item{time}{A dataframe that is a column vector (T by 1) with the running time variable.

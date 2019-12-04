@@ -4,14 +4,18 @@
 \alias{HistogramOfDiff}
 \title{Make histogram of null with effect size}
 \usage{
-
-  HistogramOfDiff(y.StandardizedDifference = SCUL.pvalue$y.StandardizedDifference,
+HistogramOfDiff(
+  y.StandardizedDifference = SCUL.pvalue$y.StandardizedDifference,
   y.placebo.StandardizedDifference = SCUL.inference$y.placebo.StandardizedDifference,
   time = SCUL.input$time,
   TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
-  OutputFilePath = SCUL.input$OutputFilePath, width = 40,
-  widthBreaks = c(-width, -width/2, 0, width/2, width), height = 0.05,
-  AdjustmentParm = 3, BandwidthParm = 3)
+  OutputFilePath = SCUL.input$OutputFilePath,
+  width = 40,
+  widthBreaks = c(-width, -width/2, 0, width/2, width),
+  height = 0.05,
+  AdjustmentParm = 3,
+  BandwidthParm = 3
+)
 }
 \arguments{
 \item{y.StandardizedDifference}{The standardized difference between target data and synthetic data series across time. Default is SCUL.inference$y.StandardizedDifference.}

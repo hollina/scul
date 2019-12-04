@@ -4,11 +4,12 @@
 \alias{VisualCrossValidationExample}
 \title{Illustrate rolling-origin k-fold cross-validation}
 \usage{
-VisualCrossValidationExample(PostPeriodLength = nrow(SCUL.input$y) -
-  SCUL.input$TreatmentBeginsAt + 1,
+VisualCrossValidationExample(
+  PostPeriodLength = nrow(SCUL.input$y) - SCUL.input$TreatmentBeginsAt + 1,
   PrePeriodLength = SCUL.input$TreatmentBeginsAt - 1,
   NumberInitialTimePeriods = SCUL.input$NumberInitialTimePeriods,
-  OutputFilePath = SCUL.input$OutputFilePath)
+  OutputFilePath = SCUL.input$OutputFilePath
+)
 }
 \arguments{
 \item{PostPeriodLength}{An integer that indicates the length of the post-treatment period.

@@ -4,15 +4,17 @@
 \alias{CreatePlaceboDistribution}
 \title{Run scul procedure on placebo pool to create null distribution}
 \usage{
-CreatePlaceboDistribution(x.PlaceboPool = SCUL.input$x.PlaceboPool,
+CreatePlaceboDistribution(
+  x.PlaceboPool = SCUL.input$x.PlaceboPool,
   TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
-  PostPeriodLength = nrow(SCUL.input$y) - SCUL.input$TreatmentBeginsAt +
-  1, PrePeriodLength = SCUL.input$TreatmentBeginsAt - 1,
+  PostPeriodLength = nrow(SCUL.input$y) - SCUL.input$TreatmentBeginsAt + 1,
+  PrePeriodLength = SCUL.input$TreatmentBeginsAt - 1,
   NumberInitialTimePeriods = SCUL.input$NumberInitialTimePeriods,
   OutputFilePath = SCUL.input$OutputFilePath,
   CohensDThreshold = SCUL.input$CohensDThreshold,
   y.scul = SCUL.output$y.scul,
-  TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength)
+  TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength
+)
 }
 \arguments{
 \item{x.PlaceboPool}{A (T by J) data frame containing all products that you wish to include in the placebo distribution
