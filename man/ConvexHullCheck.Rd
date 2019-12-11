@@ -4,10 +4,13 @@
 \alias{ConvexHullCheck}
 \title{Check if synthetic variable is in convex hull}
 \usage{
-ConvexHullCheck(coef.exact = SCUL.output$coef.exact,
-  x.DonorPool = SCUL.input$x.DonorPool, y.scul = SCUL.output$y.scul,
+ConvexHullCheck(
+  coef.exact = SCUL.output$coef.exact,
+  x.DonorPool = SCUL.input$x.DonorPool,
+  y.scul = SCUL.output$y.scul,
   y.actual = SCUL.output$y.actual,
-  TreatmentBeginsAt = SCUL.output$TreatmentBeginsAt)
+  TreatmentBeginsAt = SCUL.output$TreatmentBeginsAt
+)
 }
 \arguments{
 \item{coef.exact}{The sparse matrix of coefficients used to construc the synthetic estimate. 

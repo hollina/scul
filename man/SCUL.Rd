@@ -4,16 +4,19 @@
 \alias{SCUL}
 \title{Run SCUL procedure on target data}
 \usage{
-SCUL(PostPeriodLength = nrow(SCUL.input$y) - SCUL.input$TreatmentBeginsAt
-  + 1, PrePeriodLength = SCUL.input$TreatmentBeginsAt - 1,
+SCUL(
+  PostPeriodLength = nrow(SCUL.input$y) - SCUL.input$TreatmentBeginsAt + 1,
+  PrePeriodLength = SCUL.input$TreatmentBeginsAt - 1,
   NumberInitialTimePeriods = SCUL.input$NumberInitialTimePeriods,
   OutputFilePath = SCUL.input$OutputFilePath,
   x.DonorPool.PreTreatment = SCUL.input$x.DonorPool.PreTreatment,
   y.PreTreatment = SCUL.input$y.PreTreatment,
-  x.DonorPool = SCUL.input$x.DonorPool, time = SCUL.input$time,
+  x.DonorPool = SCUL.input$x.DonorPool,
+  time = SCUL.input$time,
   y.actual = SCUL.input$y,
   TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
-  TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength)
+  TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength
+)
 }
 \arguments{
 \item{PostPeriodLength}{An integer that indicates the length of the post-treatment period.

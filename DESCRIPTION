@@ -5,11 +5,18 @@ Authors@R: person("Alex", "Hollingsworth", email = "hollinal@indiana.edu", role 
 Maintainer: Alex Hollingsworth <hollinal@indiana.edu>
 Date: 2019-02-17
 Description: TBD. See Hollingsworth and Wing (2019).
-Depends: R (>= 3.4.3)
-License: Not sure.
+License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 6.1.1
-Suggests: 
-    knitr,
-    rmarkdown
+RoxygenNote: 7.0.0
 VignetteBuilder: knitr
+Imports: 
+    caret,
+    dplyr,
+    formattable,
+    ggplot2,
+    glmnet,
+    htmltools,
+    pBrackets,
+    reshape2,
+    tidyr,
+    webshot

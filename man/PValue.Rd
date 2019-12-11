@@ -4,12 +4,15 @@
 \alias{PValue}
 \title{Calculate a simple bounded p-value for the treatment effect}
 \usage{
-
-  PValue(x.PlaceboPool.StandardizedDiff.trimmed = SCUL.inference$y.placebo.StandardizedDifference,
+PValue(
+ 
+    x.PlaceboPool.StandardizedDiff.trimmed = SCUL.inference$y.placebo.StandardizedDifference,
   TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
   OutputFilePath = SCUL.input$OutputFilePath,
   CohensDThreshold = SCUL.input$CohensDThreshold,
-  y.actual = SCUL.output$y.actual, y.scul = SCUL.output$y.scul)
+  y.actual = SCUL.output$y.actual,
+  y.scul = SCUL.output$y.scul
+)
 }
 \arguments{
 \item{x.PlaceboPool.StandardizedDiff.trimmed}{A (T by L), where L<=J)  data frame containing all products that are included in the placebo distribution
