@@ -27,7 +27,7 @@ A cleaned matrix or data frame with violating columns dropped.
 }
 \description{
 This function loads a matrix or a data-fram a file as a matrix.
-It ensures that for all relevant subsets that could be used as a training 
-dataset for the later SCUL procedure have variation. 
+It ensures that for all relevant subsets that could be used as a training
+dataset for the later SCUL procedure have variation.
 It drops any columns that violate these conditions.
 }
