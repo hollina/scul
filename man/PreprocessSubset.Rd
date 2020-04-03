@@ -4,14 +4,10 @@
 \alias{PreprocessSubset}
 \title{Drops columns that have no variation in training subsets}
 \usage{
-PreprocessSubset(
-  z,
-  TreatmentBeginsAt,
-  NumberInitialTimePeriods = nrow(z) - TreatmentBeginsAt + 1,
-  PostPeriodLength = nrow(z) - TreatmentBeginsAt + 1,
-  PrePeriodLength = TreatmentBeginsAt - 1,
-  TrainingPostPeriodLength = nrow(z) - TreatmentBeginsAt + 1
-)
+PreprocessSubset(z, TreatmentBeginsAt, NumberInitialTimePeriods = nrow(z)
+  - TreatmentBeginsAt + 1, PostPeriodLength = nrow(z) - TreatmentBeginsAt
+  + 1, PrePeriodLength = TreatmentBeginsAt - 1,
+  TrainingPostPeriodLength = nrow(z) - TreatmentBeginsAt + 1)
 }
 \arguments{
 \item{z}{A matrix or a data frame.}

@@ -4,15 +4,11 @@
 \alias{PlotShareForBothTopTen}
 \title{Graph output from SCUL procedure}
 \usage{
-PlotShareForBothTopTen(
-  coef.exact = SCUL.output$coef.exact,
-  x.DonorPool = SCUL.input$x.DonorPool,
-  y.scul = SCUL.output$y.scul,
-  y.actual = SCUL.output$y.actual,
-  time = SCUL.output$time,
+PlotShareForBothTopTen(coef.exact = SCUL.output$coef.exact,
+  x.DonorPool = SCUL.input$x.DonorPool, y.scul = SCUL.output$y.scul,
+  y.actual = SCUL.output$y.actual, time = SCUL.output$time,
   OutputFilePath = SCUL.input$OutputFilePath,
-  TreatmentBeginsAt = SCUL.output$TreatmentBeginsAt
-)
+  TreatmentBeginsAt = SCUL.output$TreatmentBeginsAt)
 }
 \arguments{
 \item{coef.exact}{The sparse matrix of coefficients used to construc the synthetic estimate. 

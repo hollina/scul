@@ -4,12 +4,9 @@
 \alias{GraphTargetData}
 \title{Graph target data series across time}
 \usage{
-GraphTargetData(
-  time = SCUL.input$time,
-  TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
-  y = SCUL.input$y,
-  OutputFilePath = SCUL.input$OutputFilePath
-)
+GraphTargetData(time = SCUL.input$time,
+  TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt, y = SCUL.input$y,
+  OutputFilePath = SCUL.input$OutputFilePath)
 }
 \arguments{
 \item{time}{A dataframe that is a column vector (T by 1) with the running time variable.

@@ -4,12 +4,11 @@
 \alias{VisualCrossValidationExample}
 \title{Illustrate rolling-origin k-fold cross-validation}
 \usage{
-VisualCrossValidationExample(
-  PostPeriodLength = nrow(SCUL.input$y) - SCUL.input$TreatmentBeginsAt + 1,
+VisualCrossValidationExample(PostPeriodLength = nrow(SCUL.input$y) -
+  SCUL.input$TreatmentBeginsAt + 1,
   PrePeriodLength = SCUL.input$TreatmentBeginsAt - 1,
   NumberInitialTimePeriods = SCUL.input$NumberInitialTimePeriods,
-  OutputFilePath = SCUL.input$OutputFilePath
-)
+  OutputFilePath = SCUL.input$OutputFilePath)
 }
 \arguments{
 \item{PostPeriodLength}{An integer that indicates the length of the post-treatment period.
@@ -18,10 +17,10 @@ Defailt is calculated using SCUL.input data.}
 \item{PrePeriodLength}{An integer that indicates the length of the pre-treatment period.
 Defailt is calculated using SCUL.input data.}
 
-\item{NumberInitialTimePeriods}{An integer that indicates the number of time periods desired in the training data for the first cross-validation run. 
+\item{NumberInitialTimePeriods}{An integer that indicates the number of time periods desired in the training data for the first cross-validation run.
 Default is the stated amount in SCUL.input data.}
 
-\item{OutputFilePath}{A file path to store output. Default is taken from 
+\item{OutputFilePath}{A file path to store output. Default is taken from
 SCUL.input$OutputFilePath}
 }
 \value{
