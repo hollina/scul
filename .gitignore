@@ -1,2 +1,8 @@
+.DS_Store
+.Rhistory
+.Rbuildignore
 .Rproj.user
 inst/doc
+doc
+Meta
+.DS_Store

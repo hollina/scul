@@ -4,16 +4,19 @@
 \alias{SCUL}
 \title{Run SCUL procedure on target data}
 \usage{
-SCUL(PostPeriodLength = nrow(SCUL.input$y) - SCUL.input$TreatmentBeginsAt
-  + 1, PrePeriodLength = SCUL.input$TreatmentBeginsAt - 1,
+SCUL(
+  PostPeriodLength = nrow(SCUL.input$y) - SCUL.input$TreatmentBeginsAt + 1,
+  PrePeriodLength = SCUL.input$TreatmentBeginsAt - 1,
   NumberInitialTimePeriods = SCUL.input$NumberInitialTimePeriods,
   OutputFilePath = SCUL.input$OutputFilePath,
   x.DonorPool.PreTreatment = SCUL.input$x.DonorPool.PreTreatment,
   y.PreTreatment = SCUL.input$y.PreTreatment,
-  x.DonorPool = SCUL.input$x.DonorPool, time = SCUL.input$time,
+  x.DonorPool = SCUL.input$x.DonorPool,
+  time = SCUL.input$time,
   y.actual = SCUL.input$y,
   TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
-  TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength)
+  TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength
+)
 }
 \arguments{
 \item{PostPeriodLength}{An integer that indicates the length of the post-treatment period.
@@ -22,28 +25,28 @@ Defailt is calculated using SCUL.input data.}
 \item{PrePeriodLength}{An integer that indicates the length of the pre-treatment period.
 Defailt is calculated using SCUL.input data.}
 
-\item{NumberInitialTimePeriods}{An integer that indicates the number of time periods desired in the training data for the first cross-validation run.
+\item{NumberInitialTimePeriods}{An integer that indicates the number of time periods desired in the training data for the first cross-validation run. 
 Default is the stated amount in SCUL.input data.}
 
-\item{OutputFilePath}{A file path to store output. Default is taken from
+\item{OutputFilePath}{A file path to store output. Default is taken from 
 SCUL.input$OutputFilePath}
 
 \item{x.DonorPool.PreTreatment}{A data frame with the pre-treament values of the donor pool.
 Default is to extract this from SCUL.input$x.DonorPool.PreTreatment}
 
-\item{y.PreTreatment}{A data frame with the pre-treament values of the target variable
+\item{y.PreTreatment}{A data frame with the pre-treament values of the target variable 
 Default is to extract this from SCUL.input$y.PreTreatment}
 
 \item{x.DonorPool}{A data frame with the all values of the donor pool.
 Default is to extract this from SCUL.input$x.DonorPool}
 
-\item{time}{A data frame that is a column vector (Tx1) sorted by time. Default is taken from
+\item{time}{A data frame that is a column vector (Tx1) sorted by time. Default is taken from 
 SCUL.input$time}
 
 \item{y.actual}{A data frame that is a column vector (Tx1) sorted by time
 Default is taken from SCUL.input$y}
 
-\item{TreatmentBeginsAt}{An integer indicating which row begins treatment.
+\item{TreatmentBeginsAt}{An integer indicating which row begins treatment. 
 Default is to begin this at SCUL.input$TreatmentBeginsAt.}
 
 \item{TrainingPostPeriodLength}{The number of timer periods post-treatment for training data. Defaults to all time since treatment begins.}

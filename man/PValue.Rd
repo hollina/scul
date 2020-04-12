@@ -2,24 +2,27 @@
 % Please edit documentation in R/PValue.R
 \name{PValue}
 \alias{PValue}
-\title{Calculate a simple bounded p-value for the treatment effect}
+\title{Calculate a simple bounded p-value for the treatment effect reporting the larger end of the bound}
 \usage{
-
-  PValue(x.PlaceboPool.StandardizedDiff.trimmed = SCUL.inference$y.placebo.StandardizedDifference,
+PValue(
+ 
+    x.PlaceboPool.StandardizedDiff.full = SCUL.inference$y.placebo.StandardizedDifference.Full,
+  x.PlaceboPool.CohensD = SCUL.inference$y.placebo.CohensD,
   TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
   OutputFilePath = SCUL.input$OutputFilePath,
-  CohensDThreshold = SCUL.input$CohensDThreshold,
-  y.actual = SCUL.output$y.actual, y.scul = SCUL.output$y.scul)
+  CohensD = SCUL.input$CohensDThreshold,
+  y.actual = SCUL.output$y.actual,
+  y.scul = SCUL.output$y.scul,
+  StartTime = SCUL.input$TreatmentBeginsAt,
+  EndTime = nrow(SCUL.output$y.scul)
+)
 }
 \arguments{
-\item{x.PlaceboPool.StandardizedDiff.trimmed}{A (T by L), where L<=J)  data frame containing all products that are included in the placebo distribution
-Trimmed by Cohen's D using CreatePlaceboDistribution function. Default is SCUL.inference$x.PlaceboPool.StandardizedDiff.trimmed}
-
 \item{TreatmentBeginsAt}{An integer indicating which row begins treatment. Default is  SCUL.output$TreatmentBeginsAt.}
 
 \item{OutputFilePath}{Output file path. Default is  SCUL.input$OutputFilePath.}
 
-\item{CohensDThreshold}{A real number greater than 0, indicating the Cohen's D threshold at which
+\item{CohensD}{A real number greater than 0, indicating the Cohen's D threshold at which
 fit is determined to be "poor". The difference is in standard deviation units. Default is SCUL.input$CohensDThreshold.}
 
 \item{y.actual}{The actual (target) data. Default is SCUL.output$y.actual.}
@@ -32,15 +35,18 @@ Defailt is calculated using SCUL.input data.}
 \item{PrePeriodLength}{An integer that indicates the length of the pre-treatment period.
 Defailt is calculated using SCUL.input data.}
 
-\item{NumberInitialTimePeriods}{An integer that indicates the number of time periods desired in the training data for the first cross-validation run. 
+\item{NumberInitialTimePeriods}{An integer that indicates the number of time periods desired in the training data for the first cross-validation run.
 Default is the stated amount in SCUL.input data.}
+
+\item{x.PlaceboPool.StandardizedDiff.trimmed}{A (T by L), where L<=J)  data frame containing all products that are included in the placebo distribution
+Trimmed by Cohen's D using CreatePlaceboDistribution function. Default is SCUL.inference$x.PlaceboPool.StandardizedDiff.trimmed}
 }
 \value{
 list  The bounds for the rank based p-value based upon rank of mean absolute value of post-treatment standardized effect against null distribution.
 }
 \description{
-Determines the rank of the mean absolute value of the standardized treatment effect 
-of the target product relative to the placebo distribution. There are many alternative 
-ways to use the placebo distribution to calculate a mean value (e.g., mean p-value or another test statistic). 
+Determines the rank of the mean absolute value of the standardized treatment effect
+of the target product relative to the placebo distribution. There are many alternative
+ways to use the placebo distribution to calculate a mean value (e.g., mean p-value or another test statistic).
 This is a simple example of one such way.
 }

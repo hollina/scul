@@ -4,10 +4,14 @@
 \alias{PreprocessSubset}
 \title{Drops columns that have no variation in training subsets}
 \usage{
-PreprocessSubset(z, TreatmentBeginsAt, NumberInitialTimePeriods = nrow(z)
-  - TreatmentBeginsAt + 1, PostPeriodLength = nrow(z) - TreatmentBeginsAt
-  + 1, PrePeriodLength = TreatmentBeginsAt - 1,
-  TrainingPostPeriodLength = nrow(z) - TreatmentBeginsAt + 1)
+PreprocessSubset(
+  z,
+  TreatmentBeginsAt,
+  NumberInitialTimePeriods = nrow(z) - TreatmentBeginsAt + 1,
+  PostPeriodLength = nrow(z) - TreatmentBeginsAt + 1,
+  PrePeriodLength = TreatmentBeginsAt - 1,
+  TrainingPostPeriodLength = nrow(z) - TreatmentBeginsAt + 1
+)
 }
 \arguments{
 \item{z}{A matrix or a data frame.}
@@ -27,7 +31,7 @@ A cleaned matrix or data frame with violating columns dropped.
 }
 \description{
 This function loads a matrix or a data-fram a file as a matrix.
-It ensures that for all relevant subsets that could be used as a training
-dataset for the later SCUL procedure have variation.
+It ensures that for all relevant subsets that could be used as a training 
+dataset for the later SCUL procedure have variation. 
 It drops any columns that violate these conditions.
 }

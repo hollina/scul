@@ -4,15 +4,16 @@
 \alias{CreatePlaceboDistribution}
 \title{Run scul procedure on placebo pool to create null distribution}
 \usage{
-CreatePlaceboDistribution(x.PlaceboPool = SCUL.input$x.PlaceboPool,
+CreatePlaceboDistribution(
+  x.PlaceboPool = SCUL.input$x.PlaceboPool,
   TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
-  PostPeriodLength = nrow(SCUL.input$y) - SCUL.input$TreatmentBeginsAt +
-  1, PrePeriodLength = SCUL.input$TreatmentBeginsAt - 1,
+  PostPeriodLength = nrow(SCUL.input$y) - SCUL.input$TreatmentBeginsAt + 1,
+  PrePeriodLength = SCUL.input$TreatmentBeginsAt - 1,
   NumberInitialTimePeriods = SCUL.input$NumberInitialTimePeriods,
   OutputFilePath = SCUL.input$OutputFilePath,
   CohensDThreshold = SCUL.input$CohensDThreshold,
-  y.scul = SCUL.output$y.scul,
-  TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength)
+  TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength
+)
 }
 \arguments{
 \item{x.PlaceboPool}{A (T by J) data frame containing all products that you wish to include in the placebo distribution
@@ -26,7 +27,7 @@ Defailt is calculated using SCUL.input data.}
 \item{PrePeriodLength}{An integer that indicates the length of the pre-treatment period.
 Defailt is calculated using SCUL.input data.}
 
-\item{NumberInitialTimePeriods}{An integer that indicates the number of time periods desired in the training data for the first cross-validation run. 
+\item{NumberInitialTimePeriods}{An integer that indicates the number of time periods desired in the training data for the first cross-validation run.
 Default is the stated amount in SCUL.input data.}
 
 \item{OutputFilePath}{Output file path. Default is  SCUL.input$OutputFilePath.}
@@ -40,7 +41,7 @@ fit is determined to be "poor". The difference is in standard deviation units. D
 list  A list of standardized placbo effect sizes
 }
 \description{
-Runs the scul procedure on the whole placebo pool 
+Runs the scul procedure on the whole placebo pool
 (using itself as the donor pool; this could be altered to have a custom donor pool)
 to create null distribution that can be used for inference in later steps.
 }

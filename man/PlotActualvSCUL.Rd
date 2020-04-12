@@ -4,10 +4,13 @@
 \alias{PlotActualvSCUL}
 \title{Graph output from SCUL procedure}
 \usage{
-PlotActualvSCUL(y.actual = SCUL.output$y.actual,
-  y.scul = SCUL.output$y.scul, time = SCUL.output$time,
+PlotActualvSCUL(
+  y.actual = SCUL.output$y.actual,
+  y.scul = SCUL.output$y.scul,
+  time = SCUL.output$time,
   OutputFilePath = SCUL.input$OutputFilePath,
-  TreatmentBeginsAt = SCUL.output$TreatmentBeginsAt)
+  TreatmentBeginsAt = SCUL.output$TreatmentBeginsAt
+)
 }
 \arguments{
 \item{y.actual}{The actual (target) data. Default is SCUL.output$y.actual.}
