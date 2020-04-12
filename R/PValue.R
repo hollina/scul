@@ -9,16 +9,15 @@
 #' @param y.scul Synthetic data created by SCUL procedure. Default is SCUL.output$y.scul.
 #' @param CohensD A real number greater than 0, indicating the Cohen's D threshold at which
 #'                     fit is determined to be "poor". The difference is in standard deviation units. Default is SCUL.input$CohensDThreshold.
+#' @param StartTime The begining time period for which the average pseduo treatment effect is calculated. T
+#' @param EndTime The end time period for which the average pseduo treatment effect is calculated. T
 #' @param OutputFilePath Output file path. Default is  SCUL.input$OutputFilePath.
 #' @param TreatmentBeginsAt  An integer indicating which row begins treatment. Default is  SCUL.output$TreatmentBeginsAt.
-#' @param PostPeriodLength An integer that indicates the length of the post-treatment period.
-#'        Defailt is calculated using SCUL.input data.
-#' @param PrePeriodLength An integer that indicates the length of the pre-treatment period.
-#'        Defailt is calculated using SCUL.input data.
-#' @param NumberInitialTimePeriods An integer that indicates the number of time periods desired in the training data for the first cross-validation run.
-#'        Default is the stated amount in SCUL.input data.
-#' @param x.PlaceboPool.StandardizedDiff.trimmed A (T by L), where L<=J)  data frame containing all products that are included in the placebo distribution
-#'         Trimmed by Cohen's D using CreatePlaceboDistribution function. Default is SCUL.inference$x.PlaceboPool.StandardizedDiff.trimmed
+#' @param x.PlaceboPool.StandardizedDiff.full A (T by L), where L<=J)  data frame containing all products that are included in the placebo distribution
+#'        Default is SCUL.inference$y.placebo.StandardizedDifference.Full
+#' @param x.PlaceboPool.CohensD A (1 by L)  data frame containing all pre-period Cohen's D fit statistic for each placebo unit.
+#'        Default is SCUL.inference$y.placebo.CohensD,
+#'
 #'
 #' @return list  The bounds for the rank based p-value based upon rank of mean absolute value of post-treatment standardized effect against null distribution.
 #' @import glmnet

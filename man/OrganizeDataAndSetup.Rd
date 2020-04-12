@@ -31,7 +31,7 @@ Must be sorted by time (oldest to most recent).}
 \item{CohensDThreshold}{A real number greater than 0, indicating the Cohen's D threshold at which
 fit is determined to be "poor". The difference is in standard deviation units. Default is .25}
 
-\item{NumberInitialTimePeriods}{An integer indicating the minimum number of pre-treatment time periods to be 
+\item{NumberInitialTimePeriods}{An integer indicating the minimum number of pre-treatment time periods to be
  included in the trainging data for the first cross-validation run.
 Default is the length of the post-treatment time period.}
 
@@ -41,8 +41,6 @@ Must be sorted by time. Default is to be the same as x.}
 \item{TrainingPostPeriodLength}{The number of timer periods post-treatment for training data. Defaults to all time since treatment begins.}
 
 \item{OutputFilePath}{A file path to store output. Default is current working directory}
-
-\item{TimeFormat}{A lubridate-style time format that indicates the format of the time variable. This is helpful for graphing results. TODO (hollina). Add this feature.}
 }
 \value{
 InputDataForSCUL A list of items that will be called on for running the SCUL procedure.
