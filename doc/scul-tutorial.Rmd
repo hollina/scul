@@ -1,0 +1,1638 @@
+---
+title: "Synthetic Control Using Lasso (SCUL)"
+subtitle: "Overview of R package, extended example using publicly available data, and brief comparison to traditional method" 
+author: "Alex Hollingsworth"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    toc: false
+    toc_depth: 4
+    number_sections: false
+bibliography: references.bib  
+vignette: >
+  %\VignetteIndexEntry{scul-tutorial}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<style>
+body {
+text-align: justify}
+</style>
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+```{r setup, include = FALSE}
+# Load packages
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(
+  scul, tidyverse, glmnet, pBrackets, knitr, kableExtra, cowplot, formattable, Synth)
+```
+
+--------
+# Introduction
+
+## What is a synthetic control?
+
+The synthetic control methodology is a strategy for estimating causal treatment effects for idiosyncratic historical events.
+In the typical application developed by @Abadie2010, researchers observe time series outcomes for both a treated unit and a number of untreated units.
+A weighted average of the untreated series is used to construct a counterfactual estimate of the treated series, which is referred to as a synthetic comparison group.
+Weights are chosen to minimize discrepancies between the synthetic comparison group and the treated unit in the pre-treatment time period.
+Treatment effect estimates are taken to be the difference between observed outcomes and a synthetic counterfactual.
+Statistical inference is normally organized around a placebo analysis; in which, pseudo-treatment effects are estimated for many untreated placebo units, and the distribution of pseudo-estimates represents the null distribution of no treatment effect.
+
+
+## Extensions of the traditional method
+
+Recent methodological work has proposed a number of alternative strategies for estimating synthetic control weights  [@Arkhangelsky2018; @Doudchenko2017; @Powell2019].
+In a similar vein, we use a method called **Synthetic Control Using Lasso (SCUL)** to construct donor weights.  
+This method is a flexible, data-driven way to construct synthetic control groups.
+It relies on lasso regressions, which are popular in the machine-learning literature, and favor weights that predict well out of sample.
+In general, the approach allows for a high-dimensional donor pool that may be larger than the number of time periods, extrapolation from the donor pool, counter-cyclical weights, and the same model selection procedure to be used for target and placebo series. 
+
+Our working paper highlights identification assumptions and recommendations that are relevant for any synthetic control study. 
+We implement versions of the recommendations in this vignette. 
+We frame synthetic controls as a way of matching on unobserved underlying factors that form the data generating process. 
+When viewed in this context, using donor units from a wide range of variable types makes sense because different units may help pin down different underlying factors. 
+As such we use a wide range of donor variables to construct our synthetic control groups, not just the same variable type as the target variable as is common practice. 
+
+
+## How can I learn more about SCUL?/Where can I get your data used in the paper?
+
+More detail on the procedure can be found in *"Tactics for design and inference in synthetic control studies: An applied example using high-dimensional data."*
+This working paper, which is co-authored with Coady Wing, uses the SCUL method to estimate how recreational marijuana legalization affects sales of alcohol and over-the-counter painkillers, finding reductions in alcohol sales. Please cite our paper if you use this package, vignette, or the paper. :)
+
+
+The paper uses retail scanner data from Nielsen cannot be publicly posted online, but are available for purchase from the Kilts Center for Marketing at the University of Chicago, https://www.chicagobooth.edu/research/kilts/datasets/nielsen.
+
+
+## What's this package/vignette do?
+
+This package provides code to implement the SCUL procedure.
+Because the data in our working paper cannot be posted online, we also provide an example that uses publicly available data.
+The entire procedure or parts of the method may be useful in many settings.
+Feel free to use any or all of the code; it is available under the MIT license.
+
+
+# Example data
+
+For our example, we use similar data as in @Abadie2010.
+The empirical goal of this paper was to estimate the effects of a California tobacco control policy implemented in 1988.
+
+When in long form, the data are at the state-year level and range from 1970 to 1997 (28 years).
+For each state and year there are data on cigarette sales per capita (`cigsale`) and the retail price of cigarettes (`retprice`). 
+To be used in the SCUL procedure, the data must be in wide format, where each row is a time-period (e.g., year) and each column is a unit-specific variable. In our data, for each variable the unit is identified by the end of each column name (e.g., variables from the state of California are indicated by `_6`, which is the FIPS code for California.)
+
+The dataset should be sorted by whatever variable you use to index time with the earliest date being first and the most recent date being last.
+
+The `cigarette_sales` dataset is stored in the `data` subdirectory of this package. It should be automatically loaded when the `scul` package is loaded. 
+
+```{r}
+dim(cigarette_sales)
+
+head(cigarette_sales[,1:6])
+```
+
+We will break this dataset into two: one containing data on the target product and another containing all other data that will be used to as the donor pool for our synthetic counterfactual. In each dataset we will leave the first column, which indexes time. We will not include the retail price in California as a potential donor variable as this is endogenous. 
+
+```{r}
+AllYData <- cigarette_sales[, 1:2]
+AllXData <- cigarette_sales %>%
+  select(-c("year", "cigsale_6", "retprice_6"))
+```
+
+## Pre-processing/cleaning data
+
+Before we begin our analysis, let's make sure the data are in the right format and trim any problematic variables.
+
+### Clean data with `Preprocess()`
+
+The `Preprocess()` function takes a matrix or a data-frame and ensures that each column
+
+- is numeric
+- has all non-missing values
+- and is not constant
+
+It drops any column that violate these conditions.
+
+```{r}
+processed.AllYData <- Preprocess(AllYData)
+```
+
+### Use `PreprocessSubset()` to ensure that all subsets have variation
+
+To avoid over-fitting, we will use a cross-validation approach that evaluate models on many subsets of the data.
+As such we need to ensure that the subsets of the variables used in the analysis have variation.
+The `PreprocessSubset()` is the same as the `Preprocess()` function, except that it iteratively performs the same procedure on every subset that is used in the cross-validation.
+
+To determine subsets used in the cross-validation process, it is necessary to input:
+
+- First row for the first date of treatment `TreatmentBeginsAt` (we do this as row number to allow time to be input in a flexible manner)
+- `NumberInitialTimePeriods`: The number of initial time periods wanted in the training data for the first cross-validation run. 
+
+  - Ideally this number would be the same as the post-treatment length, but may need to be shorter if there are not enough pre-treatment time periods. For the example in our working paper, we use a very long pre-period. However  the example in this vignette using a "short" dataset, so we use a smaller number here. 
+
+Assuming that treatment occurs at a discrete time and does not "turn-off," both the pre-treatment length and post-treatment length are automatically calculated
+- The length of the post-treat
+
+```{r}
+TreatmentBeginsAt <- 19 # Here the 18th row is 1988 
+PostPeriodLength <- nrow(processed.AllYData) - TreatmentBeginsAt + 1
+PrePeriodLength <- TreatmentBeginsAt-1
+NumberInitialTimePeriods <- 5
+processed.AllYData <- PreprocessSubset(processed.AllYData,
+                                       TreatmentBeginsAt ,
+                                       NumberInitialTimePeriods,
+                                       PostPeriodLength,
+                                       PrePeriodLength)
+```                                      
+
+### Use `OrganizeDataAndSetup()` to clean donor and placebo pool data
+
+`OrganizeDataAndSetup()` creates a list of items called that is called by the later SCUL procedures. 
+We call this list `SCUL.input`. 
+This function also cleans the donor and placebo pools in using the functions outlined above `PreprocessSubset()` and `Preprocess()`.
+
+In this function you need to specify:
+
+- `time`: a column vector for time
+- `y`: a column vector for the target variable of interest
+- `x.DonorPool`: the variables that will be used to construct your synthetic control group
+- `CohensDThreshold`: a unit-free threshold for what is considered a satisfactory model fit (outlined in more detail below and in our paper)
+- `x.PlaceboPool`: the variables that will be used to conduct statistical inference. Need not be the same as the donor pool. See below more details on the process used for statistical inference.
+- `OutputFilePath`: a directory where output will be saved
+- `NumberInitialTimePeriods`: The number of initial time periods wanted in the training data for the first cross-validation run. 
+- `TrainingPostPeriodLength`: The number of  time periods wanted in the test data for all  cross-validation runs. Ideally this would be the same as the post-treatment length since this is the length of time you are asking your prediction to preform an an out-of-sample prediction over. However for shorter panels this may not be feasible. 
+
+```{r}
+SCUL.input <- OrganizeDataAndSetup (
+    time =  data.frame(AllYData[, 1]),
+    y = data.frame(AllYData[, 2]),
+    TreatmentBeginsAt = TreatmentBeginsAt,
+    x.DonorPool = AllXData[, -1],
+    CohensDThreshold = 0.25,
+    NumberInitialTimePeriods = NumberInitialTimePeriods,
+    TrainingPostPeriodLength = 7,
+    x.PlaceboPool = AllXData[, -1],
+    OutputFilePath="vignette_output/"
+)
+```
+
+## Examine plot raw data using `GraphTargetData()`
+`GraphTargetData()` will graph any variable against time placing a dashed vertical line in the period before treatment begins. The default is to graph the target variable. A png file is saved in the `OutputFilePath` designated in the  `OrganizeDataAndSetup()` function.
+
+This isn't the most aesthetically appealing figure since it is automatically generated.  However it serves as a nice check that your data are being input correctly and that your treatment time is where it should be. Here we can see that California cigarette sales have been declining across time and that the pre and post treatment times are delineated at 1988.
+
+```{r, fig.height=8, fig.width=12, warning = FALSE, fig.align = "center", out.width = '100%'}
+    GraphTargetData()
+```
+
+
+
+
+# What is a synthetic control group? (in math)
+
+
+
+Use  $s=0 \ldots S$ to index the units of analysis.
+For this example the units are state-specific variable, such as cigarette sales per person in California (`cigsale_6`) or the retail sales price of cigarettes in Alabama (`retprice_1`).
+In other settings, the units might be the same outcome or product across geographical territories (e.g., limited to cigarette sales per capita in each state).
+In general, each $s \in S$ is either a donor unit or treated unit.
+For simplicity, suppose there is a single treated unit, denoted by $s=0$, and a number of untreated units, each denoted by an $s>0$.
+Let $t=1\ldots T$ index time periods, which are weeks in our application.  
+Next, assume that treatment exposure occurs in period $T_0 + 1$.
+Finally, set $D_{st}=1[t>T_0]\times 1[s=0]$ to be a binary variable equal to $1$ if unit $s$ is exposed to treatment in period $t$.
+
+Let $y(0)_{st}$  and $y(1)_{st}$ represent potential outcomes that record the outcome of unit $s$ in period $t$ under the control and treatment conditions.
+In our application, $y(0)_{st}$ is the quantity sold in product-state $s$ during period $t$ in the absence of a recreational marijuana law, and  $y(1)_{st}$ is the quantity sold in the same product-state under the recreational marijuana law.
+The difference between the two is $\beta_{st}=y(1)_{st}-y(0)_{st}$, which is the causal effect of treatment on unit $s$ at time $t$.
+The realized outcome is  $y_{st}=y(0)_{st}+D_{st} \beta_{st}$.  
+However, this introduces a natural identification problem because untreated outcomes are not observable for the treated unit following exposure to treatment. That is,  after period $T_0$, we are only able to observe values of $y(1)_{0t}$ for the treated unit.
+
+The basic goal of the synthetic control strategy is to estimate values of $y(0)_{0t}$ in the post-treatment time periods.
+With those counterfactual estimates in hand, it is possible to estimate $\beta_{st}$ for the post-treatment periods $t>T_0$. Often the focus will be on multi-period average treatment effects rather period-specific estimates. For example, the average treatment effect on the treated unit (ATT) over the entire post-treatment period is $ATT(T_0+1,T)=\frac{1}{(T-T_0-1)} \sum_{t=T_0+1}^T\beta_{0t}$.
+
+A synthetic control is a weighted average of outcomes from a collection of candidate untreated control units.
+Suppose that $x_t=(y_{1t},\ldots, y_{St})$ is the $1\times S$ vector of the outcomes that prevailed in each of the candidate comparison units at time $t$. Let $\omega=(\pi_{1},\ldots,\pi_{S} )^T$ be a $S \times 1$ vector of weights. A synthetic control group for the outcome of the treated unit is:
+
+\begin{align}\label{eq:generic_synth_control}
+y_{t}^* &=   \sum_{s=1}^S y_{st}  \pi_{s} \nonumber\\
+y_{t}^* & =  x_t \omega
+\end{align}
+
+
+# Synthetic Control Using Lasso (SCUL)
+
+One way that synthetic control methods can differ from one another is how they determine $\omega$.
+One potential method for choosing weights is a simple regression framework.
+For example, we could choose synthetic control weights by implementing an ordinary least squares regression on only pre-treatment data, choosing weights that minimize the sum of squared differences between the pre-treatment treated time series and the synthetic control group time series:
+
+
+\begin{align}
+\widehat{\omega}_{OLS} = arg\ min_{\omega}
+\left(\sum_{t=1}^{T_0}(y_{0t}-x_t \omega)^2 \right)
+\end{align}
+
+Here, the weights are simply the coefficients that arise from a regression of outcomes for the treated unit on the outcomes from each of the comparison units using only the $t=1...T_{0}$ observations from the pre-treatment period. With the coefficients in hand, the synthetic control group is the predicted value from the regression for each period.
+In post-treatment time periods, the predicted values represent estimates of the counterfactual outcome based on the pre-treatment  cross-sectional partial correlations between treated unit outcomes and each donor pool outcome.
+If the policy does induce a treatment effect on the outcomes, then the connection between treated outcomes and donor unit outcomes should change in the post-treatment period. That pattern will be measurable as an emerging difference between observed outcomes in the treated unit and the synthetic control series.
+
+
+Although it is familiar and intuitive, the OLS method may not be ideal for choosing synthetic control weights. It may overfit the pre-treatment outcome data by emphasizing idiosyncratic correlations that are not a part of the true data-generating process.  
+In that case, the synthetic control may have poor out-of-sample predictive performance.
+Another limitation is that the OLS estimator does not provide a unique set of weights in cases where there are more comparison units than pre-treatment observations (i.e., when $T_0\leq S$).
+
+
+An alternative approach is to choose synthetic control weights using a penalized regression method, such as the lasso. A lasso regression chooses synthetic control weights to solve:
+
+\begin{align}
+ \widehat{\omega}_{lasso} = arg \ min_{\omega } \left(\sum_{t=1}^{T_0}(y_{0t}-x_t \omega)^2+\lambda|\omega|_1  \right) \label{eq:lasso}
+\end{align}
+
+The lasso objective function consists of the same squared prediction error as OLS, but with an additional penalty that rises with the complexity of the vector of weights.
+In the expression, $|\omega|_1$ is the sum of the absolute values of the coefficients associated with each candidate control series. The penalty means that coefficients that are large in an unconstrained OLS regression shrink toward zero. Coefficients that are relatively small may shrink all the way to zero. Since some coefficients are set to zero, the lasso is able to estimate coefficients that minimize the penalized sum of squares even when the number of independent variables exceeds the number of observations. In addition, the regression framework relaxes the restriction that weights must be non-negative and sum to one. It is straightforward, for example, to add an intercept to the model by including a comparison unit that is simply equal to a constant in every period.
+
+Our package uses the `glmnet` package in order to conduct lasso regressions. This is a very fast and flexible package with excellent documentation and a (free!) accompanying textbook, <https://web.stanford.edu/~hastie/StatLearnSparsity/>. By modifying the options of `glmnet` within our package a wide-variety of other models could be accommodated.
+
+## How to choose $\lambda$
+
+A key choice parameter in the lasso regression method is the penalty parameter, which is represented by $\lambda$ in the above equation. 
+As $\lambda$ increases, each weight in $\widehat{\omega}_{lasso}$ will attenuate and the set of donors with non-zero weight will become more sparse as many weights are driven to zero.
+At one extreme, the penalty parameter could be so large that every weight is set to zero.
+At the other extreme, the penalty parameter could be set to zero, which would simply be the OLS estimator.
+
+
+We are going to see if there is a sparse weighted combination of the donor pool (i.e., x matrix)  that creates a valid counter-factual prediction for our treated unit. 
+We want to create the best possible out-of-sample prediction. 
+It’s quite easy to generate a prediction that over-fits (or even perfectly fits the data in the pre-treatment time period), but this type over over-fitting will likely lead to poor out-of-sample predictions.
+
+The weights are a function of the size of the penalty. The penalty induces sparsity.
+Every choice of $\lambda$ in between these extremes will result in a different set of unique weights.
+For each lasso regression, a number of $\lambda$ choices are considered in a grid from zero to the smallest value of $\lambda$, which forces every weight to be zero.
+
+Here we use all of the pre-treatment data to obtain weights for a number of lambda penalty values spaced upon a grid.
+
+
+
+
+```{r, echo = FALSE}
+first_guess_lasso = glmnet(as.matrix(SCUL.input$x.DonorPool[(1:TreatmentBeginsAt-1),]), as.matrix(SCUL.input$y[(1:TreatmentBeginsAt-1),]))
+```
+
+
+
+
+
+```{r, fig.height=5.33, fig.width=8, warning = FALSE, fig.align = "center", echo = FALSE, out.width = '100%'}
+plot(first_guess_lasso, "lambda", label = TRUE )
+```
+
+
+You can see as the lambda changes, both the number of coefficients (i.e., weights) and the coefficients themselves change. Every line above displays the relationship between the log value of the penalty parameter the value of that coefficient. The bottom x-axis is the log penalty value, the y-axis is the value of the coefficients, the top x-axis is the number of coefficients with a non-zero value.
+Here we use all of the pre-treatment data to obtain weights for a number of lambda penalty values spaced upon a grid.
+
+
+But how do these different number and value of coefficients affect the prediction we are interested in? 
+We explore that next by using pre-treatment data to run four lasso regressions using only four different lambda values. We will then see how these four naive predictions do in the out-of-sample (i.e., post-treatment period)
+
+The four $\lambda$ penalties that we will consider are:
+
+1. one that removes all coefficients (i.e. there is only an intercept and it will be a straight line)
+
+    -  $\lambda$ =  `r first_guess_lasso$lambda[1]`
+
+2. one that removes most of the coefficients
+
+    -  $\lambda$ =  `r first_guess_lasso$lambda[round(length(first_guess_lasso$lambda)/10)]`
+
+3. one that removes some coefficients
+
+    -  $\lambda$ =  `r first_guess_lasso$lambda[round(length(first_guess_lasso$lambda)/5)]`
+
+4. one that removes no coefficients (lambda of zero)
+
+    - $\lambda$ =  0
+    - Note: In this last case if there are more donor variables than observations, the coefficients will not be identified (i.e., unique).
+
+
+
+```{r, fig.height=6, fig.width=10, warning = FALSE, fig.align = "center", echo = FALSE, out.width = '100%'}
+
+# Create a dataframe of the treated data
+data_to_plot_scul_vary_lambda <- data.frame(SCUL.input$time, SCUL.input$y)
+
+# Label the columns
+colnames(data_to_plot_scul_vary_lambda) <- c("time", "actual_y")
+
+# Create four naive predictions that are based on random lambdas
+data_to_plot_scul_vary_lambda$naive_prediction_1  <-
+  predict(
+    x = as.matrix(SCUL.input$x.DonorPool[(1:TreatmentBeginsAt-1),]),
+    y = as.matrix(SCUL.input$y[(1:TreatmentBeginsAt-1),]),
+    newx = as.matrix(SCUL.input$x.DonorPool),
+    first_guess_lasso,
+    s = first_guess_lasso$lambda[1],
+    exact = TRUE
+  )
+
+data_to_plot_scul_vary_lambda$naive_prediction_2  <-
+  predict(
+    x = as.matrix(SCUL.input$x.DonorPool[(1:TreatmentBeginsAt-1),]),
+    y = as.matrix(SCUL.input$y[(1:TreatmentBeginsAt-1),]),
+    newx = as.matrix(SCUL.input$x.DonorPool),
+    first_guess_lasso,
+    s = first_guess_lasso$lambda[round(length(first_guess_lasso$lambda)/10)],
+    exact = TRUE
+  )
+
+
+data_to_plot_scul_vary_lambda$naive_prediction_3  <-
+  predict(
+    x = as.matrix(SCUL.input$x.DonorPool[(1:TreatmentBeginsAt-1),]),
+    y = as.matrix(SCUL.input$y[(1:TreatmentBeginsAt-1),]),
+    newx = as.matrix(SCUL.input$x.DonorPool),
+    first_guess_lasso,
+    s = first_guess_lasso$lambda[round(length(first_guess_lasso$lambda)/5)],
+    exact = TRUE
+  )
+
+data_to_plot_scul_vary_lambda$naive_prediction_4  <-
+  predict(
+    x = as.matrix(SCUL.input$x.DonorPool[(1:TreatmentBeginsAt-1),]),
+    y = as.matrix(SCUL.input$y[(1:TreatmentBeginsAt-1),]),
+    newx = as.matrix(SCUL.input$x.DonorPool),
+    first_guess_lasso,
+    s = 0,
+    exact = TRUE
+  )
+
+# Plot these variables
+lasso_plot <-
+  ggplot() +
+  geom_line(data = data_to_plot_scul_vary_lambda,
+            aes(x = time, y = actual_y, color="Real Data"), size=1, linetype="solid")  +
+  geom_line(data = data_to_plot_scul_vary_lambda,
+            aes(x = time, y = naive_prediction_1, color = "#1; Removes all donors"), size=1, linetype="dashed") +
+  geom_line(data = data_to_plot_scul_vary_lambda,
+            aes(x = time, y = naive_prediction_2, color="#2"), size = 1, linetype="twodash")  +
+  geom_line(data = data_to_plot_scul_vary_lambda, aes(x = time, y = naive_prediction_3,color = "#3"), size = 1, linetype = "longdash")  +
+  geom_line(data = data_to_plot_scul_vary_lambda, aes(x = time, y = naive_prediction_4,color = "#4; Removes no donors"), size = 1, linetype="dotdash")  +
+  scale_color_manual(name = "",
+                     values = c("#1; Removes all donors" = "blue", "Real Data" = "#F21A00", "#2" = "#00A08A", "#3" = "#EBCC2A", "#4; Removes no donors" = "#0F0D0E")) +  
+  theme_bw(base_size = 15)  +
+  theme(
+    panel.border = element_blank(),
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank(),
+    axis.line = element_line(colour = "black"))  +  
+  geom_vline(xintercept = data_to_plot_scul_vary_lambda$time[TreatmentBeginsAt-1], colour="grey", linetype = "dashed")  + theme(legend.position="bottom") +
+  ylab("") +
+  xlab("Time") +
+  ggtitle(expression("Actual data v.SCUL predictions from different"~lambda~"penalties")) +
+  annotate("text", x = (data_to_plot_scul_vary_lambda$time[TreatmentBeginsAt-1]-data_to_plot_scul_vary_lambda$time[1])/2+data_to_plot_scul_vary_lambda$time[1], y = max(data_to_plot_scul_vary_lambda[,-1])*1.01, label = "Pre-treatment",cex=6) +
+  annotate("text", x = (data_to_plot_scul_vary_lambda$time[nrow(SCUL.input$y)] - data_to_plot_scul_vary_lambda$time[TreatmentBeginsAt-1])/2+data_to_plot_scul_vary_lambda$time[TreatmentBeginsAt-1], y = max(data_to_plot_scul_vary_lambda[,-1])*1.01, label = "Post-treatment",cex=6) +
+  guides(color=guide_legend(ncol=3))
+
+ lasso_plot
+
+ various_scul_options_path<-paste(SCUL.input$OutputFilePath,"various_scul_options.pdf",sep='')
+ ggsave(various_scul_options_path, width=12, height=8, dpi=100)
+```
+
+So how do we pick between these options? Should we pick the one that fits the line the best during the pre-treatment period? During the post-treatment period? 
+
+In general we want to pick the prediction that captures the underlying data generating process *before* treatment occurs, since we are using this prediction to evaluate a counterfactual as if treatment had not occured. Treatment (if it has any effect) will impact the underlying data generating process. 
+
+### Thoughtful cross-validation to the rescue
+
+Cross-validation is a simple procedure where a dataset is partitioned into multiple subsets that include training data and test data; multiple analyses are performed on the training data; and the optimal analysis is determined using the test data.
+In our setting, lasso regressions across a grid of penalty parameters are performed for each subset of training data. The series of optimal weights is stored for each candidate penalty parameter. The test data are then used to evaluate which set of weights (i.e. which penalty parameter) produces the best out-of-sample prediction. Importantly, all data used in the cross-validation.
+
+In short, cross-validation is an organized way of choosing between penalty parameters where the objective is to find weights that best match the underlying factors during the pre-treatment period **and** that will provide an acceptable out-of-sample predcition. 
+It avoids overfitting. That is, it sets up a situation where we are more likely to find donors and weights that represent the  underlying data generating process of interest and less likely to find donors and weights that match on noise. 
+
+### SCUL uses rolling-origin cross-validation
+
+Now we will set up our cross validation. We are going to do rolling forecasting origin cross validation. The main goal of the entire exercise (not just the cross-validation) is to predict the value of the treated variable for all of the post-treatment time periods, say $T_{post}$. Thus we want to optimize our model for this type of prediction.
+
+We do this because we do not want to use future observations to predict obervations in the past. This can create a variety of issues related to autocorrelation, although there are some instances in which is doesn't matter. If doing this on your own, you will need to be careful because the default cross-validation procedure used by many statistical procedures does not account for the fact that data may be time series and often uses  "leave-one-out" cross-validation. See our working paper, https://robjhyndman.com/papers/cv-wp.pdf, @Hyndman2020, or @Kellogg2020 for more details.  
+
+In the procedure, we will only examine data from the pre-treatment period. We will also perform as many cross-validation runs as possible with the pre-treatment data being broken up into at least two, contiguous chunks. One chunk with consecutive time periods at least as long as  $T_{post}$ and another chunk that follows immediately in time that is exactly as long as  $T_{post}$. We will increase the size of the first chunk by one time period for each cross-validation run and stop when we reach the maximum number of runs we can perform.
+
+The figure below shows our cross-validation procedure visually. Here all of the data are pre-treatment. The square shapes indicate the training data, the circles indicate the test data, and the X's indicate data that isn't used in a particular cross-validation run. We will run one cross validation for each row you see below.
+
+
+```{r, fig.height=5, fig.width=8, warning = FALSE, fig.align = "center", echo = FALSE, warning = FALSE, , message=FALSE, results='hide', out.width = '100%'}
+TrainingPostPeriodLength <- 7
+  # Calculate the maximum number of possible runs given the previous three choices
+  MaxCrossValidations <- PrePeriodLength-NumberInitialTimePeriods-TrainingPostPeriodLength+1
+
+  # Set up the limits of the plot and astetics. (spelling?)
+  plot(0,0,xlim=c(-3.75,PrePeriodLength+2.5),ylim=c(-.75,1.5),
+       xaxt="n",yaxt="n",bty="n",xlab="",ylab="",type="n")
+
+  # Set colors (train, test, left-out)
+  # From Darjeeling Limited color palette, https://github.com/karthik/wesanderson
+  #custom_colors <- c("#F98400", "#00A08A", "#5BBCD6")
+  CustomColors <- c("black", "white", "red")
+  # Loop through all the possible cross validations
+  for(j in 1:MaxCrossValidations)
+  {
+    # Identify the possible set of test data: From one after the training data ends until the end of the pre-treatment period.
+    RangeOfFullSetOfTestData <- (NumberInitialTimePeriods+j):PrePeriodLength #7:20
+
+    # Identify the actual set of test data: From one after the training data ends until the end of test data
+    RangeOfjthTestData <- (NumberInitialTimePeriods+j):(NumberInitialTimePeriods+j+TrainingPostPeriodLength-1)
+
+    # Identify the actual set of data left out: From one after the test data ends until the end of pre-treatment data
+    RangeOfLeftoutData <- (NumberInitialTimePeriods+j+TrainingPostPeriodLength):PrePeriodLength
+
+    #  Identify the training data. From the first one until adding (J-1).
+    RangeOfTrainingData <- 1:(NumberInitialTimePeriods-1+j)
+
+    # Put arrows through the data points to represent time
+    arrows(0,1-j/MaxCrossValidations,PrePeriodLength+1,1-j/MaxCrossValidations,0.05)
+
+    # Add squares to all of the training data
+    points(RangeOfTrainingData,rep(1-j/MaxCrossValidations,length(RangeOfTrainingData)),pch=15,col=CustomColors[1])
+
+    # Add X's to the unused data
+    if(length(RangeOfFullSetOfTestData) > TrainingPostPeriodLength)
+      points(RangeOfLeftoutData, rep(1-j/MaxCrossValidations,length(RangeOfLeftoutData)), pch=4, col=CustomColors[3])
+
+    # Add circles to the test data
+    if(length(RangeOfFullSetOfTestData) >= TrainingPostPeriodLength)
+      points(RangeOfjthTestData,rep(1-j/MaxCrossValidations,length(RangeOfjthTestData)), pch=21, col="black",bg=CustomColors[2])
+  }
+  # Add informative text and bracket
+
+  ## label what is training data
+  brackets(1, .9 , NumberInitialTimePeriods, .9, h=.05)
+  text((NumberInitialTimePeriods+1)/2,1.15,"Training data\n for 1st CV")
+
+  ## label what is test data
+  brackets((NumberInitialTimePeriods+1), .9 , (NumberInitialTimePeriods+TrainingPostPeriodLength), .9, h=.05)
+  text((NumberInitialTimePeriods+TrainingPostPeriodLength)-((TrainingPostPeriodLength-1)/2),1.15,"Test data\n for 1st CV")
+
+  ## label what is left-out data
+  brackets(NumberInitialTimePeriods+TrainingPostPeriodLength+1, .9 , PrePeriodLength, .9, h=.05)
+  text((PrePeriodLength-(PrePeriodLength-NumberInitialTimePeriods-TrainingPostPeriodLength)/2),1.15,"Left-out data\n for 1st CV")
+
+
+  ## Add a legend so it will be clear in black and white
+
+  legend(
+    x="bottom",
+    legend=c("Training", "Testing","Left-out"),
+    bg=CustomColors,
+    col=c(CustomColors[1], "black", CustomColors[3]),
+    lwd=1,
+    lty=c(0,0),
+    pch=c(15,21,4),
+    bty="n",
+    horiz = TRUE,
+    x.intersp=.5,
+    y.intersp= .25 ,
+    text.width=c(2.5,2.5,2.5)
+  )
+
+  # Add custom x-axis labels to indicate time until treatment
+  text(PrePeriodLength/2,-.35,"Time period relative to treatment", cex=1)
+  CustomXLables <-seq((-PrePeriodLength),0, by=1)
+  for (z in seq(from = 1, to = PrePeriodLength + 1, by=5)) {
+    text(z, -.15, CustomXLables[z], cex=1)
+  }
+
+  # Add custom y-axis labels to indicate CV run number
+  text(-3.5,1,bquote(underline("CV Run")), cex=1)
+  for (z in seq(from = 0, to = 1-1/MaxCrossValidations, by = (1/MaxCrossValidations))) {
+    TempLabel = MaxCrossValidations - z*MaxCrossValidations
+    text(-3.5,z,TempLabel, cex=1)
+  }
+
+  # Add title
+  #title(main = "Example of rolling origin cross-validation procedure",line = -.8)
+  text(-3.75, 1.5, "Example of rolling-origin k-fold cross-validation",cex=1.5,adj=0)
+
+  # Save graph
+  FullPlotPath<-paste0(SCUL.input$OutputFilePath,"visual_illustration_of_cross_validation.pdf")
+  dev.copy(pdf,FullPlotPath, width=12, height=8)
+  dev.off()
+```
+
+The SCUL procedure automatically chooses the penalty parameter using this procedure. 
+The procedure preforms as many cross-validation runs as possible given the `PrePeriodLength` and the user input desired length of training (`NumberInitialTimePeriods`) and length of testing (`NumberInitialTimePeriods`). 
+
+  
+
+## Create a synthetic control group using the `SCUL()` function
+
+Assuming you've set everything up correctly and have a list of elements named `SCUL.input`, you can simply run the `SCUL()` function to run the cross-validated procedure outlined above. We store the output as a list called `SCUL.output`.
+
+```{r, warning = FALSE, message=FALSE, results = 'hide'}
+SCUL.output <- SCUL()
+```
+
+`SCUL.output` contains a number of useful things. 
+
+- `time`: A vector of the running time variable
+- `TreatmentBeginsAt`: A scalar indicating the row that treatment begins
+- `y.actual`: The obvserved target series
+- `y.scul`: The counterfactul prediction from SCUL of the target series
+- `CrossValidatedLambda`: The median cross-validated lambda from all of the cross-validation runs that is used to create `y.scul`. For this example, $\lambda$ = `r round(SCUL.output$CrossValidatedLambda, digits = 2)`
+- `CohensD`: A unit-free measure of fit between `y.actual` and `y.scul`. Discussed more below. For this example the fit is `r round(SCUL.output$CohensD, digits = 2)`
+- `coef.exact`: A matrix of the coefficients for each donor variable which are used to create the synthetic prediction. We present these in a slighly unconventional manner outlined later in the vignette. 
+
+##  Plot actual data and SCUL counterfactual using `PlotActualvSCUL()`
+
+Using the `PlotActualvSCUL()` function you can plot the observed data against the counterfactual prediction.
+
+```{r, fig.height=8, fig.width=12, warning = FALSE, fig.align = "center", out.width = '100%'}
+PlotActualvSCUL()
+```
+
+## Evaluating synthetic control fit
+
+```{r, echo = FALSE}
+# Calculate pre-treatment sd
+PreTreatmentSD <- sd(unlist(SCUL.output$y.actual[1:(SCUL.input$TreatmentBeginsAt-1),]))
+
+# Store Cohen's D in each period for cross-validated lambda
+StandardizedDiff <- abs(SCUL.output$y.actual-SCUL.output$y.scul)/PreTreatmentSD
+names(StandardizedDiff) <- c("scul.cv")
+
+# Store Cohen's D in each period for max lambda
+StandardizedDiff$naive_prediction_1 <- abs(data_to_plot_scul_vary_lambda$naive_prediction_1 - data_to_plot_scul_vary_lambda$actual_y)/PreTreatmentSD
+StandardizedDiff$naive_prediction_2 <- abs(data_to_plot_scul_vary_lambda$naive_prediction_2 - data_to_plot_scul_vary_lambda$actual_y)/PreTreatmentSD
+StandardizedDiff$naive_prediction_3 <- abs(data_to_plot_scul_vary_lambda$naive_prediction_3 - data_to_plot_scul_vary_lambda$actual_y)/PreTreatmentSD
+StandardizedDiff$naive_prediction_4 <- abs(data_to_plot_scul_vary_lambda$naive_prediction_4 - data_to_plot_scul_vary_lambda$actual_y)/PreTreatmentSD
+
+# Show Cohen's D for each of these
+CohensD <- data.frame(colMeans(StandardizedDiff[1:(TreatmentBeginsAt-1),]))
+
+
+# Calculate treatment effect for each of these
+
+TreatmentEffect <- SCUL.output$y.actual-SCUL.output$y.scul
+names(TreatmentEffect) <- c("scul.cv")
+
+TreatmentEffect$naive_prediction_1 <-
+  data_to_plot_scul_vary_lambda$actual_y -   
+  data_to_plot_scul_vary_lambda$naive_prediction_1 
+TreatmentEffect$naive_prediction_2 <- 
+  data_to_plot_scul_vary_lambda$actual_y - 
+  data_to_plot_scul_vary_lambda$naive_prediction_2
+TreatmentEffect$naive_prediction_3 <- 
+  data_to_plot_scul_vary_lambda$actual_y- 
+  data_to_plot_scul_vary_lambda$naive_prediction_3 
+TreatmentEffect$naive_prediction_4 <-  
+  data_to_plot_scul_vary_lambda$actual_y - 
+  data_to_plot_scul_vary_lambda$naive_prediction_4
+
+
+AvgTreatmentEffect <- data.frame(colMeans(TreatmentEffect[TreatmentBeginsAt:nrow(StandardizedDiff),]))
+
+# For target variable
+Results.y.CohensD <- SCUL.output$CohensD
+Results.y.StandardizedDiff <- (SCUL.output$y.actual-SCUL.output$y.scul)/sd(unlist(SCUL.output$y.actual[1:(SCUL.input$TreatmentBeginsAt-1),]))
+Results.y <- SCUL.output$y.scul
+```
+There is no guarantee that the lasso regressions (or any other approach) can find a weighted mixture of donor units that closely mimics the treated unit during the pre-period.
+Therefore, researchers need a practical method of deciding whether a proposed synthetic control is "good enough" for proceeding with the analysis.
+
+One rule of thumb is that a covariate is out of balance if the Cohen's D statistic is greater than .25, which means that the imbalance between the groups is more than a quarter of a standard deviation for a particular variable [@Ho2007; @King2006; @Cochran1968].
+The specific choice of a Cohen's D threshold is arbitrary in most applications; in general, the smaller the discrepancy the better. However, the Cohen's D statistic is a unit-free, standardized metric that is comparable across different variables.
+
+We apply a modified version of the Cohen’s D to evaluate pre-period fit. Specifically, we let $\sigma_{s} = \frac{1}{T_0}\sum_{t=1}^{T_0}(y_{st} - \overline{y_s})^2$ be the standard deviation of outcome $s$ during the pre-treatment period.
+The pre-treatment average Cohen’s D statistic for a proposed synthetic control
+is $D_s = \frac{1}{T_0}\sum_{t=1}^{T_0}|\frac{y_{st} - y^{*}_{st}}{\sigma_{s}}|$. We compute $D_s$ for each synthetic control candidate in our study. If $D_s > 0.25$, we do not report a synthetic control estimate for that outcome since the model could not provide a suitable fit. We apply the same standard to the placebo products we use to conduct statistical inference.
+We describe the consequences of different Cohen's D inclusion thresholds for statistical power and inference more in our working paper.
+
+In the table below, we report measures of pre-period fit and treatment effect estimates for five potential synthethic control estimators. Treatment effect estimates are simply the average difference between the actual and counterfactual SCUL prediction.
+The first prediction is from our SCUL procedure and uses a cross-validated penalty. The last four are the same naive lasso predictions we used earlier. The use the entire pre-treatment time-period and the penalties are therefore not cross-validated. 
+
+```{r, echo = FALSE, warning = FALSE, message=FALSE}
+table_for_hux <- cbind(
+  (CohensD),
+  (AvgTreatmentEffect)
+)
+names(table_for_hux) <- c("CohensD", "ATE")
+
+table_for_hux$name <- c("Cross-validation for determining penalty", "Naive guess 1:\n Max penalty (remove all donors)", "Naive guess 2:\n Random penalty", "Naive guess 3:\n Random penalty", "Naive guess 4:\n No penalty (include all donors)")
+table_for_hux$value <- c(SCUL.output$CrossValidatedLambda, first_guess_lasso$lambda[1], first_guess_lasso$lambda[round(length(first_guess_lasso$lambda)/10)], first_guess_lasso$lambda[round(length(first_guess_lasso$lambda)/5)], 0)
+
+table_for_hux <- table_for_hux[c(3, 4, 1,2)]
+
+
+kable(table_for_hux, col.names = c("Method","Penalty parameter", "Cohens D (pre-period fit)", "ATE estimate"), digits = 2, row.names = FALSE) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F) %>%
+column_spec(1, width = "5cm") %>%
+column_spec(2:4, width = "2cm")  %>%
+  pack_rows("SCUL procedure using:", 1, 1) %>%
+  pack_rows("SCUL using naive guesses for penalty", 2, 5)
+
+```
+
+## Reporting synthetic control weights (i.e. determine the influence of each regressor in the prediction) using `PlotShareTable()`
+
+Neither the traditional synthetic control weights nor the weights from the SCUL procedure can be directly interpreted as the share of the synthetic prediction composed by each donor series. Traditional synthetic control weights are constrained to sum to one across the donor units. Weights therefore only represent the fraction of the total weight that is given to a particular donor series; they do not reflect the size and variability of the outcome for each unit across time periods. The SCUL weights, which are lasso regression coefficients, are not constrained to sum to one and are not naturally interpreted as the share given to a particular donor series.
+
+In both methods, the fraction of the synthetic prediction a given donor unit is responsible for changes with the value of the donor unit across time.
+Suppose, for example, that there are two donor series, A and B, observed in two periods, 1 and 2, and each unit receives a weight equal to $\frac{1}{2}$. The donor values for the first time period are  $y_{A,1} = 10$ and $y_{B,1} = 1$. The donor values for the second time period are $y_{A,2} = 1$ and $y_{B,2} = 10$.  The resulting synthetic prediction is $y_{1}^* =  5.5$ in period 1 and $y_{2}^* = 5.5$ in period 2. In period 1, unit A represents  $100 \times \frac{ \frac{1}{2}\times 10}{5.5} = 91\%$ of  the synthetic prediction. In period 2, unit B represents $91\%$ of the synthetic prediction. Despite each donor weight being 50\%, neither unit contributes 50\% to the synthetic unit in either period.
+
+
+
+Both the outcome and the weight share matter and since the outcome varies over time, the importance of each control unit may change over time as well. Below we use the `PlotShareTable()` function to create a table that shows the relative contribution of each donor to the synthetic contribution. Shares are rounded to two decimal places.  All donor variables not shown recieve exactly zero weight. 
+
+
+
+```{r echo=FALSE, fig.align="center", fig.height=8, fig.width=5, message=FALSE, warning=FALSE, out.width = '100%'}
+PlotShareTable()
+```
+
+
+In this application, relative contributions appear to be stable across time. The single most important donor unit for California cigarette sales is the intercept, which is a measure of average pre-treatment cigarette sales in California. The second and third most influential donors are cigarettes sales in Illinois and Nevada. 
+
+Of note, cigarette sales in other states are all positively related, while prices in other states are all negatively related. We do not include California's retail price of cigarette sales as a potential donor series as this would be endogenous. The negative relationship between out-of-state prices and in-state sales makes intuitive sense as increasing sales price may reflect trends that would also increase California prices or efforts to decrease demand for cigarettes.   
+This negative contribution of a donor series is not possible in the traditional methods. 
+
+
+## Statistical Inference
+
+To perform statistical inference on our treatment estimates, we construct a rank-based, two-sided p-value using randomization inference [@Cavallo2013; @Dube2015].
+We compare the absolute value of the standardized treatment estimate to the absolute value of the standardized estimate from a number of placebo series.
+The estimates from the placebo distribution serve as the null distribution that assumes no treatment effect.
+In our setting, we use the same units compose both our donor pool and candidate placebo time series.
+In practice, however, the donor  and placebo pools need not overlap.
+We limit the target time series considered, and placebo time series used for inference, to those that have synthetic control estimates that fit the data reasonably well during the pre-treatment period.
+We standardize using the pre-treatment period standard deviation for each respective time series, so that the respective treatment estimates are unit-free and comparable.
+
+
+The first step in this procedure is to estimate a pseudo-treatment effect for each untreated unit in the placebo pool. 
+
+
+###  Run SCUL procedure on placebo pool to estimate pseudo-treatment effects using `CreatePlaceboDistribution()`
+
+```{r, results='hide'}
+SCUL.inference <- CreatePlaceboDistribution()
+```
+
+
+We save the output from this procedure as the list `SCUL.inference`. This list contains 
+
+- `y.placebo.StandardizedDifference.Full`: the standardized difference between the actual and synthetic outcome for each placebo unit. 
+- `y.placebo.CohensD`: the Cohen's D measure for pre-treatment fit for each placebo unit. 
+
+
+Before we calculate the p-value we will visually examine the distribution across time and as an average in the post-period. We will then compare these distributions of pseudo-treatment effects to our estimated treatment effect. 
+
+### Visually compare standardized treatment estimate against placebo distribution
+
+#### Using a smoke plot
+
+In the first figure, we compare the pseuedo differences between each placebo and its synthetic control. The graph only includes placebo lines that survived the Cohen's D screen by having a pre-treatment Cohen's D less than 0.25. The placebo lines in the graph are drawn with some transparency so that the darker areas have a greater density of placebo units than lighter spaces. 
+This shading highlights the deterioration of the counterfactual fit across time and gives the appearance of smoke. 
+As such, we refer to this style of plot as a "smoke plot."
+The difference between actual sales of cigarettes sold in California and the SCUL prediction is displayed in green. The pre-treatment difference is small and centered around zero. 
+
+We don't provide a function for this figure, but the code used to create this graph can be found in the `.Rmd` file associated with this vignette and can be easily modified for other purposes. 
+
+```{r, fig.align="center", fig.height=5, fig.width=8, message=FALSE, warning=FALSE, echo = FALSE, out.width = '100%'}
+
+###############################################################################################
+# Make Smoke Plot
+
+# Trim placebos with poor pre-treatment fit
+placebo.distribution.trim <- data.frame(SCUL.inference$y.placebo.StandardizedDifference.Full)[,data.frame(SCUL.inference$y.placebo.CohensD) <=.25 ]
+
+colMax <- function(data) sapply(data, max, na.rm = TRUE)
+
+
+# reshape the placebo data to be in long form
+data_to_plot_wide_y <- cbind( SCUL.input$time, Results.y.StandardizedDiff)
+names(data_to_plot_wide_y) <- c("time", "std_diff")
+
+data_to_plot_wide <- cbind( SCUL.input$time, placebo.distribution.trim)
+names(data_to_plot_wide)[1] <- c("time")
+
+
+data_to_plot_long <- pivot_longer(data = data_to_plot_wide,
+                                  cols = starts_with("X"),
+   names_to = "group",
+   names_prefix = "X",
+   values_to = "std_diff",
+   values_drop_na = TRUE
+ )
+
+# create smoke plot
+smoke_plot <- ggplot(data = data_to_plot_long, aes(x = time, y = std_diff)) +
+  geom_line(aes(group = group), alpha = .5, size = 1) +
+  theme_classic() +
+    geom_line(data = data_to_plot_wide_y, aes(x = time, y = std_diff), alpha = 1, size = 2., color = "black") +
+    geom_line(data = data_to_plot_wide_y, aes(x = time, y = std_diff), alpha = 1, size = 1.75, color = "#4dac26") +
+    geom_vline(
+        xintercept = SCUL.input$time[TreatmentBeginsAt,1],
+        linetype = "dashed",
+        size = 1,
+        color = "grey37"
+    ) +
+    labs(
+        title = "Standardized difference for CA cigarette sales compared to standardized\n difference for each placebo donor product",
+        x = "Time",
+        y = "Difference between actual data and scul prediction\n in pre-treatment standard deviations for each product"
+    ) +
+    theme(
+        axis.text = element_text(size = 18),
+        axis.title.y = element_text(size = 12),
+        axis.title.x = element_text(size = 18),
+        title = element_text(size = 12),
+        legend.position = "none"
+    )
+
+# Save graph
+SmokePlotPath<-paste0(SCUL.input$OutputFilePath,"smoke_plot.png")
+ggsave(SmokePlotPath,
+       plot = smoke_plot,
+       width = 8,
+       height = 5,
+       dpi = 300,
+       units = "in")
+
+# Display graph
+smoke_plot
+```
+
+The spreading of the placebo distribution as time since treatment is the deterioration of model fit. Since the null distribution has the greatest power to detect small treatment effects when the distribution is less disperse, smaller treatment effects are more "detectable" closer to treatment time rather than farther away.
+
+#### Using a density plot of the null distribution and the `PlotNullDistribution()` function 
+
+
+This second figure shows the distribution of average treatment effect (average difference between the actual placebo data and scul prediction) for the post-treatment time period. We show two distributions. 
+
+- One with no Cohen's D restriction on the placebo pool
+- One with a 0.25 Cohen's D restriction on the placebo pool
+
+In red on each figure is the "rejection region." If an estimate falls in this region it is considered to be sufficiently rare so as to be statistically significant at the 10% level. 
+
+The `PlotNullDistribution()` function takes a few inputs
+
+- `CohensD`: the Cohen's D threshold used to trim the placebo distribution
+- `StartTime` and `EndTime`: These form the begining and end time periods over which the average pseduo treatment effect is calculated. This is usful if you want to consider smaller intervals of time than the entire post-treatment period. 
+- `width` and `height`: respective dimensions of the plot
+- `AdjustmentParm` and `BandwidthParm`: parameters that affect the estimate of the density
+- various labels. 
+
+We add to each density plot the treatment effect estimate (in standard deviation units). This is displayed by the red dashed-line.
+
+
+```{r, fig.height=8, fig.width=4, warning = FALSE, fig.align = "center", out.width = '50%'}
+
+# Plot null distribution with no restriction on pre-period fit
+NullDist.Full <- PlotNullDistribution(
+    CohensD = 999,
+    StartTime = TreatmentBeginsAt,
+    EndTime = nrow(SCUL.output$y.actual),
+    height = 2,
+    AdjustmentParm = 1,
+    BandwidthParm = .25,
+    title_label = "Placebo distribution compared\n to ATE estimate in\n pre-period standard deviation units",
+    y_label  = " ",
+    x_label  =  "",
+    subtitle_label  =  "No Cohen's D restriction",
+    rejection_label  =  ""
+) +
+  geom_vline(
+        xintercept = mean(Results.y.StandardizedDiff[TreatmentBeginsAt:nrow(Results.y.StandardizedDiff),]),
+        linetype = "dashed",
+        size = 1,
+        color = "red")
+
+# Plot null distribution 0.25 cohen's D restriction on pre-period fit
+NullDist.25 <- PlotNullDistribution(
+    CohensD = 0.25,
+    StartTime = TreatmentBeginsAt,
+    EndTime = nrow(SCUL.output$y.actual),
+    height = 2,
+    AdjustmentParm = 1,
+    BandwidthParm = .25,
+    y_label  = "",
+    x_label  =  "Distribution of standardized difference\n for placebo donor pool",
+    subtitle_label  =  "0.25 Cohen's D restriction",
+    rejection_label  =  "",
+    title_label = " ",
+
+) +
+  geom_vline(
+        xintercept = mean(Results.y.StandardizedDiff[TreatmentBeginsAt:nrow(Results.y.StandardizedDiff),]),
+        linetype = "dashed",
+        size = 1,
+        color = "red")
+
+# Plot n
+# Combine the three plots
+combined_plot <- plot_grid(
+    NullDist.Full,NullDist.25,
+    ncol = 1)
+
+# Save the plot
+FilePath <- paste0(SCUL.input$OutputFilePath,"mde_graph.pdf")
+ggsave(FilePath,
+       plot = combined_plot,
+       width = 4,
+       height = 8,
+       units = "in")
+
+# Display the plot
+combined_plot
+```
+
+In general, a more compact null distribution is desirable because wider null distributions are less able to differentiate small  treatment effects from statistical noise. Thus, synthetic control methods have the greatest power to detect small effect sizes in the time periods closest to treatment, and when the synthetic control method also provides a satisfactory fit for the placebo pool used to compose the null distribution. 
+
+Maximizing statistical power in these ways is not without trade-offs. Dynamic treatment effects that grow over time may not be large enough to be detectable in the periods immediately following treatment.
+Using a smaller Cohen's D threshold can improve power by eliminating noisy placebo units, but this also may eliminate  target units that do not meet the pre-treatment fit quality standard. 
+
+#### Use `PValue()` to determine permutation based two-sided p-value
+
+We construct a two-sided p-value by comparing the rank of the absolute value of the standardized treatment effect for the target series against the absolute value of the estimated standardized pseudo-treatment effect for each untreated unit.
+The p-value is simply the percentile of the rank.
+For smaller placebo pools, it may make sense to report a bounded p-value.
+For example, if there are one treated unit and 49 placebos, then a rank of 2 out of 50 represents a p-value of between .02 and .04
+
+
+
+The `PValue()` function takes a few inputs
+
+- `CohensD`: the Cohen's D threshold used to trim the placebo distribution
+- `StartTime` and `EndTime`: These form the begining and end time periods over which the average pseduo treatment effect is calculated. This is usful if you want to consider smaller intervals of time than the entire post-treatment period. 
+
+
+```{r}
+#########################################################################################################
+# Calculate an average post-treatment p-value
+PValue(
+    CohensD = 999,
+    StartTime = SCUL.input$TreatmentBeginsAt,
+    EndTime = nrow(Results.y.StandardizedDiff)
+)
+
+PValue(
+    CohensD = .25,
+    StartTime = SCUL.input$TreatmentBeginsAt,
+    EndTime = nrow(Results.y.StandardizedDiff)
+)
+
+
+```
+
+
+As could also be seen in the first density plot, when we allow all units in the placebo pool (i.e., no Cohen's D restriction) to contribute to the null distribution estimate, our treatment effect estimate does not appear sufficiently rare. It has a p-value of 0.4. However, when we include only those placebos where the SCUL procedure found a suitable counterfactual (judged by Cohen's D less than or equal to 0.25), our treatment effect estimate is extremely rare with a p-value of 0.02. 
+
+# Comparison with traditional synthetic control method
+
+To compose the counterfactual estimate, $\widehat{y(0)}_{st}$, typical synthetic control methods use a convex weighted average of the same target variable from the untreated units. The set of target variables here is also referred to as the donor pool.
+
+In the traditional method, each donor receives a single weight, which must be non-negative and between zero and one. The weights for all untreated donor units must sum to one. These restriction combine to create a check against extrapolation from the donor pool. Specifically, no synthetic control estimate can be greater than the largest value of the donor pool. We explore the consequenes of these restrictions in more detail in our paper. 
+
+The set of weights across all donor units are chosen such that they minimize an importance weighted combination of
+
+  1. the distance between pre-treatment synthetic predictions and actual pre-treatment data
+  1. and the difference between a set of predicted and actual *summary statistics* chosen by the researcher.
+    - the *summary statistics* as we call them here can refer to any number of things that the researcher would normally consider in a balance table. There could be a great number of them; (a particular value of the target variable in the pre-period, four values of another important variable from different pre-period years, the standard deviation of yet another variable).
+
+The importance weights for each *summary statistic* in (2) and for the cumulative donor weights (1) are determined in an iterative procedure. The nature of this procedure limits the combined number of potential donor units (and the number user-chosen summary statistics) to be less than the number of observations for the treated unit.
+
+A full review of the traditional method is beyond the scope of this vignette. @Abadie2010 developed the original and mostly widely used method of constructing a synthetic control group and @AlbertoAbadie2020 provide an excellent overview of the traditional synthetic control method as well as other recent extensions.
+
+However, we have contructed our data in such a way that we can conduct a version of the traditional approach. Here the *summary statistics* will be 
+
+- mean retail price
+- mean cigarette sales in 1970
+- mean cigarette sales in 1980
+- mean cigarette sales in 1985
+
+We implement the procedure using the `Synth` package. 
+
+```{r, echo = FALSE, warning = FALSE, , message=FALSE, results='hide'}
+
+data_for_traditional_scm <- pivot_longer(data = cigarette_sales,
+                                  cols = starts_with(c("cigsale_", "retprice_")),
+   names_to = c("variable", "fips"),
+   names_sep = "_",
+   names_prefix = "X",
+   values_to = "value",
+   values_drop_na = TRUE
+ )
+
+data_for_traditional_scm <- pivot_wider(data = data_for_traditional_scm,
+                                  names_from = variable,
+                                  values_from = value)
+
+
+ data_for_traditional_scm$fips <- as.numeric(data_for_traditional_scm$fips)
+
+
+## While synth() can be used to construct synthetic control groups
+## directly, by providing the X1, X0, Z1, and Z0 matrices, we strongly
+## recommend to first run dataprep() to extract these matrices
+## and pass them to synth() as a single object
+
+## The usual sequence of commands is:
+## 1. dataprep() for matrix-extraction
+## 2. synth() for the construction of the synthetic control group
+## 3. synth.tab(), gaps.plot(), and path.plot() to summarize the results
+## Below we provide two examples
+
+
+## First Example: Toy panel dataset
+
+# load data
+data(synth.data)
+
+# create matrices from panel data that provide inputs for synth()
+data_for_traditional_scm$idno = as.numeric(as.factor(data_for_traditional_scm$fips))  # create numeric country id required for synth()
+
+data_for_traditional_scm <- as.data.frame(data_for_traditional_scm)
+
+dataprep.out<-
+  dataprep(
+    foo = data_for_traditional_scm,
+    predictors = c("retprice"),
+    predictors.op = "mean",
+    dependent = "cigsale",
+    unit.variable = "idno",
+    time.variable = "year",
+    special.predictors = list(
+      list("cigsale", 1970, "mean"),
+      list("cigsale", 1980, "mean"),
+      list("cigsale", 1985, "mean")
+    ),
+    treatment.identifier = unique(data_for_traditional_scm$idno[data_for_traditional_scm$fips==6]),
+    controls.identifier = unique(data_for_traditional_scm$idno[data_for_traditional_scm$fips!=6]),
+    time.predictors.prior = c(1970:1987),
+    time.optimize.ssr = c(1970:1987),
+    time.plot = 1970:1997
+  )
+
+## run the synth command to identify the weights
+## that create the best possible synthetic
+## control unit for the treated.
+synth.out <- synth(dataprep.out)
+
+## there are two ways to summarize the results
+## we can either access the output from synth.out directly
+#round(synth.out$solution.w,2)
+# contains the unit weights or
+#synth.out$solution.v
+## contains the predictor weights.
+
+## the output from synth opt
+## can be flexibly combined with
+## the output from dataprep to
+## compute other quantities of interest
+## for example, the period by period
+## discrepancies between the
+## treated unit and its synthetic control unit
+## can be computed by typing
+gaps<- dataprep.out$Y1plot-(
+  dataprep.out$Y0plot%*%synth.out$solution.w
+)
+
+StandardizedDiff$traditional_scm <- abs(dataprep.out$Y1plot-(
+  dataprep.out$Y0plot%*%synth.out$solution.w
+))/PreTreatmentSD
+
+# Show Cohen's D for each of these
+CohensD <- data.frame(colMeans(StandardizedDiff[1:(TreatmentBeginsAt-1),]))
+
+
+# Calculate treatment effect for each of these
+TreatmentEffect <- data.frame(colMeans(StandardizedDiff[TreatmentBeginsAt:nrow(StandardizedDiff),])*PreTreatmentSD)
+
+## also there are three convenience functions to summarize results.
+## to get summary tables for all information
+## (V and W weights plus balance btw.
+## treated and synthetic control) use the
+## synth.tab() command
+#ynth.tables <- synth.tab(
+#  dataprep.res = dataprep.out,
+#  synth.res = synth.out)
+#print(synth.tables)
+
+## to get summary plots for outcome trajectories
+## of the treated and the synthetic control unit use the
+## path.plot() and the gaps.plot() commands
+
+## plot in levels (treated and synthetic)
+#path.plot(dataprep.res = dataprep.out,synth.res = synth.out)
+
+## plot the gaps (treated - synthetic)
+#gaps.plot(dataprep.res = dataprep.out,synth.res = synth.out)
+```
+
+
+The first figure shows two time series, each a difference between actual cigarette sales and a synthetic prediction. 
+
+- The green solid line is the difference using the SCUL prediction
+- The orange dashed line is the difference using the tradtional prediction
+
+Both have very similar properties. Small deviations during the pre-period and large negative deviations in the post-treatment period.
+
+```{r, fig.height=5, fig.width=8, warning = FALSE, fig.align = "center", echo = FALSE, out.width = '100%'}
+
+StandardizedDiff<-cbind(StandardizedDiff,SCUL.input$time)
+colnames(StandardizedDiff)[7] <- "time"
+# create smoke plot
+difference_plot <- ggplot() +
+  theme_classic() +
+    geom_line(data = StandardizedDiff, aes(x = time, y = -scul.cv), alpha = 1, size = 2., color = "black") +
+    geom_line(data = StandardizedDiff, aes(x = time, y = -scul.cv), alpha = 1, size = 1.75, color = "#4dac26") +
+     geom_line(data = StandardizedDiff, aes(x = time, y = -traditional_scm), alpha = 1, size = 2., color = "black") +
+    geom_line(data = StandardizedDiff, aes(x = time, y = -traditional_scm), alpha = 1, size = 1.75, color = "orange", linetype = "dashed") +
+    geom_vline(
+        xintercept = SCUL.input$time[TreatmentBeginsAt,1],
+        linetype = "dashed",
+        size = 1,
+        color = "grey37"
+    ) +
+    labs(
+        title = "Difference between actual cigarette sales and synthetic predictions\n from SCUL (green-solid)\n and a traditional synthetic control method (orange-dashed)",
+        x = "Time",
+        y = "Difference between actual data and predictions\n in pre-treatment standard deviations for each product"
+    ) +
+    theme(
+        axis.text = element_text(size = 18),
+        axis.title.y = element_text(size = 12),
+        axis.title.x = element_text(size = 18),
+        title = element_text(size = 12)
+    )
+
+
+# Save graph
+difference_plotPath <- paste0(SCUL.input$OutputFilePath,"difference_plot.png")
+
+ggsave(difference_plotPath,
+       plot = difference_plot,
+       width = 8,
+       height = 5,
+       dpi = 300,
+       units = "in")
+
+# Display graph
+difference_plot
+```
+
+
+The table below displays the average treatment effect across the two models. They are very similar, 13.5 for SCUL and 14.9 for the traditional method. The table also displays the measure of pre-period fit. Despite using a cross-validation procedure the SCUL estimate produces a better pre-period fit by an order of magnitude (0.015 vs. 0.155).
+
+```{r, echo = FALSE, warning = FALSE, message=FALSE}
+table_for_hux_scm <- cbind(
+  (CohensD),
+  (TreatmentEffect)
+)
+table_for_hux_scm <- table_for_hux_scm[-(2:5),]
+
+names(table_for_hux_scm) <- c("CohensD", "ATE")
+
+table_for_hux_scm$name <- c("Cross-validation for determining penalty", " ")
+table_for_hux_scm$value <- c(round(SCUL.output$CrossValidatedLambda, digits = 2), "NA")
+
+table_for_hux_scm <- table_for_hux_scm[c(3, 4, 1,2)]
+
+
+kable(table_for_hux_scm, col.names = c("Method","Penalty parameter", "Cohens D (pre-period fit)", "ATE estimate"), digits = 3, row.names = FALSE) %>%
+  kable_styling(bootstrap_options = "striped", full_width = F) %>%
+column_spec(1, width = "5cm") %>%
+column_spec(2:4, width = "2cm")  %>%
+  pack_rows("SCUL procedure using:", 1, 1) %>%
+  pack_rows("Traditional SCM method", 2, 2)
+
+```
+
+We also display the traditional weights as well as the share each donor contributes to the first and last prediction (our perferred way of displaying weights). All donors here are only cigarette sales in other states. The number in the first column is the FIPS code for each donor.
+
+Unlike the weights for SCUL (displayed earlier), the weights for the traditional method are all positive and sum to one. However these weights are not the same as the share the variable contributes to the prediction. Take the first donor (Kentuck) for example. The coefficient on Kentucky cigarette sales is 0.3229, but in the most recent prediction the share this donor is responsible for is 52.11%. 
+
+Also of note. Many of these variable recieve nearly, but not exactly zero weight. The SCUL procedure produces a more sparse set of donors since the majority of the donors receive *exactly* zero weight. 
+
+```{r, echo = FALSE, warning = FALSE, message=FALSE}
+ # Make the exact coefficients are stored as
+  coef.exact<-as.matrix(synth.out$solution.w)
+
+  # Add an intercept variable (always takes the value of 1) to the donor pool
+  # Label the first column
+  #colnames(x.DonorPoolWithIntercept) <- c("Intercept")
+
+  # Multiply the coefficients by the value in at each time period
+  ContributionToPrediction <- sweep(t(dataprep.out$Y0plot),MARGIN=1,FUN="*",STATS=coef.exact)
+  ContributionToPrediction <- t(ContributionToPrediction)
+
+  # Determine sign of coefficient
+  SignOfContribution <- ContributionToPrediction
+  SignOfContribution[SignOfContribution>0] <-  1
+  SignOfContribution[SignOfContribution<0] <- 2 #This is in this numeric order on purpose. When there are only positive weights the graphic defaults to showing them in the "first" category. So we want that to be the lower number here.
+  SignOfContribution<-SignOfContribution[ , !apply(SignOfContribution==0,2,all)]
+
+  # Take the absolute value of everything since we are concerned with contribution
+  ContributionToPrediction <- abs(ContributionToPrediction)
+
+  # Without the intercept, percentage of contribution each variable makes to the prediction
+  ShareOfPrediction <-sweep(ContributionToPrediction,MARGIN=1,FUN="/",STATS=rowSums(ContributionToPrediction))
+  #rowSums(ShareOfPrediction)
+
+  ## Remove zero contributions
+  #Value_of_prediction<-value_of_prediction[ , !apply(share_of_prediction==0,2,all)]
+  ShareOfPrediction<-ShareOfPrediction[ , !apply(ShareOfPrediction==0,2,all)]
+  coef.exact<-coef.exact[apply(coef.exact,1,function(x) all(abs(x)>0))]
+
+  ## Show the top five items in the time treatment began without intercept
+  # Note: Percents are [0-1]
+  #head(sort(ShareOfPrediction[SCUL.input$TreatmentBeginsAt,], decreasing=TRUE))
+
+  ## Create a data frame with the share of prediction in the time of treatment and the last time observed.
+  ShareOfPredictionForPlot<-data.frame(ShareOfPrediction[TreatmentBeginsAt,],ShareOfPrediction[length(SCUL.output$y.actual),],SignOfContribution[TreatmentBeginsAt,],coef.exact)
+
+
+  #create a variable from the row names
+  ShareOfPredictionForPlot$names=row.names(ShareOfPredictionForPlot)
+
+  #label the columns
+  colnames(ShareOfPredictionForPlot) <- c("share.1","share.2","sign", "coef", "RowNames")
+
+  # sort by the contribution in the first time
+  ShareOfPredictionForPlot<-ShareOfPredictionForPlot[order(-abs(ShareOfPredictionForPlot$share.1)),]
+
+  # Create a variable that stores this order
+  for (i in 1:nrow(ShareOfPredictionForPlot)) {
+    ShareOfPredictionForPlot$order[i]<- nrow(ShareOfPredictionForPlot)-i+1
+  }
+  ShareOfPredictionForPlot$order<-as.numeric(ShareOfPredictionForPlot$order)
+  # Keep only the parts we need for the table
+  ShareOfPredictionForTable<-ShareOfPredictionForPlot[,1:4]
+  ShareOfPredictionForTable<-ShareOfPredictionForTable[,-3]
+  ShareOfPredictionForTable[,1]<-round(ShareOfPredictionForTable[,1],digits=4)
+  ShareOfPredictionForTable[,2]<-round(ShareOfPredictionForTable[,2],digits=4)
+  ShareOfPredictionForTable[,3]<-round(ShareOfPredictionForTable[,3],digits=4)
+  colnames(ShareOfPredictionForTable) <- c("Share for\n First Prediction" ,"Share for Most\n Recent Prediction","Coefficient")
+
+  # Make it so the coef is green/red for positive/negative
+  sign_formatter <- formatter("span",
+                              style = x ~ style(color = ifelse(x > 0, "green",
+                                                               ifelse(x < 0, "red", "black"))))
+
+  # Plot the
+  SharesInTable<-formattable(ShareOfPredictionForTable,align =c("r","r","r"), list(
+    area(col = c("Share for\n First Prediction", "Share for Most\n Recent Prediction")) ~ normalize_bar(color = "#3399FF", 0.2),
+    "Coefficient" = sign_formatter
+  ))
+  SharesInTable
+```
+
+```{r, echo = FALSE, results = 'hide'}
+# Combine the two plots for the readme
+PlotForReadMe <- plot_grid(
+    smoke_plot, combined_plot,
+    ncol = 2, rel_widths = c(1, .4))
+
+ReadMePlotPath <- paste0(SCUL.input$OutputFilePath,"ReadMeFigure.png")
+
+ggsave(ReadMePlotPath,
+       plot = PlotForReadMe,
+       width = 18,
+       height = 9,
+       dpi = 300,
+       units = "in")
+```
+
+# When would you want non-convex or negative weights?
+
+- When there are more donors than time periods (i.e., high-dimensiona data)
+- When the target series is outside the the support of the donor pool (case 1 below)
+- When negatively correllated donors can help identify underlying data generating process (case 2 below)
+
+The SCUL procedure is a flexible synthetic control method that accomodates all of these scenarios. 
+
+
+```{r, echo = FALSE, fig.height=12, fig.width=18, warning = FALSE, fig.align = "center", warning = FALSE, , message=FALSE, results='hide', out.width = '100%'}
+#########################################################################################################
+# Clear memory
+rm(list = ls())
+
+#########################################################################################################
+# Load packages
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(
+  cowplot, tidyverse, Synth, scul
+)
+
+#########################################################################################################
+# Set seed 
+set.seed(1234)
+
+#########################################################################################################
+# Number of time periods
+n_time_periods <- 100
+
+# Number of groups
+n_groups <- 51
+
+# Standard deviation for brownian motion
+sig2 <- 0.05
+
+###################################################################
+# Initialize data frame
+df <- data.frame(matrix(vector(), n_time_periods*n_groups, 3,
+                        dimnames=list(c(), c("group_id", "time", "value"))),
+                 stringsAsFactors=F)
+
+# Set a random starting point for each variable
+random_start_point <- rnorm(n_groups)
+
+for (i in 1:n_groups) {
+
+  # Store group id
+  df[((i*n_time_periods) - n_time_periods + 1):(i*n_time_periods), 1] <- rep(i, n_time_periods)
+
+  # Store time
+  df[((i*n_time_periods) - n_time_periods + 1):(i*n_time_periods), 2] <- 1:n_time_periods - n_time_periods/2
+
+  # Store value
+  temp_normal_draws <- c(random_start_point[i], rnorm(n = n_time_periods - 1, sd = sqrt(sig2)))
+  temp_cumulative_normal_draws <- cumsum(temp_normal_draws)
+
+  df[((i*n_time_periods) - n_time_periods + 1):(i*n_time_periods), 3] <- temp_cumulative_normal_draws
+}
+
+# Remove temp objects
+rm(list = ls()[grep("temp", ls())])
+
+###################################################################
+# Create a max time-series that won't be in the convex hull of the donor pool
+
+temp_max <- aggregate(df$value, by = list(df$time), max)
+
+names(temp_max) <- c("time", "value")
+temp_max$value <- temp_max$value*1.25
+temp_max$value[temp_max$time>=0] <- temp_max$value[temp_max$time>=0]*1.25
+temp_max$group_id <- n_groups + 1
+
+# Add to dataframe
+df_with_max <- rbind(df, temp_max)
+
+#########################################3
+# Create a half max
+temp_half_max <- temp_max
+temp_half_max$value <- temp_half_max$value - 4
+temp_half_max$group_id <- n_groups + 2
+
+# Add to dataframe
+df_with_max <- rbind(df_with_max, temp_half_max)
+
+# Remove temp objects
+rm(list = ls()[grep("temp", ls())])
+
+
+# Plot data
+max_plot <- ggplot(data = df_with_max, aes(x = time, y = value)) +
+  geom_line(aes(group = group_id), alpha = .25, size = 1) +
+  geom_line(data = subset(df_with_max, group_id == n_groups + 1) ,aes(group = group_id), alpha = 1 , size = 2, color = 'black') +
+  geom_line(data = subset(df_with_max, group_id == n_groups + 1) ,aes(group = group_id), alpha = 1 , size = 1.5, color = '#ffab10') +
+  geom_line(data = subset(df_with_max, group_id == n_groups + 2) ,aes(group = group_id), alpha = 1 , size = 2, color = 'black') +
+  geom_line(data = subset(df_with_max, group_id == n_groups + 2) ,aes(group = group_id), alpha = 1 , size = 1.5, color = '#5810ff') +
+  theme_classic() +
+  labs(title = "Case 1: No convex combination of the donor pool can equal\n the target time series",
+       y = "Value",
+       x = "Time since treatment") +
+  theme(axis.text = element_text(size = 15),
+        axis.title = element_text(size = 18),
+        title = element_text(size = 18)
+  ) +
+  ylim(-8, 8) +
+  geom_vline(xintercept = 0, linetype = "dashed", size = 1, color = "black") +
+  geom_segment(aes(y = 6.7, x = 25, yend = 6, xend = 28 ),
+               arrow = arrow(length = unit(0.25, "cm"))) + 
+  annotate("text", y = 7 , x=18, label= "Target series", hjust = 0,  size = 5)  +
+  geom_segment(aes(y = -4.75, x = -30, yend = -2, xend = -25 ),
+               arrow = arrow(length = unit(0.25, "cm"))) + 
+  annotate("text", y = -5.75 , x=-39, label= "Optimal donor series \n with weight = 1\n and intercept = 4", hjust = 0,  size = 5) 
+
+###################################################################
+# Create an inverse time series
+group_to_treat <- 15
+df_with_inverse <- df
+treated_value <- df_with_inverse$value + abs(df_with_inverse$value) + 1
+df_with_inverse$value <- ifelse(df_with_inverse$group_id == group_to_treat & df_with_inverse$time>=0, treated_value, df_with_inverse$value)
+
+temp_inverse <- subset(df_with_inverse, group_id == group_to_treat)
+temp_inverse$value <- -temp_inverse$value
+temp_inverse$group_id <-  n_groups + 1
+
+# Add to dataframe
+df_with_inverse <- rbind(df_with_inverse, temp_inverse)
+
+# Remove temp objects
+rm(list = ls()[grep("temp", ls())])
+
+# Plot data
+inv_plot <- ggplot(data = df_with_inverse, aes(x = time, y = value)) +
+  geom_line(aes(group = group_id), alpha = .25, size = 1) +
+  geom_line(data = subset(df_with_inverse, group_id == group_to_treat) ,aes(group = group_id), alpha = 1 , size = 2, color = 'black') +
+  geom_line(data = subset(df_with_inverse, group_id == group_to_treat) ,aes(group = group_id), alpha = 1 , size = 1.5, color = '#ffab10') +
+  geom_line(data = subset(df_with_inverse, group_id == n_groups + 1) ,aes(group = group_id), alpha = 1 , size = 2, color = 'black', linetype = "solid") +
+  geom_line(data = subset(df_with_inverse, group_id == n_groups + 1) ,aes(group = group_id), alpha = 1 , size = 1.5, color = '#5810ff', linetype = "solid") +
+  theme_classic() +
+  labs(title = "Case 2: The best donor series for this time series is\n countercyclical and would need a weight of -1",
+       y = "Value",
+       x = "Time since treatment") +
+  theme(axis.text = element_text(size = 15),
+        axis.title = element_text(size = 18),
+        title = element_text(size = 18)
+        ) +
+  ylim(-8, 8) +
+  geom_vline(xintercept = 0, linetype = "dashed", size = 1, color = "black") +
+  geom_segment(aes(y = 5.34, x = 20, yend = 4.5 , xend = 16 ),
+               arrow = arrow(length = unit(0.25, "cm"))) + 
+  annotate("text", y = 5.7 , x=18, label= "Target series", hjust = 0,  size = 5) +
+  geom_segment(aes(y = -6, x = 29, yend = -4.2 , xend = 37 ),
+               arrow = arrow(length = unit(0.25, "cm"))) + 
+  annotate("text", y = -7.25 , x=18, label= "Optimal donor series\n with weight = -1\n and intercept = 0", hjust = 0,  size = 5) 
+
+
+###########################################################################################
+# combined_plot <- plot_grid(max_plot, inv_plot, 
+#                            ncol = 2, 
+#                            align = c('v', 'h'), 
+#                            rel_heights = c(1,1),
+#                            labels = c('A', 'B')
+#                            )
+# combined_plot
+# 
+# ggsave("~/Documents/GitHub/scul_work/vignettes/time_series_convex_hull.png",
+#        plot = combined_plot,
+#        dpi = 300, 
+#        width = 16, 
+#        height = 8, 
+#        units = "in")
+
+#
+ 
+ # combined_plot <- plot_grid(max_plot, inv_plot, two_series,
+ #                            ncol = 3, 
+ #                            align = c('v', 'h'), 
+ #                            rel_heights = c(1,1),
+ #                            labels = c('A', 'B', 'C')
+ # )
+ # combined_plot
+ # 
+ # ggsave("~/Documents/GitHub/scul_work/vignettes/time_series_convex_hull.png",
+ #        plot = combined_plot,
+ #        dpi = 300, 
+ #        width = 27, 
+ #        height = 9, 
+ #        units = "in")
+ # 
+ 
+ 
+ ##########################################################
+ ## Abadie synthetic control 
+
+ # Number of groups
+ n_groups <- 51
+ 
+ dataprep.out <-
+   dataprep(df_with_max,
+            dependent     = "value",
+            unit.variable = "group_id",
+            time.variable = "time",
+            special.predictors = list(
+              list("value",1:49,c("mean"))),
+            treatment.identifier  = 52,
+            controls.identifier   = c(1:51, 53),
+            time.predictors.prior = c(-49:-1),
+            time.optimize.ssr     = c(-49:-1),
+            time.plot             = c(-49:50)
+   )
+ 
+ # Run synth
+ synth.out <- synth(dataprep.out)
+ 
+ # Store restults as a dataframe
+ temp_scm_max <- data.frame(dataprep.out$Y0plot%*%synth.out$solution.w[,1])
+ names(temp_scm_max) <- c("value")
+ temp_scm_max$group_id <- -99
+ temp_scm_max$time <- c(-49:50)
+ 
+ ##################################################################################
+ # Run the SCUL algorithm 
+
+ # Reshape data 
+ df_with_max_reshape <- reshape(df_with_max, idvar = "time", timevar = "group_id", direction = "wide")
+
+ # Set up variables for import
+ temp.y <- data.frame(df_with_max_reshape[,53])
+ names(temp.y) <- c("y")
+ temp.time <-data.frame(df_with_max_reshape[,1] + 50)
+ names(temp.time) <- c("time")
+ temp.x <- data.frame(df_with_max_reshape[,c(-1,-53)])
+ 
+ #########################################################################################################
+ # Setup for SCUL
+ 
+  SCUL.input <- OrganizeDataAndSetup (
+   time = temp.time,
+   y = temp.y,
+   TreatmentBeginsAt = 50,
+   x.DonorPool = temp.x,
+   CohensDThreshold=0.10,
+   NumberInitialTimePeriods = 10,
+   TrainingPostPeriodLength = 10,
+   x.PlaceboPool=temp.x,
+   OutputFilePath="output/"
+ )
+  
+  
+  #########################################################################################################
+  # Main run
+  SCUL.output<-SCUL()
+  
+  # Store restults as a dataframe
+  temp_scul_max <- data.frame(SCUL.output$y.scul)
+  names(temp_scul_max) <- c("value")
+  temp_scul_max$group_id <- -999
+  temp_scul_max$time <- c(-49:50)
+  
+  
+  # Add to dataframe
+  df_with_max_scm <- rbind(df_with_max, temp_scm_max, temp_scul_max)
+  
+  # Plot data
+
+  
+  max_plot_scm_v_scul <- ggplot(data = df_with_max_scm, aes(x = time, y = value)) +
+     stat_summary(data = subset(df, group_id > 0), geom="ribbon", alpha = 0.6, fun.max = max, fun.min = min) +
+    geom_line(data = subset(df, group_id == n_groups + 1) ,aes(group = group_id), alpha = 1 , size = 2, color = 'black') +
+    geom_line(data = subset(df_with_max_scm, group_id == n_groups + 1) ,aes(group = group_id), alpha = 1 , size = 1.5, color = '#ffab10') +
+    geom_line(data = subset(df_with_max_scm, group_id == -99) ,aes(group = group_id), alpha = 1 , size = 2, color = 'black') +
+    geom_line(data = subset(df_with_max_scm, group_id == -99) ,aes(group = group_id), alpha = 1 , size = 1.5, color = 'red') +
+    geom_line(data = subset(df_with_max_scm, group_id == -999) ,aes(group = group_id), alpha = 1 , size = 1, color = 'blue', linetype = "dashed") +
+    theme_classic() +
+    labs(title = "Case 1: Traditional SCM is bound by convex hull and\n cannot use an intercept to select the optimal donor series",
+         y = "Value",
+         x = "Time since treatment") +
+    theme(axis.text = element_text(size = 15),
+          axis.title = element_text(size = 18),
+          title = element_text(size = 18)
+    ) +
+    ylim(-8, 8) +
+    geom_vline(xintercept = 0, linetype = "dashed", size = 1, color = "black") +
+    geom_segment(aes(y = 4.8, x = -32.5, yend = 2.5, xend = -25 ),
+                 arrow = arrow(length = unit(0.25, "cm"))) + 
+    annotate("text", y = 5.75 , x= -35, label= "SCUL prediction\n (dashed-line)", hjust = 0,  size = 5)  +
+    geom_segment(aes(y = 6.7, x = 25, yend = 6, xend = 28 ),
+                 arrow = arrow(length = unit(0.25, "cm"))) + 
+    annotate("text", y = 7 , x=18, label= "Target series", hjust = 0,  size = 5)  +
+    geom_segment(aes(y = -4.75, x = -30, yend = 0.5 , xend = -20 ),
+                 arrow = arrow(length = unit(0.25, "cm"))) + 
+    annotate("text", y = -5.5 , x=-39, label= "SCM Prediction", hjust = 0,  size = 5) +
+    annotate("text", y = -2.25 , x=27, label= "Convex Hull of\n Donor Pool", hjust = 0,  size = 5, color = "white") 
+    
+  
+  
+  
+  ##########################################################
+  ## Abadie synthetic control 
+
+  # Number of groups
+  n_groups <- 51
+  
+  dataprep.out <-
+    dataprep(df_with_inverse,
+             dependent     = "value",
+             unit.variable = "group_id",
+             time.variable = "time",
+             special.predictors = list(
+               list("value",1:49,c("mean"))),
+             treatment.identifier  = 15,
+             controls.identifier   = c(1:14, 16:52),
+             time.predictors.prior = c(-49:-1),
+             time.optimize.ssr     = c(-49:-1),
+             time.plot             = c(-49:50)
+    )
+  
+  # Run synth
+  synth.out <- synth(dataprep.out)
+  
+  # Store restults as a dataframe
+  temp_scm_inv <- data.frame(dataprep.out$Y0plot%*%synth.out$solution.w[,1])
+  names(temp_scm_inv) <- c("value")
+  temp_scm_inv$group_id <- -99
+  temp_scm_inv$time <- c(-49:50)
+  
+  ##################################################################################
+  # Run the SCUL algorithm 
+
+  # Reshape data 
+  df_with_inverse_reshape <- reshape(df_with_inverse, idvar = "time", timevar = "group_id", direction = "wide")
+  
+  # Set up variables for import
+  temp.y <- data.frame(df_with_inverse_reshape[,16])
+  names(temp.y) <- c("y")
+  temp.time <-data.frame(df_with_inverse_reshape[,1] + 50)
+  names(temp.time) <- c("time")
+  temp.x <- data.frame(df_with_inverse_reshape[,c(-1,-16)])
+  
+  #########################################################################################################
+  # Setup for SCUL
+
+  
+  SCUL.input <- OrganizeDataAndSetup (
+    time = temp.time,
+    y = temp.y,
+    TreatmentBeginsAt = 50,
+    x.DonorPool = temp.x,
+    CohensDThreshold=0.10,
+    NumberInitialTimePeriods = 10,
+    TrainingPostPeriodLength = 10,
+    x.PlaceboPool=temp.x,
+    OutputFilePath="output/"
+  )
+  
+  
+  #########################################################################################################
+  # Main run
+  SCUL.output<-SCUL()
+  
+  # Store restults as a dataframe
+  temp_scul_inv <- data.frame(SCUL.output$y.scul)
+  names(temp_scul_inv) <- c("value")
+  temp_scul_inv$group_id <- -999
+  temp_scul_inv$time <- c(-49:50)
+  
+  
+  # Add to dataframe
+  df_with_inv_scm <- rbind(df_with_inverse, temp_scm_inv, temp_scul_inv)
+  
+  # Plot data
+  
+  inv_plot_scm_v_scul <- ggplot(data = df_with_inv_scm, aes(x = time, y = value)) +
+  stat_summary(data = subset(df_with_inverse, group_id > 0), geom="ribbon", alpha = 0.6, fun.max = max, fun.min = min) +
+    geom_line(data = subset(df_with_inv_scm, group_id == 15) ,aes(group = group_id), alpha = 1 , size = 2, color = 'black') +
+    geom_line(data = subset(df_with_inv_scm, group_id == 15) ,aes(group = group_id), alpha = 1 , size = 1.5, color = '#ffab10') +
+    geom_line(data = subset(df_with_inv_scm, group_id == -99) ,aes(group = group_id), alpha = 1 , size = 2, color = 'black') +
+    geom_line(data = subset(df_with_inv_scm, group_id == -99) ,aes(group = group_id), alpha = 1 , size = 1.5, color = 'red') +
+    geom_line(data = subset(df_with_inv_scm, group_id == -999) ,aes(group = group_id), alpha = 1 , size = 1, color = 'blue', linetype = "dashed") +
+    theme_classic() +
+    labs(title = "Case 2: Traditional SCM cannot give -1 weight to\n optimal donor series",
+         y = "Value",
+         x = "Time since treatment") +
+    theme(axis.text = element_text(size = 15),
+          axis.title = element_text(size = 18),
+          title = element_text(size = 18)
+    ) +
+    ylim(-8, 8) +
+    geom_vline(xintercept = 0, linetype = "dashed", size = 1, color = "black")   +
+    geom_segment(aes(y = 4.8, x = -32.5, yend = 1, xend = -30 ),
+                 arrow = arrow(length = unit(0.25, "cm"))) + 
+    annotate("text", y = 5.75 , x= -35, label= "SCUL prediction\n (dashed-line)", hjust = 0,  size = 5)  +
+    geom_segment(aes(y = 5.34, x = 20, yend = 4.5 , xend = 16 ),
+                 arrow = arrow(length = unit(0.25, "cm"))) + 
+    annotate("text", y = 5.7 , x=18, label= "Target series", hjust = 0,  size = 5) +
+    geom_segment(aes(y = -4.75, x = -30, yend = -0.5 , xend = -37 ),
+                 arrow = arrow(length = unit(0.25, "cm"))) + 
+    annotate("text", y = -5.5 , x=-39, label= "SCM Prediction", hjust = 0,  size = 5) +
+    annotate("text", y = -2.25 , x=27, label= "Convex Hull of\n Donor Pool", hjust = 0,  size = 5, color = "white") 
+  
+  
+
+  
+  
+  combined_plot <- plot_grid(max_plot, inv_plot, max_plot_scm_v_scul, inv_plot_scm_v_scul, 
+                             ncol = 2, 
+                             align = c('v', 'h'), 
+                             rel_heights = c(1,1),
+                             labels = c('A', 'B', 'C' , 'D')
+  )
+  
+combined_plot
+  ggsave("vignette_output/time_series_convex_hull.pdf",
+         plot = combined_plot,
+         width = 18, 
+         height = 12, 
+         units = "in")
+  
+```
+
+
+# Session-info
+```{r}
+sessionInfo()
+```
+
+
+
+# References
