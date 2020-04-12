@@ -11,7 +11,7 @@ The R package can be downloaded using the devtools package and typing the follow
 
 An in-depth tutorial of the package using publicly available data is available here, <https://raw.githack.com/hollina/scul/master/doc/scul-tutorial.html>.
 
-More detail on the procedure can be found in our working paper here, (link to be posted 3 May 2020).
+More detail on the procedure can be found in our working paper, (link to be posted 3 May 2020).
 
 ## What is a synthetic control?
 
@@ -19,25 +19,43 @@ The synthetic control methodology is a strategy for estimating causal treatment 
 In the typical application developed by Abadie, Diamond, and Hainmueller (2010), researchers observe time series outcomes for both a treated unit and a number of untreated units.
 A weighted average of the untreated series is used to construct a counterfactual estimate of the treated series, which is referred to as a synthetic comparison group.
 Weights are chosen to minimize discrepancies between the synthetic comparison group and the treated unit in the pre-treatment time period.
-
-A useful way to think about synthetic controls is as a procedure that *matches* donor series to target series on the unobserved factors that describe the data generating process.
-The goal of synthetic controls is then to estimate how a particular treatment affected the underlying data generating process for the treated unit.
-When framed in this manner both identification assumptions and strategies for inference become more salient.
-
 Treatment effect estimates are taken to be the difference between observed outcomes and a synthetic counterfactual.
 Statistical inference is normally organized around a placebo analysis; in which, pseudo-treatment effects are estimated for many untreated placebo units, and the distribution of pseudo-estimates represents the null distribution of no treatment effect.
 
+A useful way to think about synthetic controls is as a procedure that attempts to *match* donor series to target series based on the unobserved factors that determine the data generating process.
+When framed in this manner identification assumptions and strategies for model selection and inference become more salient.
 
 ## Extensions of the traditional method
 
-Recent methodological work has proposed a number of alternative strategies for estimating synthetic control weights (Arkhangelsky et al. 2018; Doudchenko and Imbens 2017; Powell 2019). In a similar vein, we use a method called **Synthetic Control Using Lasso (SCUL)** to construct donor weights.
-This method is a flexible, data-driven way to construct synthetic control groups. It relies on lasso regressions, which are popular in the machine-learning literature, and favor weights that predict well out of sample. In general, the approach allows for a high-dimensional donor pool that may be larger than the number of time periods, extrapolation from the donor pool, counter-cyclical weights, and the same model selection procedure to be used for target and placebo series.
+Recent methodological work has proposed a number of innovative strategies for estimating synthetic control weights (Arkhangelsky et al. 2018; Doudchenko and Imbens 2017; Powell 2019).
+In a similar vein, we use a method called **Synthetic Control Using Lasso (SCUL)** to construct donor weights.
+This method is a flexible, data-driven way to construct synthetic control groups.
+It relies on lasso regressions, which are popular in the machine-learning literature, and favor weights that predict well out of sample.
+In general, our approach allows for a high-dimensional donor pool that may be larger than the number of time periods, extrapolation from the donor pool, counter-cyclical weights, and the same model selection procedure to be used for target and placebo series.
 
 Our working paper highlights identification assumptions and recommendations that are relevant for any synthetic control study.
-We implement versions of the recommendations in our tutorial.
+We implement versions of the recommendations in our [tutorial](https://raw.githack.com/hollina/scul/master/doc/scul-tutorial.html).
 We frame synthetic controls as a way of matching on unobserved underlying factors that form the data generating process.
-When viewed in this context, using donor units from a wide range of variable types makes sense because different units may help pin down different underlying factors.
+When viewed in this context, using donor units from a wide range of variable types makes sense because different variable types may help pin down different underlying factors/features of the data generating process for the treated unit.
 As such we use a wide range of donor variables to construct our synthetic control groups, not just the same variable type as the target variable as is common practice.
+
+## When would you want non-convex or negative weights?
+
+The traditional synthetic control method restricts weights to be non-negative and to sum to one.
+These restrictions force the synthetic control group to remain within the support (i.e., convex hull) of the donor pool, preventing extrapolation.
+This can certainly be a desirable property.
+However there are some situations where these restrictions that prevent extrapolation can inhibit a synthetic control group from finding a perfect donor series.
+
+- Case 1: When the target series is outside the the support of the donor pool (i.e. you need extrapolation to match the target series
+- Case 2: When negatively correlated donors can help identify underlying data generating process (e.g., two financial assets, or a price and consumption series)
+
+
+<figure style="float:center;">
+<img src="https://github.com/hollina/scul/blob/master/vignettes/vignette_output/time_series_convex_hull.png"  width="800"  />
+</figure>
+
+The SCUL procedure is a flexible synthetic control method that accommodates both of these scenarios. It also allows for more donors than time periods (i.e., high-dimensional data), which is not possible using the traditional method.
+
 
 ## How can I learn more about SCUL?/Where can I get your data used in the paper?
 
@@ -55,31 +73,18 @@ The entire procedure or parts of the method may be useful in many settings.
 Feel free to use any or all of the code; it is available under the MIT license.
 
 
-# When would you want non-convex or negative weights?
-
-- When there are more donors than time periods (i.e., high-dimensional data)
-- When the target series is outside the the support of the donor pool (case 1 below)
-- When negatively correlated donors can help identify underlying data generating process (case 2 below)
-
-The SCUL procedure is a flexible synthetic control method that accommodates all of these scenarios.
-
-<figure style="float:center;">
-<img src="https://github.com/hollina/scul/blob/master/vignettes/vignette_output/time_series_convex_hull.png"  width="800"  />
-</figure>
-
-## Software Used:
+### Software Used:
 The package is made for R. and was developed on a Unix machine using R 3.6.1. See session info in the vignette for exact version of every package used.
 
-## License:
+### License:
 Replication Package (this github repo): [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 Working Paper: [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
-
 ## To Do:
 
-  1 Post working paper
-  2 Add examples to each function
-  3 Create function for smoke plot
-  4 Proof read documentation
-  5 Submit package via CRAN
+1. Post working paper
+1. Add examples to each function
+1. Create function for smoke plot
+1. Proof read documentation
+1. Submit package via CRAN
