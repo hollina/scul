@@ -67,7 +67,7 @@ Feel free to use any or all of the code; it is available under the MIT license.
 The SCUL procedure is a flexible synthetic control method that accommodates all of these scenarios.
 
 <figure style="float:center;">
-<img src="https://github.com/hollina/scul/blob/master/vignettes/vignette_output/time_series_convex_hull.pdf"  width="800"  />
+<img src="https://github.com/hollina/scul/blob/master/vignettes/vignette_output/time_series_convex_hull.png"  width="800"  />
 </figure>
 
 
