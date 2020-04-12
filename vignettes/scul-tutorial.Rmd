@@ -801,7 +801,7 @@ NullDist.Full <- PlotNullDistribution(
     height = 2,
     AdjustmentParm = 1,
     BandwidthParm = .25,
-    title_label = "Placebo distribution compared\n to ATE estimate in\n pre-period standard deviation units",
+    title_label = "Placebo distribution compared\n to ATE estimate in\n pre-period standard deviations",
     y_label  = " ",
     x_label  =  "",
     subtitle_label  =  "No Cohen's D restriction",
@@ -1197,14 +1197,14 @@ Also of note. Many of these variable recieve nearly, but not exactly zero weight
 # Combine the two plots for the readme
 PlotForReadMe <- plot_grid(
     smoke_plot, combined_plot,
-    ncol = 2, rel_widths = c(1, .4))
+    ncol = 2, rel_widths = c(1, .45))
 
 ReadMePlotPath <- paste0(SCUL.input$OutputFilePath,"ReadMeFigure.png")
 
 ggsave(ReadMePlotPath,
        plot = PlotForReadMe,
-       width = 18,
-       height = 9,
+       width = 12,
+       height = 6,
        dpi = 300,
        units = "in")
 ```
