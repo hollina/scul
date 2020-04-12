@@ -2,10 +2,9 @@
 .Rhistory
 .Rbuildignore
 .Rproj.user
-inst/doc
-doc
 Meta
 .DS_Store
 .DS_Store
 .Rhistory
+.DS_Store
 .DS_Store
