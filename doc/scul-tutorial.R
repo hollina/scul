@@ -24,7 +24,7 @@ AllXData <- cigarette_sales %>%
 processed.AllYData <- Preprocess(AllYData)
 
 ## -----------------------------------------------------------------------------
-TreatmentBeginsAt <- 19 # Here the 18th row is 1988 
+TreatmentBeginsAt <- 19 # Here the 18th row is 1988
 PostPeriodLength <- nrow(processed.AllYData) - TreatmentBeginsAt + 1
 PrePeriodLength <- TreatmentBeginsAt-1
 NumberInitialTimePeriods <- 5
@@ -266,15 +266,15 @@ names(TreatmentEffect) <- c("scul.cv")
 
 TreatmentEffect$naive_prediction_1 <-
   data_to_plot_scul_vary_lambda$actual_y -   
-  data_to_plot_scul_vary_lambda$naive_prediction_1 
-TreatmentEffect$naive_prediction_2 <- 
-  data_to_plot_scul_vary_lambda$actual_y - 
+  data_to_plot_scul_vary_lambda$naive_prediction_1
+TreatmentEffect$naive_prediction_2 <-
+  data_to_plot_scul_vary_lambda$actual_y -
   data_to_plot_scul_vary_lambda$naive_prediction_2
-TreatmentEffect$naive_prediction_3 <- 
-  data_to_plot_scul_vary_lambda$actual_y- 
-  data_to_plot_scul_vary_lambda$naive_prediction_3 
+TreatmentEffect$naive_prediction_3 <-
+  data_to_plot_scul_vary_lambda$actual_y-
+  data_to_plot_scul_vary_lambda$naive_prediction_3
 TreatmentEffect$naive_prediction_4 <-  
-  data_to_plot_scul_vary_lambda$actual_y - 
+  data_to_plot_scul_vary_lambda$actual_y -
   data_to_plot_scul_vary_lambda$naive_prediction_4
 
 
@@ -386,7 +386,7 @@ NullDist.Full <- PlotNullDistribution(
     height = 2,
     AdjustmentParm = 1,
     BandwidthParm = .25,
-    title_label = "Placebo distribution compared\n to ATE estimate in\n pre-period standard deviation units",
+    title_label = "Placebo distribution compared\n to ATE estimate in\n pre-period standard deviations",
     y_label  = " ",
     x_label  =  "",
     subtitle_label  =  "No Cohen's D restriction",
@@ -711,14 +711,14 @@ column_spec(2:4, width = "2cm")  %>%
 # Combine the two plots for the readme
 PlotForReadMe <- plot_grid(
     smoke_plot, combined_plot,
-    ncol = 2, rel_widths = c(1, .4))
+    ncol = 2, rel_widths = c(1, .45))
 
 ReadMePlotPath <- paste0(SCUL.input$OutputFilePath,"ReadMeFigure.png")
 
 ggsave(ReadMePlotPath,
        plot = PlotForReadMe,
-       width = 18,
-       height = 9,
+       width = 12,
+       height = 6,
        dpi = 300,
        units = "in")
 
@@ -735,7 +735,7 @@ pacman::p_load(
 )
 
 #########################################################################################################
-# Set seed 
+# Set seed
 set.seed(1234)
 
 #########################################################################################################
@@ -819,11 +819,11 @@ max_plot <- ggplot(data = df_with_max, aes(x = time, y = value)) +
   ylim(-8, 8) +
   geom_vline(xintercept = 0, linetype = "dashed", size = 1, color = "black") +
   geom_segment(aes(y = 6.7, x = 25, yend = 6, xend = 28 ),
-               arrow = arrow(length = unit(0.25, "cm"))) + 
+               arrow = arrow(length = unit(0.25, "cm"))) +
   annotate("text", y = 7 , x=18, label= "Target series", hjust = 0,  size = 5)  +
   geom_segment(aes(y = -4.75, x = -30, yend = -2, xend = -25 ),
-               arrow = arrow(length = unit(0.25, "cm"))) + 
-  annotate("text", y = -5.75 , x=-39, label= "Optimal donor series \n with weight = 1\n and intercept = 4", hjust = 0,  size = 5) 
+               arrow = arrow(length = unit(0.25, "cm"))) +
+  annotate("text", y = -5.75 , x=-39, label= "Optimal donor series \n with weight = 1\n and intercept = 4", hjust = 0,  size = 5)
 
 ###################################################################
 # Create an inverse time series
@@ -860,54 +860,54 @@ inv_plot <- ggplot(data = df_with_inverse, aes(x = time, y = value)) +
   ylim(-8, 8) +
   geom_vline(xintercept = 0, linetype = "dashed", size = 1, color = "black") +
   geom_segment(aes(y = 5.34, x = 20, yend = 4.5 , xend = 16 ),
-               arrow = arrow(length = unit(0.25, "cm"))) + 
+               arrow = arrow(length = unit(0.25, "cm"))) +
   annotate("text", y = 5.7 , x=18, label= "Target series", hjust = 0,  size = 5) +
   geom_segment(aes(y = -6, x = 29, yend = -4.2 , xend = 37 ),
-               arrow = arrow(length = unit(0.25, "cm"))) + 
-  annotate("text", y = -7.25 , x=18, label= "Optimal donor series\n with weight = -1\n and intercept = 0", hjust = 0,  size = 5) 
+               arrow = arrow(length = unit(0.25, "cm"))) +
+  annotate("text", y = -7.25 , x=18, label= "Optimal donor series\n with weight = -1\n and intercept = 0", hjust = 0,  size = 5)
 
 
 ###########################################################################################
-# combined_plot <- plot_grid(max_plot, inv_plot, 
-#                            ncol = 2, 
-#                            align = c('v', 'h'), 
+# combined_plot <- plot_grid(max_plot, inv_plot,
+#                            ncol = 2,
+#                            align = c('v', 'h'),
 #                            rel_heights = c(1,1),
 #                            labels = c('A', 'B')
 #                            )
 # combined_plot
-# 
+#
 # ggsave("~/Documents/GitHub/scul_work/vignettes/time_series_convex_hull.png",
 #        plot = combined_plot,
-#        dpi = 300, 
-#        width = 16, 
-#        height = 8, 
+#        dpi = 300,
+#        width = 16,
+#        height = 8,
 #        units = "in")
 
 #
- 
+
  # combined_plot <- plot_grid(max_plot, inv_plot, two_series,
- #                            ncol = 3, 
- #                            align = c('v', 'h'), 
+ #                            ncol = 3,
+ #                            align = c('v', 'h'),
  #                            rel_heights = c(1,1),
  #                            labels = c('A', 'B', 'C')
  # )
  # combined_plot
- # 
+ #
  # ggsave("~/Documents/GitHub/scul_work/vignettes/time_series_convex_hull.png",
  #        plot = combined_plot,
- #        dpi = 300, 
- #        width = 27, 
- #        height = 9, 
+ #        dpi = 300,
+ #        width = 27,
+ #        height = 9,
  #        units = "in")
- # 
- 
- 
+ #
+
+
  ##########################################################
- ## Abadie synthetic control 
+ ## Abadie synthetic control
 
  # Number of groups
  n_groups <- 51
- 
+
  dataprep.out <-
    dataprep(df_with_max,
             dependent     = "value",
@@ -921,20 +921,20 @@ inv_plot <- ggplot(data = df_with_inverse, aes(x = time, y = value)) +
             time.optimize.ssr     = c(-49:-1),
             time.plot             = c(-49:50)
    )
- 
+
  # Run synth
  synth.out <- synth(dataprep.out)
- 
+
  # Store restults as a dataframe
  temp_scm_max <- data.frame(dataprep.out$Y0plot%*%synth.out$solution.w[,1])
  names(temp_scm_max) <- c("value")
  temp_scm_max$group_id <- -99
  temp_scm_max$time <- c(-49:50)
- 
- ##################################################################################
- # Run the SCUL algorithm 
 
- # Reshape data 
+ ##################################################################################
+ # Run the SCUL algorithm
+
+ # Reshape data
  df_with_max_reshape <- reshape(df_with_max, idvar = "time", timevar = "group_id", direction = "wide")
 
  # Set up variables for import
@@ -943,10 +943,10 @@ inv_plot <- ggplot(data = df_with_inverse, aes(x = time, y = value)) +
  temp.time <-data.frame(df_with_max_reshape[,1] + 50)
  names(temp.time) <- c("time")
  temp.x <- data.frame(df_with_max_reshape[,c(-1,-53)])
- 
+
  #########################################################################################################
  # Setup for SCUL
- 
+
   SCUL.input <- OrganizeDataAndSetup (
    time = temp.time,
    y = temp.y,
@@ -958,25 +958,25 @@ inv_plot <- ggplot(data = df_with_inverse, aes(x = time, y = value)) +
    x.PlaceboPool=temp.x,
    OutputFilePath="output/"
  )
-  
-  
+
+
   #########################################################################################################
   # Main run
   SCUL.output<-SCUL()
-  
-  # Store restults as a dataframe
+
+  # Store results as a dataframe
   temp_scul_max <- data.frame(SCUL.output$y.scul)
   names(temp_scul_max) <- c("value")
   temp_scul_max$group_id <- -999
   temp_scul_max$time <- c(-49:50)
-  
-  
+
+
   # Add to dataframe
   df_with_max_scm <- rbind(df_with_max, temp_scm_max, temp_scul_max)
-  
+
   # Plot data
 
-  
+
   max_plot_scm_v_scul <- ggplot(data = df_with_max_scm, aes(x = time, y = value)) +
      stat_summary(data = subset(df, group_id > 0), geom="ribbon", alpha = 0.6, fun.max = max, fun.min = min) +
     geom_line(data = subset(df, group_id == n_groups + 1) ,aes(group = group_id), alpha = 1 , size = 2, color = 'black') +
@@ -995,25 +995,25 @@ inv_plot <- ggplot(data = df_with_inverse, aes(x = time, y = value)) +
     ylim(-8, 8) +
     geom_vline(xintercept = 0, linetype = "dashed", size = 1, color = "black") +
     geom_segment(aes(y = 4.8, x = -32.5, yend = 2.5, xend = -25 ),
-                 arrow = arrow(length = unit(0.25, "cm"))) + 
+                 arrow = arrow(length = unit(0.25, "cm"))) +
     annotate("text", y = 5.75 , x= -35, label= "SCUL prediction\n (dashed-line)", hjust = 0,  size = 5)  +
     geom_segment(aes(y = 6.7, x = 25, yend = 6, xend = 28 ),
-                 arrow = arrow(length = unit(0.25, "cm"))) + 
+                 arrow = arrow(length = unit(0.25, "cm"))) +
     annotate("text", y = 7 , x=18, label= "Target series", hjust = 0,  size = 5)  +
     geom_segment(aes(y = -4.75, x = -30, yend = 0.5 , xend = -20 ),
-                 arrow = arrow(length = unit(0.25, "cm"))) + 
+                 arrow = arrow(length = unit(0.25, "cm"))) +
     annotate("text", y = -5.5 , x=-39, label= "SCM Prediction", hjust = 0,  size = 5) +
-    annotate("text", y = -2.25 , x=27, label= "Convex Hull of\n Donor Pool", hjust = 0,  size = 5, color = "white") 
-    
-  
-  
-  
+    annotate("text", y = -2.25 , x=27, label= "Convex Hull of\n Donor Pool", hjust = 0,  size = 5, color = "white")
+
+
+
+
   ##########################################################
-  ## Abadie synthetic control 
+  ## Abadie synthetic control
 
   # Number of groups
   n_groups <- 51
-  
+
   dataprep.out <-
     dataprep(df_with_inverse,
              dependent     = "value",
@@ -1027,33 +1027,33 @@ inv_plot <- ggplot(data = df_with_inverse, aes(x = time, y = value)) +
              time.optimize.ssr     = c(-49:-1),
              time.plot             = c(-49:50)
     )
-  
+
   # Run synth
   synth.out <- synth(dataprep.out)
-  
-  # Store restults as a dataframe
+
+  # Store results as a dataframe
   temp_scm_inv <- data.frame(dataprep.out$Y0plot%*%synth.out$solution.w[,1])
   names(temp_scm_inv) <- c("value")
   temp_scm_inv$group_id <- -99
   temp_scm_inv$time <- c(-49:50)
-  
-  ##################################################################################
-  # Run the SCUL algorithm 
 
-  # Reshape data 
+  ##################################################################################
+  # Run the SCUL algorithm
+
+  # Reshape data
   df_with_inverse_reshape <- reshape(df_with_inverse, idvar = "time", timevar = "group_id", direction = "wide")
-  
+
   # Set up variables for import
   temp.y <- data.frame(df_with_inverse_reshape[,16])
   names(temp.y) <- c("y")
   temp.time <-data.frame(df_with_inverse_reshape[,1] + 50)
   names(temp.time) <- c("time")
   temp.x <- data.frame(df_with_inverse_reshape[,c(-1,-16)])
-  
+
   #########################################################################################################
   # Setup for SCUL
 
-  
+
   SCUL.input <- OrganizeDataAndSetup (
     time = temp.time,
     y = temp.y,
@@ -1065,24 +1065,24 @@ inv_plot <- ggplot(data = df_with_inverse, aes(x = time, y = value)) +
     x.PlaceboPool=temp.x,
     OutputFilePath="output/"
   )
-  
-  
+
+
   #########################################################################################################
   # Main run
   SCUL.output<-SCUL()
-  
-  # Store restults as a dataframe
+
+  # Store results as a dataframe
   temp_scul_inv <- data.frame(SCUL.output$y.scul)
   names(temp_scul_inv) <- c("value")
   temp_scul_inv$group_id <- -999
   temp_scul_inv$time <- c(-49:50)
-  
-  
+
+
   # Add to dataframe
   df_with_inv_scm <- rbind(df_with_inverse, temp_scm_inv, temp_scul_inv)
-  
+
   # Plot data
-  
+
   inv_plot_scm_v_scul <- ggplot(data = df_with_inv_scm, aes(x = time, y = value)) +
   stat_summary(data = subset(df_with_inverse, group_id > 0), geom="ribbon", alpha = 0.6, fun.max = max, fun.min = min) +
     geom_line(data = subset(df_with_inv_scm, group_id == 15) ,aes(group = group_id), alpha = 1 , size = 2, color = 'black') +
@@ -1101,34 +1101,35 @@ inv_plot <- ggplot(data = df_with_inverse, aes(x = time, y = value)) +
     ylim(-8, 8) +
     geom_vline(xintercept = 0, linetype = "dashed", size = 1, color = "black")   +
     geom_segment(aes(y = 4.8, x = -32.5, yend = 1, xend = -30 ),
-                 arrow = arrow(length = unit(0.25, "cm"))) + 
+                 arrow = arrow(length = unit(0.25, "cm"))) +
     annotate("text", y = 5.75 , x= -35, label= "SCUL prediction\n (dashed-line)", hjust = 0,  size = 5)  +
     geom_segment(aes(y = 5.34, x = 20, yend = 4.5 , xend = 16 ),
-                 arrow = arrow(length = unit(0.25, "cm"))) + 
+                 arrow = arrow(length = unit(0.25, "cm"))) +
     annotate("text", y = 5.7 , x=18, label= "Target series", hjust = 0,  size = 5) +
     geom_segment(aes(y = -4.75, x = -30, yend = -0.5 , xend = -37 ),
-                 arrow = arrow(length = unit(0.25, "cm"))) + 
+                 arrow = arrow(length = unit(0.25, "cm"))) +
     annotate("text", y = -5.5 , x=-39, label= "SCM Prediction", hjust = 0,  size = 5) +
-    annotate("text", y = -2.25 , x=27, label= "Convex Hull of\n Donor Pool", hjust = 0,  size = 5, color = "white") 
-  
-  
+    annotate("text", y = -2.25 , x=27, label= "Convex Hull of\n Donor Pool", hjust = 0,  size = 5, color = "white")
 
-  
-  
-  combined_plot <- plot_grid(max_plot, inv_plot, max_plot_scm_v_scul, inv_plot_scm_v_scul, 
-                             ncol = 2, 
-                             align = c('v', 'h'), 
+
+
+
+
+  combined_plot <- plot_grid(max_plot, inv_plot, max_plot_scm_v_scul, inv_plot_scm_v_scul,
+                             ncol = 2,
+                             align = c('v', 'h'),
                              rel_heights = c(1,1),
                              labels = c('A', 'B', 'C' , 'D')
   )
-  
+
 combined_plot
-  ggsave("vignette_output/time_series_convex_hull.pdf",
+  ggsave("vignette_output/time_series_convex_hull.png",
          plot = combined_plot,
-         width = 18, 
-         height = 12, 
+         dpi = 300,
+         width = 18,
+         height = 12,
          units = "in")
-  
+
 
 ## -----------------------------------------------------------------------------
 sessionInfo()

@@ -44,8 +44,6 @@ fit is determined to be "poor". The difference is in standard deviation units. D
 \item{title_label}{Graph title}
 
 \item{rejection_label}{Label for the top of the red rejection region}
-
-\item{widthBreaks}{width breaks histogram. Default is 5, evenly spaced.}
 }
 \value{
 graph  A denisty plot of the null distribution conditional on satisfactory fit

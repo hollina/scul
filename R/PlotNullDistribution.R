@@ -10,7 +10,6 @@
 #' @param StartTime The begining time period for which the average pseduo treatment effect is calculated. T
 #' @param EndTime The end time period for which the average pseduo treatment effect is calculated. T
 #' @param width width of histogram. Default is 20
-#' @param widthBreaks width breaks histogram. Default is 5, evenly spaced.
 #' @param height height of histogram. Default is 0.05
 #' @param AdjustmentParm Adjustment parameter for guassian histogram. Default is 3.
 #' @param BandwidthParm Bandwidth parameter for guassian histogram. Default is 3.
