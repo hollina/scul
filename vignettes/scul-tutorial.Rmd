@@ -1,5 +1,5 @@
 ---
-title: "Synthetic Control Using Lasso (SCUL)"
+title: "SCUL Tutorial"
 subtitle: "Overview of R package, extended example using publicly available data, and brief comparison to traditional method"
 author: "Alex Hollingsworth"
 date: "`r Sys.Date()`"
@@ -1207,6 +1207,7 @@ ggsave(ReadMePlotPath,
        height = 6,
        dpi = 300,
        units = "in")
+
 ```
 
 # When would you want non-convex or negative weights?
@@ -1223,8 +1224,7 @@ However there are some situations where these restrictions that prevent extrapol
 ```{r, echo = FALSE, fig.height=12, fig.width=18, warning = FALSE, fig.align = "center", warning = FALSE, , message=FALSE, results='hide', out.width = '100%'}
 #########################################################################################################
 # Clear memory
-rm(list = ls())
-
+rm(list=ls()[! ls() %in% c("PlotForReadMe")])
 #########################################################################################################
 # Load packages
 if (!require("pacman")) install.packages("pacman")
@@ -1621,13 +1621,18 @@ inv_plot <- ggplot(data = df_with_inverse, aes(x = time, y = value)) +
   )
 
 combined_plot
-  ggsave("vignette_output/time_series_convex_hull.png",
-         plot = combined_plot,
+  ggsave("vignette_output/ReadMeFigure.png",
+         plot = ,PlotForReadMe,
          dpi = 300,
          width = 18,
          height = 12,
          units = "in")
-
+  ggsave("vignette_output/time_series_convex_hull.png",
+         plot = combined_plot,
+         dpi = 300,
+         width = 12,
+         height = 6,
+         units = "in")
 ```
 The SCUL procedure is a flexible synthetic control method that accommodates both of these scenarios. It also allows for more donors than time periods (i.e., high-dimensional data), which is not possible using the traditional method.
 
