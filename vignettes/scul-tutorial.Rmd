@@ -14,12 +14,13 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-
-<style>
-body {
-text-align: justify}
-</style>
-
+<!-- 
+  Code to Justify Text
+    <style>
+    body {
+    text-align: justify}
+    </style>
+--> 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,

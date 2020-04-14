@@ -6,14 +6,21 @@
 This repository contains the R package `scul` that is used in
 Hollingsworth and Wing (2020) *“Tactics for design and inference in
 synthetic control studies: An applied example using high-dimensional
-data.”* (Link to paper posted on 3 May 2020)
+data.”* (link to be posted 3 May 2020)
 
 ![figure1](vignettes/vignette_output/ReadMeFigure.png)
 
-The R package can be downloaded using the devtools package and typing
-the following command `devtools::install_github("hollina/scul")`. It
-will be released via CRAN once the working paper can be publicly posted
-on-line (3 May 2020).
+## Installation
+
+``` r
+# Install release version from CRAN
+# TBD. Likely available May 2020
+
+# Install development version from GitHub
+devtools::install_github("hollina/scul")`
+```
+
+## Tutorial
 
 An in-depth tutorial of the package using publicly available data is
 available here,
@@ -22,7 +29,9 @@ available here,
 More detail on the procedure can be found in our working paper, (link to
 be posted 3 May 2020).
 
-## What is a synthetic control?
+## Overview
+
+### What is a synthetic control?
 
 The synthetic control methodology is a strategy for estimating causal
 treatment effects for idiosyncratic historical events. In the typical
@@ -52,29 +61,104 @@ Recent methodological work has proposed a number of innovative
 strategies for estimating synthetic control weights (Arkhangelsky et al.
 2018; Doudchenko and Imbens 2017; Powell 2019). In a similar vein, we
 use a method called **Synthetic Control Using Lasso (SCUL)** to
-construct donor weights. This method is a flexible, data-driven way to
-construct synthetic control groups. It relies on lasso regressions,
-which are popular in the machine-learning literature, and favor weights
-that predict well out of sample. In general, our approach allows for a
-high-dimensional donor pool that may be larger than the number of time
-periods, extrapolation from the donor pool, counter-cyclical weights,
-and the same model selection procedure to be used for target and placebo
-series.
+construct donor weights.
 
-Our working paper highlights identification assumptions and
-recommendations that are relevant for any synthetic control study. We
-implement versions of the recommendations in our
-[tutorial](https://hollina.github.io/scul/articles/scul-tutorial.html).
+## What is SCUL?
+
+This method is a flexible, data-driven way to construct synthetic
+control groups. It relies on lasso regressions, which are popular in the
+machine-learning literature, and favor weights that predict well out of
+sample. In general, our approach allows for:
+
+  - a high-dimensional donor pool that may be larger than the number of
+    time periods
+  - a simple way of ensuring that the same model selection procedure are
+    used for target and placebo series
+  - a wide variety of variable types to serve as candidate donors
+  - extrapolation from the donor pool
+  - counter-cyclical weights
+
+Our working paper also highlights **identification assumptions** and
+**recommendations** that are relevant for any synthetic control study.
+
+## SCUL contributions
+
+### 1\. Clarifying idenficiation assumptions
+
+We outline two simple identification assumptions required for a
+synthetic control design to identify causal treatment parameters:
+
+1.  conditional independence of treatment exposure and potential
+    outcomes after matching on an underlying factor structure
+2.  no dormant factors during the pre-treatment period.
+
+While neither of these assumptions is directly testable, our working
+paper offers perspectives and strategies that may help in interpreting
+the validity of such assumptions in applied work.
+
+### 2\. Providing recommendations for ad hoc choices
+
+Our recommendations for decisions that commonly appear in synthetic
+control studies include:
+
+1.  using the same model selection procedure for both target and placebo
+    products
+2.  using a unit-free measure to evaluate model fit
+3.  discarding both potential target series and placebo series (used in
+    inference) that do poorly on a pre-specified threshold of model fit
+4.  incorporating a rolling-origin cross-validation procedure to
+    determine optimal weights
+5.  reporting synthetic control weights as the average contribution to
+    the synthetic prediction rather than as a numeric coefficient
+6.  using a unit-free measure of the treatment effect estimate to
+    compare estimated treatment effects to the placebo distribution for
+    inference
+7.  reporting the minimum detectable effect size for a given
+    significance level that a given placebo distribution would consider
+    statistically different than zero
+
+We implement versions of the recommendations in our
+[tutorial](https://hollina.github.io/scul/articles/scul-tutorial.html)
+and outline each in more detail in our working
+paper.
+
+### 3\. Using machine-learning that enables a high-dimensional donor pool and automates model selection
+
+Lasso regressions penalize specifications with numerious variables and
+large coeficients. This drives the value of many coefficients to zero
+and allows for the inclusion of very large donor pools. A benefit of
+this is that—so long as a donor is theoreticlally valid— a researcher
+will not need to decide whether to include one donor over another. A
+cost of this is the concern that the procedure could overfit the data.
+SCUL weights are created using cross-validated lasso regressions that
+ensure the weights do not “overfit” the data and that favor
+out-of-sample prediction.
+
+By automating model selection and allowing for a large number of donors,
+we reduce “researcher degrees of freedom.” It is easy to imagine that
+the best synthetic prediction could be created for each target series,
+but less time would be spent perfect the model for each placebo series.
+If the automated model selection results in better fit for placebo
+series, we also improve the statistical power. This occurs if better fit
+in the pre-treatment period results in less deterioration (i.e., better
+fit) in the post-period. This improves statistical power because
+statistical inference in done by comparing deviations of the treated
+series to the distribution of placebo deviations. Therefore reducing the
+spread of the placebo null-distribution allows for smaller deviations of
+the treated unit to be considered statistically rare.
+
+### 4\. Including a wide variety of donor types
+
 We frame synthetic controls as a way of matching on unobserved
 underlying factors that form the data generating process. When viewed in
 this context, using donor units from a wide range of variable types
 makes sense because different variable types may help pin down different
 underlying factors/features of the data generating process for the
-treated unit. As such we use a wide range of donor variables to
+treated unit. As such **we use a wide range of donor variables** to
 construct our synthetic control groups, not just the same variable type
 as the target variable as is common practice.
 
-## When would you want non-convex or negative weights?
+### 5\. Allowing for extrapolation and negative weights
 
 The traditional synthetic control method restricts weights to be
 non-negative and to sum to one. These restrictions force the synthetic
@@ -85,37 +169,26 @@ that prevent extrapolation can inhibit a synthetic control group from
 finding a perfect donor series.
 
   - Case 1: When the target series is outside the the support of the
-    donor pool (i.e. you need extrapolation to match the target series -
-    Case 2: When negatively correlated donors can help identify
+    donor pool (i.e. you need extrapolation to match the target series
+  - Case 2: When negatively correlated donors can help identify
     underlying data generating process (e.g., two financial assets, or a
     price and consumption series)
 
 ![figure2](vignettes/vignette_output/time_series_convex_hull.png)
 
-The SCUL procedure is a flexible synthetic control method that
-accommodates both of these scenarios. It also allows for more donors
-than time periods (i.e., high-dimensional data), which is not possible
-using the traditional
-method.
-
-## How can I learn more about SCUL?/Where can I get your data used in the paper?
-
-More detail on the procedure can be found in *“Tactics for design and
-inference in synthetic control studies: An applied example using
-high-dimensional data.”* (Link available 3 May 2020)
+## What else does the working paper do?
 
 This working paper, which is co-authored with Coady Wing, uses the SCUL
 method to estimate how recreational marijuana legalization affects sales
 of alcohol and over-the-counter painkillers, finding reductions in
-alcohol sales. Please cite our paper if you use this package, vignette,
-or the paper. :)
+alcohol sales.
 
 The paper uses retail scanner data from Nielsen cannot be publicly
 posted online, but are available for purchase from the Kilts Center for
 Marketing at the University of Chicago,
 <https://www.chicagobooth.edu/research/kilts/datasets/nielsen>.
 
-## What’s this package/vignette do?
+## What does this package/vignette do?
 
 This package provides code to implement the SCUL procedure. Because the
 data in our working paper cannot be posted online, we also provide an
@@ -127,7 +200,8 @@ all of the code; it is available under the MIT license.
 
 The package is made for R. and was developed on a Unix machine using R
 3.6.1. See session info in the vignette for exact version of every
-package used.
+package used. Documentation was made using `roxygen2`, `pkgdown`, and
+`RStudio`.
 
 ### License:
 
@@ -178,6 +252,7 @@ Difference-In-Differences and Synthetic Control Methods: A Synthesis.”
 <div id="ref-Powell2019">
 
 Powell, David. 2019. “Imperfect Synthetic Controls,” no. May 2017: 1–38.
+<https://sites.google.com/site/davidmatthewpowell/imperfect-synthetic-controls>.
 
 </div>
 
