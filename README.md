@@ -8,6 +8,8 @@ Hollingsworth and Wing (2020) *“Tactics for design and inference in
 synthetic control studies: An applied example using high-dimensional
 data.”* (Link to paper posted on 3 May 2020)
 
+![figure1](vignettes/vignette_output/ReadMeFigure.png)
+
 ``` r
 knitr::include_graphics(vignettes/vignette_output/ReadMeFigure.png)
 ```
