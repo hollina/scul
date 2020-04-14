@@ -10,10 +10,6 @@ data.”* (Link to paper posted on 3 May 2020)
 
 ![figure1](vignettes/vignette_output/ReadMeFigure.png)
 
-``` r
-knitr::include_graphics(vignettes/vignette_output/ReadMeFigure.png)
-```
-
 The R package can be downloaded using the devtools package and typing
 the following command `devtools::install_github("hollina/scul")`. It
 will be released via CRAN once the working paper can be publicly posted
@@ -21,7 +17,7 @@ on-line (3 May 2020).
 
 An in-depth tutorial of the package using publicly available data is
 available here,
-<https://raw.githack.com/hollina/scul/master/doc/scul-tutorial.html>.
+<https://hollina.github.io/scul/articles/scul-tutorial.html>.
 
 More detail on the procedure can be found in our working paper, (link to
 be posted 3 May 2020).
@@ -68,7 +64,7 @@ series.
 Our working paper highlights identification assumptions and
 recommendations that are relevant for any synthetic control study. We
 implement versions of the recommendations in our
-[tutorial](https://raw.githack.com/hollina/scul/master/doc/scul-tutorial.html).
+[tutorial](https://hollina.github.io/scul/articles/scul-tutorial.html).
 We frame synthetic controls as a way of matching on unobserved
 underlying factors that form the data generating process. When viewed in
 this context, using donor units from a wide range of variable types
@@ -92,14 +88,9 @@ finding a perfect donor series.
     donor pool (i.e. you need extrapolation to match the target series -
     Case 2: When negatively correlated donors can help identify
     underlying data generating process (e.g., two financial assets, or a
-    price and consumption
-series)
+    price and consumption series)
 
-<!-- end list -->
-
-``` r
-knitr::include_graphics(vignettes/vignette_output/time_series_convex_hull.png)
-```
+![figure2](vignettes/vignette_output/time_series_convex_hull.png)
 
 The SCUL procedure is a flexible synthetic control method that
 accommodates both of these scenarios. It also allows for more donors
