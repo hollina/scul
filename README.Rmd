@@ -43,7 +43,7 @@ When framed in this manner identification assumptions and strategies for model s
 
 ## Extensions of the traditional method
 
-Recent methodological work has proposed a number of innovative strategies for estimating synthetic control weights (Arkhangelsky et al. 2018; Doudchenko and Imbens 2017; Powell 2019).
+Recent methodological work has proposed a number of innovative strategies for estimating synthetic control weights [@Arkhangelsky2018; @Doudchenko2017; @Powell2019].
 In a similar vein, we use a method called **Synthetic Control Using Lasso (SCUL)** to construct donor weights.
 This method is a flexible, data-driven way to construct synthetic control groups.
 It relies on lasso regressions, which are popular in the machine-learning literature, and favor weights that predict well out of sample.
@@ -103,3 +103,5 @@ Working Paper: [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20
 1. Create function for smoke plot
 1. Proof read documentation
 1. Submit package via CRAN
+
+## References 

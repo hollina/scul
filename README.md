@@ -49,9 +49,9 @@ model selection and inference become more salient.
 ## Extensions of the traditional method
 
 Recent methodological work has proposed a number of innovative
-strategies for estimating synthetic control weights (Arkhangelsky et
-al. 2018; Doudchenko and Imbens 2017; Powell 2019). In a similar vein,
-we use a method called **Synthetic Control Using Lasso (SCUL)** to
+strategies for estimating synthetic control weights (Arkhangelsky et al.
+2018; Doudchenko and Imbens 2017; Powell 2019). In a similar vein, we
+use a method called **Synthetic Control Using Lasso (SCUL)** to
 construct donor weights. This method is a flexible, data-driven way to
 construct synthetic control groups. It relies on lasso regressions,
 which are popular in the machine-learning literature, and favor weights
@@ -145,6 +145,8 @@ BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https
 4.  Proof read documentation
 5.  Submit package via CRAN
 
+## References
+
 <div id="refs" class="references">
 
 <div id="ref-Abadie2010">
@@ -154,6 +156,28 @@ Control Methods for Comparative Case Studies: Estimating the Effect of
 California’s Tobacco Control Program.” *Journal of the American
 Statistical Association* 105 (490): 493–505.
 <https://doi.org/10.1198/jasa.2009.ap08746>.
+
+</div>
+
+<div id="ref-Arkhangelsky2018">
+
+Arkhangelsky, Dmitry, Susan Athey, David A. Hirshberg, Guido W. Imbens,
+and Stefan Wager. 2018. “Synthetic Difference in Differences.”
+<http://arxiv.org/abs/1812.09970>.
+
+</div>
+
+<div id="ref-Doudchenko2017">
+
+Doudchenko, Nikolay, and Guido W. Imbens. 2017. “Balancing, Regression,
+Difference-In-Differences and Synthetic Control Methods: A Synthesis.”
+<http://arxiv.org/abs/1610.07748>.
+
+</div>
+
+<div id="ref-Powell2019">
+
+Powell, David. 2019. “Imperfect Synthetic Controls,” no. May 2017: 1–38.
 
 </div>
 

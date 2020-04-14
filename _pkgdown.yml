@@ -4,3 +4,6 @@ url: http://hollina.github.io/scul
 template:
   params:
     bootswatch: flatly
+authors:
+  Alex Hollingsworth:
+    href: "https://alexjhollingsworth.com"
