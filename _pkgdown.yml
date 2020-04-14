@@ -1,3 +1,6 @@
 destination: docs
 title: SCUL
 url: http://hollina.github.io/scul
+template:
+  params:
+    bootswatch: flatly

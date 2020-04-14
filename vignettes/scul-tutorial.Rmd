@@ -1622,7 +1622,7 @@ inv_plot <- ggplot(data = df_with_inverse, aes(x = time, y = value)) +
 
 combined_plot
   ggsave("vignette_output/ReadMeFigure.png",
-         plot = ,PlotForReadMe,
+         plot = PlotForReadMe,
          dpi = 300,
          width = 12,
          height = 6,
