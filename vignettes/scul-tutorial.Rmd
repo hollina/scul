@@ -1624,14 +1624,14 @@ combined_plot
   ggsave("vignette_output/ReadMeFigure.png",
          plot = ,PlotForReadMe,
          dpi = 300,
-         width = 18,
-         height = 12,
+         width = 12,
+         height = 6,
          units = "in")
   ggsave("vignette_output/time_series_convex_hull.png",
          plot = combined_plot,
          dpi = 300,
-         width = 12,
-         height = 6,
+         width = 18,
+         height = 12,
          units = "in")
 ```
 The SCUL procedure is a flexible synthetic control method that accommodates both of these scenarios. It also allows for more donors than time periods (i.e., high-dimensional data), which is not possible using the traditional method.
