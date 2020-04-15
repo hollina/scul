@@ -46,9 +46,6 @@
 <li>
   <a href="reference/index.html">Functions</a>
 </li>
-<li>
-  <a href="news/index.html">News</a>
-</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
@@ -84,42 +81,40 @@
 <div id="synthetic-control-using-lasso-scul" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#synthetic-control-using-lasso-scul" class="anchor"></a>Synthetic Control Using Lasso (scul)</h1></div>
+<!-- badges: start -->
+
 <p>This repository contains the R package <code>scul</code> that is used in Hollingsworth and Wing (2020) <em>“Tactics for design and inference in synthetic control studies: An applied example using high-dimensional data.”</em> (link to be posted 3 May 2020)</p>
 <p><img src="articles/vignette_output/ReadMeFigure.png" alt="figure1"></p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<div class="sourceCode" id="cb1"><pre class="r"># Install release version from CRAN
-# TBD. Likely available May 2020
-
-# Install development version from GitHub
+<div class="sourceCode" id="cb1"><pre class="r"># Install development version from GitHub (CRAN coming soon) using these two lines of code
+if (!require("devtools")) install.packages("devtools")
 devtools::install_github("hollina/scul")`</pre></div>
 </div>
-<div id="tutorial" class="section level2">
+<div id="tutorialmore-details" class="section level2">
 <h2 class="hasAnchor">
-<a href="#tutorial" class="anchor"></a>Tutorial</h2>
-<p>An in-depth tutorial of the package using publicly available data is available here, <a href="https://hollina.github.io/scul/articles/scul-tutorial.html" class="uri">https://hollina.github.io/scul/articles/scul-tutorial.html</a>.</p>
-<p>More detail on the procedure can be found in our working paper, (link to be posted 3 May 2020).</p>
+<a href="#tutorialmore-details" class="anchor"></a>Tutorial/More details</h2>
+<p>An in-depth tutorial of the package and overview of every function in the package is available here, <a href="https://hollina.github.io/scul/articles/scul-tutorial.html" class="uri">https://hollina.github.io/scul/articles/scul-tutorial.html</a>. The tutorial uses publicly available data and discusses many features of the SCUL procedure.</p>
+<p>More details on the method can be found in our working paper, (link to be posted 3 May 2020). The working paper, which is co-authored with Coady Wing, desribes identification assumptions and key recommendations for—normally ad hoc—decisions that arise in most synthetic control studies. The paper then describes the SCUL method and uses SCUL to estimate how recreational marijuana legalization affects sales of alcohol and over-the-counter painkillers, finding reductions in alcohol sales.</p>
 </div>
-<div id="overview" class="section level2">
+<div id="brief-overview" class="section level2">
 <h2 class="hasAnchor">
-<a href="#overview" class="anchor"></a>Overview</h2>
+<a href="#brief-overview" class="anchor"></a>Brief overview</h2>
 <div id="what-is-a-synthetic-control" class="section level3">
 <h3 class="hasAnchor">
 <a href="#what-is-a-synthetic-control" class="anchor"></a>What is a synthetic control?</h3>
 <p>The synthetic control methodology is a strategy for estimating causal treatment effects for idiosyncratic historical events. In the typical application developed by Abadie, Diamond, and Hainmueller (2010), researchers observe time series outcomes for both a treated unit and a number of untreated units. A weighted average of the untreated series is used to construct a counterfactual estimate of the treated series, which is referred to as a synthetic comparison group. Weights are chosen to minimize discrepancies between the synthetic comparison group and the treated unit in the pre-treatment time period. Treatment effect estimates are taken to be the difference between observed outcomes and a synthetic counterfactual. Statistical inference is normally organized around a placebo analysis; in which, pseudo-treatment effects are estimated for many untreated placebo units, and the distribution of pseudo-estimates represents the null distribution of no treatment effect.</p>
-<p>A useful way to think about synthetic controls is as a procedure that attempts to <em>match</em> donor series to target series based on the unobserved factors that determine the data generating process. When framed in this manner identification assumptions and strategies for model selection and inference become more salient.</p>
+<p>A useful way to think about synthetic controls is as a procedure that attempts to <em>match</em> donor series to target series based on the unobserved factors that determine the data generating process. When framed in this manner identification assumptions and strategies for model selection/inference become more salient.</p>
+<p>Recent methodological work has proposed a number of innovative strategies for estimating synthetic control weights (Arkhangelsky et al. 2018; Doudchenko and Imbens 2017; Powell 2019). In a similar vein, we construct donor weights using a method we call <strong>Synthetic Control Using Lasso (SCUL)</strong>.</p>
 </div>
-</div>
-<div id="extensions-of-the-traditional-method" class="section level2">
-<h2 class="hasAnchor">
-<a href="#extensions-of-the-traditional-method" class="anchor"></a>Extensions of the traditional method</h2>
-<p>Recent methodological work has proposed a number of innovative strategies for estimating synthetic control weights (Arkhangelsky et al. 2018; Doudchenko and Imbens 2017; Powell 2019). In a similar vein, we use a method called <strong>Synthetic Control Using Lasso (SCUL)</strong> to construct donor weights.</p>
 </div>
 <div id="what-is-scul" class="section level2">
 <h2 class="hasAnchor">
 <a href="#what-is-scul" class="anchor"></a>What is SCUL?</h2>
-<p>This method is a flexible, data-driven way to construct synthetic control groups. It relies on lasso regressions, which are popular in the machine-learning literature, and favor weights that predict well out of sample. In general, our approach allows for:</p>
+<p>This method is a flexible, data-driven way to construct synthetic control groups. It relies on lasso regressions, which are popular in the machine-learning literature, and favor weights that predict well out of sample.</p>
+<p>Our working paper highlights <strong>identification assumptions</strong> and <strong>recommendations</strong> that are relevant for any synthetic control study.</p>
+<p>In general, our approach allows for:</p>
 <ul>
 <li>a high-dimensional donor pool that may be larger than the number of time periods</li>
 <li>a simple way of ensuring that the same model selection procedure are used for target and placebo series</li>
@@ -127,14 +122,14 @@ devtools::install_github("hollina/scul")`</pre></div>
 <li>extrapolation from the donor pool</li>
 <li>counter-cyclical weights</li>
 </ul>
-<p>Our working paper also highlights <strong>identification assumptions</strong> and <strong>recommendations</strong> that are relevant for any synthetic control study.</p>
+<p>We jointly view our statistical approach and following these recommendations as the <code>SCUL</code> procedure</p>
 </div>
-<div id="scul-contributions" class="section level2">
+<div id="what-are-the-contributions-of-scul" class="section level2">
 <h2 class="hasAnchor">
-<a href="#scul-contributions" class="anchor"></a>SCUL contributions</h2>
-<div id="clarifying-idenficiation-assumptions" class="section level3">
+<a href="#what-are-the-contributions-of-scul" class="anchor"></a>What are the contributions of SCUL?</h2>
+<div id="clarifies-idenficiation-assumptions-for-synthetic-control-methods" class="section level3">
 <h3 class="hasAnchor">
-<a href="#clarifying-idenficiation-assumptions" class="anchor"></a>1. Clarifying idenficiation assumptions</h3>
+<a href="#clarifies-idenficiation-assumptions-for-synthetic-control-methods" class="anchor"></a>1. Clarifies idenficiation assumptions for synthetic control methods</h3>
 <p>We outline two simple identification assumptions required for a synthetic control design to identify causal treatment parameters:</p>
 <ol>
 <li>conditional independence of treatment exposure and potential outcomes after matching on an underlying factor structure</li>
@@ -142,9 +137,9 @@ devtools::install_github("hollina/scul")`</pre></div>
 </ol>
 <p>While neither of these assumptions is directly testable, our working paper offers perspectives and strategies that may help in interpreting the validity of such assumptions in applied work.</p>
 </div>
-<div id="providing-recommendations-for-ad-hoc-choices" class="section level3">
+<div id="provides-recommendations-for-normally-ad-hoc-choices" class="section level3">
 <h3 class="hasAnchor">
-<a href="#providing-recommendations-for-ad-hoc-choices" class="anchor"></a>2. Providing recommendations for ad hoc choices</h3>
+<a href="#provides-recommendations-for-normally-ad-hoc-choices" class="anchor"></a>2. Provides recommendations for normally ad hoc choices</h3>
 <p>Our recommendations for decisions that commonly appear in synthetic control studies include:</p>
 <ol>
 <li>using the same model selection procedure for both target and placebo products</li>
@@ -157,20 +152,20 @@ devtools::install_github("hollina/scul")`</pre></div>
 </ol>
 <p>We implement versions of the recommendations in our <a href="https://hollina.github.io/scul/articles/scul-tutorial.html">tutorial</a> and outline each in more detail in our working paper.</p>
 </div>
-<div id="using-machine-learning-that-enables-a-high-dimensional-donor-pool-and-automates-model-selection" class="section level3">
+<div id="uses-machine-learning-approach-that-allows-for-high-dimensional-donor-pool-and-automates-model-selection" class="section level3">
 <h3 class="hasAnchor">
-<a href="#using-machine-learning-that-enables-a-high-dimensional-donor-pool-and-automates-model-selection" class="anchor"></a>3. Using machine-learning that enables a high-dimensional donor pool and automates model selection</h3>
+<a href="#uses-machine-learning-approach-that-allows-for-high-dimensional-donor-pool-and-automates-model-selection" class="anchor"></a>3. Uses machine-learning approach that allows for high-dimensional donor pool and automates model selection</h3>
 <p>Lasso regressions penalize specifications with numerious variables and large coeficients. This drives the value of many coefficients to zero and allows for the inclusion of very large donor pools. A benefit of this is that—so long as a donor is theoreticlally valid— a researcher will not need to decide whether to include one donor over another. A cost of this is the concern that the procedure could overfit the data. SCUL weights are created using cross-validated lasso regressions that ensure the weights do not “overfit” the data and that favor out-of-sample prediction.</p>
 <p>By automating model selection and allowing for a large number of donors, we reduce “researcher degrees of freedom.” It is easy to imagine that the best synthetic prediction could be created for each target series, but less time would be spent perfect the model for each placebo series. If the automated model selection results in better fit for placebo series, we also improve the statistical power. This occurs if better fit in the pre-treatment period results in less deterioration (i.e., better fit) in the post-period. This improves statistical power because statistical inference in done by comparing deviations of the treated series to the distribution of placebo deviations. Therefore reducing the spread of the placebo null-distribution allows for smaller deviations of the treated unit to be considered statistically rare.</p>
 </div>
-<div id="including-a-wide-variety-of-donor-types" class="section level3">
+<div id="includes-a-wide-variety-of-donor-types" class="section level3">
 <h3 class="hasAnchor">
-<a href="#including-a-wide-variety-of-donor-types" class="anchor"></a>4. Including a wide variety of donor types</h3>
+<a href="#includes-a-wide-variety-of-donor-types" class="anchor"></a>4. Includes a wide variety of donor types</h3>
 <p>We frame synthetic controls as a way of matching on unobserved underlying factors that form the data generating process. When viewed in this context, using donor units from a wide range of variable types makes sense because different variable types may help pin down different underlying factors/features of the data generating process for the treated unit. As such <strong>we use a wide range of donor variables</strong> to construct our synthetic control groups, not just the same variable type as the target variable as is common practice.</p>
 </div>
-<div id="allowing-for-extrapolation-and-negative-weights" class="section level3">
+<div id="allows-for-extrapolation-and-negative-weights" class="section level3">
 <h3 class="hasAnchor">
-<a href="#allowing-for-extrapolation-and-negative-weights" class="anchor"></a>5. Allowing for extrapolation and negative weights</h3>
+<a href="#allows-for-extrapolation-and-negative-weights" class="anchor"></a>5. Allows for extrapolation and negative weights</h3>
 <p>The traditional synthetic control method restricts weights to be non-negative and to sum to one. These restrictions force the synthetic control group to remain within the support (i.e., convex hull) of the donor pool, preventing extrapolation. This can certainly be a desirable property. However there are some situations where these restrictions that prevent extrapolation can inhibit a synthetic control group from finding a perfect donor series.</p>
 <ul>
 <li>Case 1: When the target series is outside the the support of the donor pool (i.e. you need extrapolation to match the target series</li>
@@ -178,27 +173,10 @@ devtools::install_github("hollina/scul")`</pre></div>
 </ul>
 <p><img src="articles/vignette_output/time_series_convex_hull.png" alt="figure2"></p>
 </div>
-</div>
-<div id="what-else-does-the-working-paper-do" class="section level2">
-<h2 class="hasAnchor">
-<a href="#what-else-does-the-working-paper-do" class="anchor"></a>What else does the working paper do?</h2>
-<p>This working paper, which is co-authored with Coady Wing, uses the SCUL method to estimate how recreational marijuana legalization affects sales of alcohol and over-the-counter painkillers, finding reductions in alcohol sales.</p>
-<p>The paper uses retail scanner data from Nielsen cannot be publicly posted online, but are available for purchase from the Kilts Center for Marketing at the University of Chicago, <a href="https://www.chicagobooth.edu/research/kilts/datasets/nielsen" class="uri">https://www.chicagobooth.edu/research/kilts/datasets/nielsen</a>.</p>
-</div>
-<div id="what-does-this-packagevignette-do" class="section level2">
-<h2 class="hasAnchor">
-<a href="#what-does-this-packagevignette-do" class="anchor"></a>What does this package/vignette do?</h2>
-<p>This package provides code to implement the SCUL procedure. Because the data in our working paper cannot be posted online, we also provide an example that uses publicly available data. The entire procedure or parts of the method may be useful in many settings. Feel free to use any or all of the code; it is available under the MIT license.</p>
 <div id="software-used" class="section level3">
 <h3 class="hasAnchor">
 <a href="#software-used" class="anchor"></a>Software Used:</h3>
 <p>The package is made for R. and was developed on a Unix machine using R 3.6.1. See session info in the vignette for exact version of every package used. Documentation was made using <code>roxygen2</code>, <code>pkgdown</code>, and <code>RStudio</code>.</p>
-</div>
-<div id="license" class="section level3">
-<h3 class="hasAnchor">
-<a href="#license" class="anchor"></a>License:</h3>
-<p>Replication Package (this github repo): <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a></p>
-<p>Working Paper: <a href="https://creativecommons.org/licenses/by/4.0/"><img src="https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg" alt="License: CC BY 4.0"></a></p>
 </div>
 </div>
 <div id="to-do" class="section level2">
@@ -247,7 +225,7 @@ devtools::install_github("hollina/scul")`</pre></div>
 <h2>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
-<li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a></small></li>
+<li><small><a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a></small></li>
 </ul>
 </div>
 <div class="developers">
@@ -258,7 +236,14 @@ devtools::install_github("hollina/scul")`</pre></div>
 </ul>
 </div>
 
-  </div>
+  <div class="dev-status">
+<h2>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://www.tidyverse.org/lifecycle/#experimental"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
+<li><a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-yellow.svg" alt="License: MIT"></a></li>
+</ul>
+</div>
+</div>
 </div>
 
 

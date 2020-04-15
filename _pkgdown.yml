@@ -19,8 +19,7 @@ navbar:
       href: articles/scul-tutorial.html
     - text: "Functions"
       href: reference/index.html
-    - text: "News"
-      href: news/index.html
+
   right:
    - icon: fa-twitter
      href: https://twitter.com/ajhollingsworth

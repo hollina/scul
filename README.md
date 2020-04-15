@@ -3,33 +3,48 @@
 
 # Synthetic Control Using Lasso (scul)
 
+<!-- badges: start -->
+
+[![Lifecycle:
+experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![License:
+MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<!-- badges: end -->
+
 This repository contains the R package `scul` that is used in
 Hollingsworth and Wing (2020) *“Tactics for design and inference in
 synthetic control studies: An applied example using high-dimensional
-data.”* (link to be posted 3 May 2020)
+data.”* (link to be posted 3 May
+2020)
 
 ![figure1](vignettes/vignette_output/ReadMeFigure.png)
 
 ## Installation
 
 ``` r
-# Install release version from CRAN
-# TBD. Likely available May 2020
-
-# Install development version from GitHub
+# Install development version from GitHub (CRAN coming soon) using these two lines of code
+if (!require("devtools")) install.packages("devtools")
 devtools::install_github("hollina/scul")`
 ```
 
-## Tutorial
+## Tutorial/More details
 
-An in-depth tutorial of the package using publicly available data is
-available here,
-<https://hollina.github.io/scul/articles/scul-tutorial.html>.
+An in-depth tutorial of the package and overview of every function in
+the package is available here,
+<https://hollina.github.io/scul/articles/scul-tutorial.html>. The
+tutorial uses publicly available data and discusses many features of the
+SCUL procedure.
 
-More detail on the procedure can be found in our working paper, (link to
-be posted 3 May 2020).
+More details on the method can be found in our working paper, (link to
+be posted 3 May 2020). The working paper, which is co-authored with
+Coady Wing, desribes identification assumptions and key recommendations
+for—normally ad hoc—decisions that arise in most synthetic control
+studies. The paper then describes the SCUL method and uses SCUL to
+estimate how recreational marijuana legalization affects sales of
+alcohol and over-the-counter painkillers, finding reductions in alcohol
+sales.
 
-## Overview
+## Brief overview
 
 ### What is a synthetic control?
 
@@ -53,22 +68,25 @@ A useful way to think about synthetic controls is as a procedure that
 attempts to *match* donor series to target series based on the
 unobserved factors that determine the data generating process. When
 framed in this manner identification assumptions and strategies for
-model selection and inference become more salient.
-
-## Extensions of the traditional method
+model selection/inference become more salient.
 
 Recent methodological work has proposed a number of innovative
 strategies for estimating synthetic control weights (Arkhangelsky et al.
 2018; Doudchenko and Imbens 2017; Powell 2019). In a similar vein, we
-use a method called **Synthetic Control Using Lasso (SCUL)** to
-construct donor weights.
+construct donor weights using a method we call **Synthetic Control Using
+Lasso (SCUL)**.
 
 ## What is SCUL?
 
 This method is a flexible, data-driven way to construct synthetic
 control groups. It relies on lasso regressions, which are popular in the
 machine-learning literature, and favor weights that predict well out of
-sample. In general, our approach allows for:
+sample.
+
+Our working paper highlights **identification assumptions** and
+**recommendations** that are relevant for any synthetic control study.
+
+In general, our approach allows for:
 
   - a high-dimensional donor pool that may be larger than the number of
     time periods
@@ -78,12 +96,13 @@ sample. In general, our approach allows for:
   - extrapolation from the donor pool
   - counter-cyclical weights
 
-Our working paper also highlights **identification assumptions** and
-**recommendations** that are relevant for any synthetic control study.
+We jointly view our statistical approach and following these
+recommendations as the `SCUL`
+procedure
 
-## SCUL contributions
+## What are the contributions of SCUL?
 
-### 1\. Clarifying idenficiation assumptions
+### 1\. Clarifies idenficiation assumptions for synthetic control methods
 
 We outline two simple identification assumptions required for a
 synthetic control design to identify causal treatment parameters:
@@ -96,7 +115,7 @@ While neither of these assumptions is directly testable, our working
 paper offers perspectives and strategies that may help in interpreting
 the validity of such assumptions in applied work.
 
-### 2\. Providing recommendations for ad hoc choices
+### 2\. Provides recommendations for normally ad hoc choices
 
 Our recommendations for decisions that commonly appear in synthetic
 control studies include:
@@ -122,7 +141,7 @@ We implement versions of the recommendations in our
 and outline each in more detail in our working
 paper.
 
-### 3\. Using machine-learning that enables a high-dimensional donor pool and automates model selection
+### 3\. Uses machine-learning approach that allows for high-dimensional donor pool and automates model selection
 
 Lasso regressions penalize specifications with numerious variables and
 large coeficients. This drives the value of many coefficients to zero
@@ -147,7 +166,7 @@ series to the distribution of placebo deviations. Therefore reducing the
 spread of the placebo null-distribution allows for smaller deviations of
 the treated unit to be considered statistically rare.
 
-### 4\. Including a wide variety of donor types
+### 4\. Includes a wide variety of donor types
 
 We frame synthetic controls as a way of matching on unobserved
 underlying factors that form the data generating process. When viewed in
@@ -158,7 +177,7 @@ treated unit. As such **we use a wide range of donor variables** to
 construct our synthetic control groups, not just the same variable type
 as the target variable as is common practice.
 
-### 5\. Allowing for extrapolation and negative weights
+### 5\. Allows for extrapolation and negative weights
 
 The traditional synthetic control method restricts weights to be
 non-negative and to sum to one. These restrictions force the synthetic
@@ -176,40 +195,12 @@ finding a perfect donor series.
 
 ![figure2](vignettes/vignette_output/time_series_convex_hull.png)
 
-## What else does the working paper do?
-
-This working paper, which is co-authored with Coady Wing, uses the SCUL
-method to estimate how recreational marijuana legalization affects sales
-of alcohol and over-the-counter painkillers, finding reductions in
-alcohol sales.
-
-The paper uses retail scanner data from Nielsen cannot be publicly
-posted online, but are available for purchase from the Kilts Center for
-Marketing at the University of Chicago,
-<https://www.chicagobooth.edu/research/kilts/datasets/nielsen>.
-
-## What does this package/vignette do?
-
-This package provides code to implement the SCUL procedure. Because the
-data in our working paper cannot be posted online, we also provide an
-example that uses publicly available data. The entire procedure or parts
-of the method may be useful in many settings. Feel free to use any or
-all of the code; it is available under the MIT license.
-
 ### Software Used:
 
 The package is made for R. and was developed on a Unix machine using R
 3.6.1. See session info in the vignette for exact version of every
 package used. Documentation was made using `roxygen2`, `pkgdown`, and
 `RStudio`.
-
-### License:
-
-Replication Package (this github repo): [![License:
-MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
-Working Paper: [![License: CC
-BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](https://creativecommons.org/licenses/by/4.0/)
 
 ## To Do:
 
