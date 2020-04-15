@@ -206,7 +206,8 @@ package used. Documentation was made using `roxygen2`, `pkgdown`, and
 2.  Add examples to each function
 3.  Create function for smoke plot
 4.  Proof read documentation
-5.  Submit package via CRAN
+5.  Add content from readme to tutorial
+6.  Submit package via CRAN
 
 ## References
 

@@ -37,41 +37,6 @@ pacman::p_load(
 ```
 
 --------
-# Introduction
-
-## What is a synthetic control?
-
-The synthetic control methodology is a strategy for estimating causal treatment effects for idiosyncratic historical events.
-In the typical application developed by @Abadie2010, researchers observe time series outcomes for both a treated unit and a number of untreated units.
-A weighted average of the untreated series is used to construct a counterfactual estimate of the treated series, which is referred to as a synthetic comparison group.
-Weights are chosen to minimize discrepancies between the synthetic comparison group and the treated unit in the pre-treatment time period.
-Treatment effect estimates are taken to be the difference between observed outcomes and a synthetic counterfactual.
-Statistical inference is normally organized around a placebo analysis; in which, pseudo-treatment effects are estimated for many untreated placebo units, and the distribution of pseudo-estimates represents the null distribution of no treatment effect.
-
-
-## Extensions of the traditional method
-
-Recent methodological work has proposed a number of alternative strategies for estimating synthetic control weights  [@Arkhangelsky2018; @Doudchenko2017; @Powell2019].
-In a similar vein, we use a method called **Synthetic Control Using Lasso (SCUL)** to construct donor weights.  
-This method is a flexible, data-driven way to construct synthetic control groups.
-It relies on lasso regressions, which are popular in the machine-learning literature, and favor weights that predict well out of sample.
-In general, the approach allows for a high-dimensional donor pool that may be larger than the number of time periods, extrapolation from the donor pool, counter-cyclical weights, and the same model selection procedure to be used for target and placebo series.
-
-Our working paper highlights identification assumptions and recommendations that are relevant for any synthetic control study.
-We implement versions of the recommendations in this vignette.
-We frame synthetic controls as a way of matching on unobserved underlying factors that form the data generating process.
-When viewed in this context, using donor units from a wide range of variable types makes sense because different units may help pin down different underlying factors.
-As such we use a wide range of donor variables to construct our synthetic control groups, not just the same variable type as the target variable as is common practice.
-
-
-## How can I learn more about SCUL?/Where can I get your data used in the paper?
-
-More detail on the procedure can be found in *"Tactics for design and inference in synthetic control studies: An applied example using high-dimensional data."*
-This working paper, which is co-authored with Coady Wing, uses the SCUL method to estimate how recreational marijuana legalization affects sales of alcohol and over-the-counter painkillers, finding reductions in alcohol sales. 
-
-The paper uses retail scanner data from Nielsen cannot be publicly posted online, but are available for purchase from the Kilts Center for Marketing at the University of Chicago, https://www.chicagobooth.edu/research/kilts/datasets/nielsen.
-
-
 # Example data
 
 This tutorial uses publicly available data that is similar to the data used in @Abadie2010.
