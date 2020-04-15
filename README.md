@@ -33,20 +33,18 @@ An in-depth tutorial of the package and overview of every function in
 the package is available here,
 <https://hollina.github.io/scul/articles/scul-tutorial.html>. The
 tutorial uses publicly available data and discusses many features of the
-SCUL procedure.
+SCUL procedure. The tutorial also provides a simple comparison the SCUL
+method to the traditional synthetic control method.
 
-More details on the method can be found in our working paper, (link to
-be posted 3 May 2020). The working paper, which is co-authored with
-Coady Wing, desribes identification assumptions and key recommendations
-for—normally ad hoc—decisions that arise in most synthetic control
-studies. The paper then describes the SCUL method and uses SCUL to
-estimate how recreational marijuana legalization affects sales of
-alcohol and over-the-counter painkillers, finding reductions in alcohol
-sales.
+More details on SCUL can be found in our working paper, (link to be
+posted 3 May 2020). The paper, joint with Coady Wing, desribes
+identification assumptions and recommendations for key—and normally ad
+hoc—decisions that arise in most synthetic control studies. The paper
+then describes the SCUL method and uses the procedure to estimate how
+recreational marijuana legalization affects sales of alcohol and
+over-the-counter painkillers, finding reductions in alcohol sales.
 
-## Brief overview
-
-### What is a synthetic control?
+## What is a synthetic control?
 
 The synthetic control methodology is a strategy for estimating causal
 treatment effects for idiosyncratic historical events. In the typical
@@ -195,7 +193,7 @@ finding a perfect donor series.
 
 ![figure2](vignettes/vignette_output/time_series_convex_hull.png)
 
-### Software Used:
+## Software Used:
 
 The package is made for R. and was developed on a Unix machine using R
 3.6.1. See session info in the vignette for exact version of every

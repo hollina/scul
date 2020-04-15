@@ -36,14 +36,13 @@ devtools::install_github("hollina/scul")`
 ```
 
 ## Tutorial/More details
-An in-depth tutorial of the package and overview of every function in the package is available here, <https://hollina.github.io/scul/articles/scul-tutorial.html>. The tutorial uses publicly available data and discusses many features of the SCUL procedure. 
+An in-depth tutorial of the package and overview of every function in the package is available here, <https://hollina.github.io/scul/articles/scul-tutorial.html>. The tutorial uses publicly available data and discusses many features of the SCUL procedure. The tutorial also provides a simple comparison the SCUL method to the traditional synthetic control method. 
 
-More details on the method can be found in our working paper, (link to be posted 3 May 2020).
-The working paper, which is co-authored with Coady Wing, desribes identification assumptions and key recommendations for---normally ad hoc---decisions that arise in most synthetic control studies. The paper then describes the SCUL method and uses SCUL to estimate how recreational marijuana legalization affects sales of alcohol and over-the-counter painkillers, finding reductions in alcohol sales. 
+More details on SCUL can be found in our working paper, (link to be posted 3 May 2020).
+The paper, joint with Coady Wing, desribes identification assumptions and recommendations for key---and normally ad hoc---decisions that arise in most synthetic control studies. 
+The paper then describes the SCUL method and uses the procedure to estimate how recreational marijuana legalization affects sales of alcohol and over-the-counter painkillers, finding reductions in alcohol sales. 
 
-## Brief overview
-
-### What is a synthetic control?
+## What is a synthetic control?
 
 The synthetic control methodology is a strategy for estimating causal treatment effects for idiosyncratic historical events.
 In the typical application developed by @Abadie2010, researchers observe time series outcomes for both a treated unit and a number of untreated units.
@@ -54,7 +53,6 @@ Statistical inference is normally organized around a placebo analysis; in which,
 
 A useful way to think about synthetic controls is as a procedure that attempts to *match* donor series to target series based on the unobserved factors that determine the data generating process.
 When framed in this manner identification assumptions and strategies for model selection/inference become more salient.
-
 
 Recent methodological work has proposed a number of innovative strategies for estimating synthetic control weights [@Arkhangelsky2018; @Doudchenko2017; @Powell2019].
 In a similar vein, we construct donor weights using a method we call **Synthetic Control Using Lasso (SCUL)**.
@@ -133,7 +131,7 @@ However there are some situations where these restrictions that prevent extrapol
 
 
                                                                       
-### Software Used:
+## Software Used:
 The package is made for R. and was developed on a Unix machine using R 3.6.1. See session info in the vignette for exact version of every package used. Documentation was made using `roxygen2`, `pkgdown`, and `RStudio`. 
 
 ## To Do:
@@ -142,6 +140,7 @@ The package is made for R. and was developed on a Unix machine using R 3.6.1. Se
 1. Add examples to each function
 1. Create function for smoke plot
 1. Proof read documentation
+1. Add content from readme to tutorial
 1. Submit package via CRAN
 
 ## References 

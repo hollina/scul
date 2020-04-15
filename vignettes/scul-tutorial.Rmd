@@ -67,24 +67,15 @@ As such we use a wide range of donor variables to construct our synthetic contro
 ## How can I learn more about SCUL?/Where can I get your data used in the paper?
 
 More detail on the procedure can be found in *"Tactics for design and inference in synthetic control studies: An applied example using high-dimensional data."*
-This working paper, which is co-authored with Coady Wing, uses the SCUL method to estimate how recreational marijuana legalization affects sales of alcohol and over-the-counter painkillers, finding reductions in alcohol sales. Please cite our paper if you use this package, vignette, or the paper. :)
-
+This working paper, which is co-authored with Coady Wing, uses the SCUL method to estimate how recreational marijuana legalization affects sales of alcohol and over-the-counter painkillers, finding reductions in alcohol sales. 
 
 The paper uses retail scanner data from Nielsen cannot be publicly posted online, but are available for purchase from the Kilts Center for Marketing at the University of Chicago, https://www.chicagobooth.edu/research/kilts/datasets/nielsen.
 
 
-## What's this package/vignette do?
-
-This package provides code to implement the SCUL procedure.
-Because the data in our working paper cannot be posted online, we also provide an example that uses publicly available data.
-The entire procedure or parts of the method may be useful in many settings.
-Feel free to use any or all of the code; it is available under the MIT license.
-
-
 # Example data
 
-For our example, we use similar data as in @Abadie2010.
-The empirical goal of this paper was to estimate the effects of a California tobacco control policy implemented in 1988.
+This tutorial uses publicly available data that is similar to the data used in @Abadie2010.
+The empirical goal of @Abadie2010 was to estimate the effects of a California tobacco control policy implemented in 1988.
 
 When in long form, the data are at the state-year level and range from 1970 to 1997 (28 years).
 For each state and year there are data on cigarette sales per capita (`cigsale`) and the retail price of cigarettes (`retprice`).

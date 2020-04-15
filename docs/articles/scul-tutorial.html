@@ -118,19 +118,14 @@ This method is a flexible, data-driven way to construct synthetic control groups
 <div id="how-can-i-learn-more-about-sculwhere-can-i-get-your-data-used-in-the-paper" class="section level2">
 <h2 class="hasAnchor">
 <a href="#how-can-i-learn-more-about-sculwhere-can-i-get-your-data-used-in-the-paper" class="anchor"></a>How can I learn more about SCUL?/Where can I get your data used in the paper?</h2>
-<p>More detail on the procedure can be found in <em>“Tactics for design and inference in synthetic control studies: An applied example using high-dimensional data.”</em> This working paper, which is co-authored with Coady Wing, uses the SCUL method to estimate how recreational marijuana legalization affects sales of alcohol and over-the-counter painkillers, finding reductions in alcohol sales. Please cite our paper if you use this package, vignette, or the paper. :)</p>
+<p>More detail on the procedure can be found in <em>“Tactics for design and inference in synthetic control studies: An applied example using high-dimensional data.”</em> This working paper, which is co-authored with Coady Wing, uses the SCUL method to estimate how recreational marijuana legalization affects sales of alcohol and over-the-counter painkillers, finding reductions in alcohol sales.</p>
 <p>The paper uses retail scanner data from Nielsen cannot be publicly posted online, but are available for purchase from the Kilts Center for Marketing at the University of Chicago, <a href="https://www.chicagobooth.edu/research/kilts/datasets/nielsen" class="uri">https://www.chicagobooth.edu/research/kilts/datasets/nielsen</a>.</p>
-</div>
-<div id="whats-this-packagevignette-do" class="section level2">
-<h2 class="hasAnchor">
-<a href="#whats-this-packagevignette-do" class="anchor"></a>What’s this package/vignette do?</h2>
-<p>This package provides code to implement the SCUL procedure. Because the data in our working paper cannot be posted online, we also provide an example that uses publicly available data. The entire procedure or parts of the method may be useful in many settings. Feel free to use any or all of the code; it is available under the MIT license.</p>
 </div>
 </div>
 <div id="example-data" class="section level1">
 <h1 class="hasAnchor">
 <a href="#example-data" class="anchor"></a>Example data</h1>
-<p>For our example, we use similar data as in <span class="citation">Abadie, Diamond, and Hainmueller (2010)</span>. The empirical goal of this paper was to estimate the effects of a California tobacco control policy implemented in 1988.</p>
+<p>This tutorial uses publicly available data that is similar to the data used in <span class="citation">Abadie, Diamond, and Hainmueller (2010)</span>. The empirical goal of <span class="citation">Abadie, Diamond, and Hainmueller (2010)</span> was to estimate the effects of a California tobacco control policy implemented in 1988.</p>
 <p>When in long form, the data are at the state-year level and range from 1970 to 1997 (28 years). For each state and year there are data on cigarette sales per capita (<code>cigsale</code>) and the retail price of cigarettes (<code>retprice</code>). To be used in the SCUL procedure, the data must be in wide format, where each row is a time-period (e.g., year) and each column is a unit-specific variable. In our data, for each variable the unit is identified by the end of each column name (e.g., variables from the state of California are indicated by <code>_6</code>, which is the FIPS code for California.)</p>
 <p>The dataset should be sorted by whatever variable you use to index time with the earliest date being first and the most recent date being last.</p>
 <p>The <code>cigarette_sales</code> dataset is stored in the <code>data</code> subdirectory of this package. It should be automatically loaded when the <code>scul</code> package is loaded.</p>
