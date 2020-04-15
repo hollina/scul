@@ -1,6 +1,6 @@
 destination: docs
 title: scul
-url: http://hollina.github.io/scul
+url: https://hollina.github.io/scul
 template:
   params:
     bootswatch: flatly
@@ -19,16 +19,8 @@ navbar:
       href: articles/scul-tutorial.html
     - text: "Functions"
       href: reference/index.html
-
+    - text: "Paper"
+      href: https://hollina.github.io
   right:
-   - icon: fa-twitter
-     href: https://twitter.com/ajhollingsworth
    - icon: fa-github
      href: https://github.com/hollina/scul
-   - icon: fa-paper-plane
-     href: mailto:hollinal@indiana.edu
-
-#home:
-#  links:
-#  - text: Browse source code
-#    href: https://github.com/hollina/scul
