@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Synthetic control using lasso (scul)
+# Synthetic Control Using Lasso (scul)
 
 This repository contains the R package `scul` that is used in
 Hollingsworth and Wing (2020) *“Tactics for design and inference in

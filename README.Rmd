@@ -16,7 +16,13 @@ knitr::opts_chunk$set(
 library(knitr)
 ```
 
-# Synthetic control using lasso (scul)
+# Synthetic Control Using Lasso (scul)
+
+<!-- badges: start -->
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![R build status](https://github.com/r-lib/pkgdown/workflows/R-CMD-check/badge.svg)](https://github.com/r-lib/pkgdown/actions)
+<!-- badges: end -->
 
 This repository contains the R package `scul` that is used in Hollingsworth and Wing (2020) *"Tactics for design and inference in synthetic control studies: An applied example using high-dimensional data."* (link to be posted 3 May 2020)
 
