@@ -130,9 +130,9 @@ control studies include:
 6.  using a unit-free measure of the treatment effect estimate to
     compare estimated treatment effects to the placebo distribution for
     inference
-7.  reporting the minimum detectable effect size for a given
-    significance level that a given placebo distribution would consider
-    statistically different than zero
+7.  reporting the minimum treatment effect size for a given significance
+    level that the placebo distribution used for inference would
+    consider statistically different than zero
 
 We implement versions of the recommendations in our
 [tutorial](https://hollina.github.io/scul/articles/scul-tutorial.html)

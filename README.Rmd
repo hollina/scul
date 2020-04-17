@@ -95,7 +95,7 @@ Our recommendations for decisions that commonly appear in synthetic control stud
   1. incorporating a rolling-origin cross-validation procedure to determine optimal weights
   1. reporting synthetic control weights as the average contribution to the synthetic prediction rather than as a numeric coefficient
   1.  using a unit-free measure of the treatment effect estimate to compare estimated treatment effects to the placebo distribution for inference
-  1. reporting the minimum detectable effect size for a given significance level that a given placebo distribution would consider statistically different than zero
+  1. reporting the minimum treatment effect size for a given significance level that the placebo distribution used for inference would consider statistically different than zero
 
 
 We implement versions of the recommendations in our [tutorial](https://hollina.github.io/scul/articles/scul-tutorial.html) and outline each in more detail in our working paper. 
