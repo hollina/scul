@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Run scul procedure on placebo pool to create null distribution — CreatePlaceboDistribution • scul</title>
+<title>Make smoke plot — SmokePlot • scul</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,10 +46,8 @@
 
 
 
-<meta property="og:title" content="Run scul procedure on placebo pool to create null distribution — CreatePlaceboDistribution" />
-<meta property="og:description" content="Runs the scul procedure on the whole placebo pool
-(using itself as the donor pool; this could be altered to have a custom donor pool)
-to create null distribution that can be used for inference in later steps." />
+<meta property="og:title" content="Make smoke plot — SmokePlot" />
+<meta property="og:description" content="Plot standardized differences of all placebo goods and target good." />
 <meta property="og:image" content="https://hollina.github.io/scul/logo.png" />
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:creator" content="@ajhollingsworth" />
@@ -121,83 +119,76 @@ to create null distribution that can be used for inference in later steps." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Run scul procedure on placebo pool to create null distribution</h1>
-    <small class="dont-index">Source: <a href='https://github.com/hollina/scul/blob/master/R/CreatePlaceboDistribution.R'><code>R/CreatePlaceboDistribution.R</code></a></small>
-    <div class="hidden name"><code>CreatePlaceboDistribution.Rd</code></div>
+    <h1>Make smoke plot</h1>
+    <small class="dont-index">Source: <a href='https://github.com/hollina/scul/blob/master/R/SmokePlot.R'><code>R/SmokePlot.R</code></a></small>
+    <div class="hidden name"><code>SmokePlot.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Runs the scul procedure on the whole placebo pool
-(using itself as the donor pool; this could be altered to have a custom donor pool)
-to create null distribution that can be used for inference in later steps.</p>
+    <p>Plot standardized differences of all placebo goods and target good.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>CreatePlaceboDistribution</span>(
-  <span class='kw'>x.PlaceboPool</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>x.PlaceboPool</span>,
+    <pre class="usage"><span class='fu'>SmokePlot</span>(
+
+    <span class='kw'>x.PlaceboPool.StandardizedDiff.full</span> <span class='kw'>=</span> <span class='no'>SCUL.inference</span>$<span class='no'>y.placebo.StandardizedDifference.Full</span>,
+  <span class='kw'>x.PlaceboPool.CohensD</span> <span class='kw'>=</span> <span class='no'>SCUL.inference</span>$<span class='no'>y.placebo.CohensD</span>,
   <span class='kw'>TreatmentBeginsAt</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>TreatmentBeginsAt</span>,
-  <span class='kw'>PostPeriodLength</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span>(<span class='no'>SCUL.input</span>$<span class='no'>y</span>) - <span class='no'>SCUL.input</span>$<span class='no'>TreatmentBeginsAt</span> + <span class='fl'>1</span>,
-  <span class='kw'>PrePeriodLength</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>TreatmentBeginsAt</span> - <span class='fl'>1</span>,
-  <span class='kw'>NumberInitialTimePeriods</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>NumberInitialTimePeriods</span>,
   <span class='kw'>OutputFilePath</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>OutputFilePath</span>,
-  <span class='kw'>CohensDThreshold</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>CohensDThreshold</span>,
-  <span class='kw'>TrainingPostPeriodLength</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>TrainingPostPeriodLength</span>,
-  <span class='kw'>DonorPoolRestrictionForEachPlacebo</span> <span class='kw'>=</span> <span class='st'>""</span>
+  <span class='kw'>CohensD</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>CohensDThreshold</span>,
+  <span class='kw'>y.actual</span> <span class='kw'>=</span> <span class='no'>SCUL.output</span>$<span class='no'>y.actual</span>,
+  <span class='kw'>y.scul</span> <span class='kw'>=</span> <span class='no'>SCUL.output</span>$<span class='no'>y.scul</span>,
+
+    <span class='kw'>fig.title</span> <span class='kw'>=</span> <span class='st'>"Standardized difference for target variable compared to standardized\n difference for each placebo"</span>,
+  <span class='kw'>custom.alpha</span> <span class='kw'>=</span> <span class='fl'>0.33</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x.PlaceboPool</th>
-      <td><p>A (T by J) data frame containing all products that you wish to include in the placebo distribution
-Must be sorted by time. Default is SCUL.input$x.PlaceboPool.</p></td>
+      <th>x.PlaceboPool.StandardizedDiff.full</th>
+      <td><p>A (T by L), where L&lt;=J)  data frame containing all products that are included in the placebo distribution
+Default is SCUL.inference$y.placebo.StandardizedDifference.Full</p></td>
+    </tr>
+    <tr>
+      <th>x.PlaceboPool.CohensD</th>
+      <td><p>A (1 by L)  data frame containing all pre-period Cohen's D fit statistic for each placebo unit.
+Default is SCUL.inference$y.placebo.CohensD,</p></td>
     </tr>
     <tr>
       <th>TreatmentBeginsAt</th>
       <td><p>An integer indicating which row begins treatment. Default is  SCUL.output$TreatmentBeginsAt.</p></td>
     </tr>
     <tr>
-      <th>PostPeriodLength</th>
-      <td><p>An integer that indicates the length of the post-treatment period.
-Defailt is calculated using SCUL.input data.</p></td>
-    </tr>
-    <tr>
-      <th>PrePeriodLength</th>
-      <td><p>An integer that indicates the length of the pre-treatment period.
-Defailt is calculated using SCUL.input data.</p></td>
-    </tr>
-    <tr>
-      <th>NumberInitialTimePeriods</th>
-      <td><p>An integer that indicates the number of time periods desired in the training data for the first cross-validation run.
-Default is the stated amount in SCUL.input data.</p></td>
-    </tr>
-    <tr>
       <th>OutputFilePath</th>
-      <td><p>Output file path. Default is  SCUL.input$OutputFilePath.</p></td>
+      <td><p>Output file path. Default is SCUL.input$OutputFilePath.</p></td>
     </tr>
     <tr>
-      <th>CohensDThreshold</th>
+      <th>CohensD</th>
       <td><p>A real number greater than 0, indicating the Cohen's D threshold at which
 fit is determined to be "poor". The difference is in standard deviation units. Default is SCUL.input$CohensDThreshold.</p></td>
     </tr>
     <tr>
-      <th>TrainingPostPeriodLength</th>
-      <td><p>The number of timer periods post-treatment for training data. Defaults to all time since treatment begins.</p></td>
+      <th>y.actual</th>
+      <td><p>The actual (target) data. Default is SCUL.output$y.actual.</p></td>
     </tr>
     <tr>
-      <th>DonorPoolRestrictionForEachPlacebo</th>
-      <td><p>This is a customizeable restriction on the placebo pool.
-In Hollingsworth and Wing (2020) we use it to ensure that no analysis on a placebo series uses donors from the same state.
-Where state is identified by a pattern in each variable name. Default is no restriction.
-The placebo pool is indexed by `h`:
-For a restriction based on the first two characters: "select(-starts_with(substring(names(x.PlaceboPool)[h],1, 2)))"
-For a restriction based on the last two characters: "select(-ends_with(substring(names(x.PlaceboPool)[h],nchar(names(x.PlaceboPool)[h]) - 2 + 1, nchar(names(x.PlaceboPool)[h]))))"</p></td>
+      <th>y.scul</th>
+      <td><p>Synthetic data created by SCUL procedure. Default is SCUL.output$y.scul.</p></td>
+    </tr>
+    <tr>
+      <th>fig.title</th>
+      <td><p>Title of smoke-plot. Default is "Standardized difference for target variable compared to standardized difference for each placebo"</p></td>
+    </tr>
+    <tr>
+      <th>custom.alpha</th>
+      <td><p>Choose transparancy of placebo pool lines. Default is .33.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>list  A list of standardized placbo effect sizes</p>
+    <p>graph  A smoke plot of the standardized effect size compared to placbos.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
