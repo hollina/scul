@@ -95,7 +95,7 @@ In general, our approach allows for:
   - counter-cyclical weights
 
 We consider the combination of this statistical approach and following
-these recommendations as the `SCUL`
+these recommendations as the SCUL
 procedure
 
 ## What are the contributions of SCUL?
@@ -204,9 +204,8 @@ package used. Documentation was made using `roxygen2`, `pkgdown`, and
 
 1.  Post working paper
 2.  Add examples to each function
-3.  Create function for smoke plot
-4.  Proof read documentation
-5.  Release package via CRAN
+3.  Proof read documentation
+4.  Release package via CRAN
 
 ## References
 

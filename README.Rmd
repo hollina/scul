@@ -138,7 +138,6 @@ The package is made for R. and was developed on a Unix machine using R 3.6.1. Se
 
 1. Post working paper
 1. Add examples to each function
-1. Create function for smoke plot
 1. Proof read documentation
 1. Release package via CRAN
 

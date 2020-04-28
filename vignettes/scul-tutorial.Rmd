@@ -651,77 +651,19 @@ Before we calculate the p-value we will visually examine the distribution across
 
 ### Visually compare standardized treatment estimate against placebo distribution
 
-#### Using a smoke plot
+#### Using a smoke plot and the `SmokePlot()` function
 
 In the first figure, we compare the pseudo differences between each placebo and its synthetic control. The graph only includes placebo lines that survived the Cohen's D screen by having a pre-treatment Cohen's D less than 0.25. The placebo lines in the graph are drawn with some transparency so that the darker areas have a greater density of placebo units than lighter spaces.
 This shading highlights the deterioration of the counterfactual fit across time and gives the appearance of smoke.
 As such, we refer to this style of plot as a "smoke plot."
 The difference between actual sales of cigarettes sold in California and the SCUL prediction is displayed in green. The pre-treatment difference is small and centered around zero.
 
-We don't provide a function for this figure, but the code used to create this graph can be found in the `.Rmd` file associated with this vignette and can be easily modified for other purposes.
 
-```{r, fig.align="center", fig.height=5, fig.width=8, message=FALSE, warning=FALSE, echo = FALSE, out.width = '100%'}
+```{r, fig.align="center", fig.height=5, fig.width=8, warning = FALSE, fig.align = "center", out.width = '100%'}
 
 ###############################################################################################
 # Make Smoke Plot
-
-# Trim placebos with poor pre-treatment fit
-placebo.distribution.trim <- data.frame(SCUL.inference$y.placebo.StandardizedDifference.Full)[,data.frame(SCUL.inference$y.placebo.CohensD) <=.25 ]
-
-colMax <- function(data) sapply(data, max, na.rm = TRUE)
-
-
-# reshape the placebo data to be in long form
-data_to_plot_wide_y <- cbind( SCUL.input$time, Results.y.StandardizedDiff)
-names(data_to_plot_wide_y) <- c("time", "std_diff")
-
-data_to_plot_wide <- cbind( SCUL.input$time, placebo.distribution.trim)
-names(data_to_plot_wide)[1] <- c("time")
-
-
-data_to_plot_long <- pivot_longer(data = data_to_plot_wide,
-                                  cols = starts_with("X"),
-   names_to = "group",
-   names_prefix = "X",
-   values_to = "std_diff",
-   values_drop_na = TRUE
- )
-
-# create smoke plot
-smoke_plot <- ggplot(data = data_to_plot_long, aes(x = time, y = std_diff)) +
-  geom_line(aes(group = group), alpha = .5, size = 1) +
-  theme_classic() +
-    geom_line(data = data_to_plot_wide_y, aes(x = time, y = std_diff), alpha = 1, size = 2., color = "black") +
-    geom_line(data = data_to_plot_wide_y, aes(x = time, y = std_diff), alpha = 1, size = 1.75, color = "#4dac26") +
-    geom_vline(
-        xintercept = SCUL.input$time[TreatmentBeginsAt,1],
-        linetype = "dashed",
-        size = 1,
-        color = "grey37"
-    ) +
-    labs(
-        title = "Standardized difference for CA cigarette sales compared to standardized\n difference for each placebo donor product",
-        x = "Time",
-        y = "Difference between actual data and scul prediction\n in pre-treatment standard deviations for each product"
-    ) +
-    theme(
-        axis.text = element_text(size = 18),
-        axis.title.y = element_text(size = 12),
-        axis.title.x = element_text(size = 18),
-        title = element_text(size = 12),
-        legend.position = "none"
-    )
-
-# Save graph
-SmokePlotPath<-paste0(SCUL.input$OutputFilePath,"smoke_plot.png")
-ggsave(SmokePlotPath,
-       plot = smoke_plot,
-       width = 8,
-       height = 5,
-       dpi = 300,
-       units = "in")
-
-# Display graph
+smoke_plot <- SmokePlot()
 smoke_plot
 ```
 

@@ -44,7 +44,7 @@ PValue <-  function(
   names(y.difference) <- names(y.actual)
 
   # Calculate the standard deviation of the outcome variable in the pre-treatment period
-  y.PreTreatmentSD <-t(apply(data.frame(y.actual[1:(TreatmentBeginsAt-1),]), 2, sd))
+  y.PreTreatmentSD <- t(apply(data.frame(y.actual[1:(TreatmentBeginsAt-1),]), 2, sd))
 
   # Take the absolute value of the difference between the prediction and the actual data divided by the standard deviation
   y.StandardizedDifference <- sweep(y.difference,MARGIN=2,FUN="/",STATS=y.PreTreatmentSD)

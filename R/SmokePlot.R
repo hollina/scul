@@ -2,15 +2,23 @@
 #'
 #' Plot standardized differences of all placebo goods and target good.
 #'
-#' @param  y.StandardizedDifference The standardized difference between target data and synthetic data series across time. Default is SCUL.pvalue$y.StandardizedDifference.
-#' @param  y.placebo.StandardizedDifference Standardized difference between each placebo data series and its synthetic prediction across time. Default is SCUL.inference$y.placebo.StandardizedDifference.
-#' @param  time The time variable across. Default is SCUL.input$time.
+#' @param  x.PlaceboPool.StandardizedDiff.full A (T by L), where L<=J)  data frame containing all products that are included in the placebo distribution
+#'        Default is SCUL.inference$y.placebo.StandardizedDifference.Full
+#' @param  x.PlaceboPool.CohensD A (1 by L)  data frame containing all pre-period Cohen's D fit statistic for each placebo unit.
+#'        Default is SCUL.inference$y.placebo.CohensD,
+#' @param  TreatmentBeginsAt An integer indicating which row begins treatment. Default is  SCUL.output$TreatmentBeginsAt.
 #' @param  OutputFilePath Output file path. Default is SCUL.input$OutputFilePath.
+#' @param  CohensD A real number greater than 0, indicating the Cohen's D threshold at which
+#'                     fit is determined to be "poor". The difference is in standard deviation units. Default is SCUL.input$CohensDThreshold.
+#' @param  y.actual The actual (target) data. Default is SCUL.output$y.actual.
+#' @param  y.scul Synthetic data created by SCUL procedure. Default is SCUL.output$y.scul.
+#' @param  fig.title Title of smoke-plot. Default is "Standardized difference for target variable compared to standardized difference for each placebo"
 #'
 #' @return graph  A smoke plot of the standardized effect size compared to placbos.
-#' @import reshape2
+#' @import tidyverse
 #' @import ggplot2
 #' @export
+
 SmokePlot <- function(
   x.PlaceboPool.StandardizedDiff.full = SCUL.inference$y.placebo.StandardizedDifference.Full,
   x.PlaceboPool.CohensD = SCUL.inference$y.placebo.CohensD,
@@ -18,10 +26,9 @@ SmokePlot <- function(
   OutputFilePath = SCUL.input$OutputFilePath,
   CohensD = SCUL.input$CohensDThreshold,
   y.actual = SCUL.output$y.actual,
-  y.scul = SCUL.output$y.scul
+  y.scul = SCUL.output$y.scul,
+  fig.title =  "Standardized difference for target variable compared to standardized\n difference for each placebo"
                   ) {
-
-
   ###################
   #Set up actual scul results for future comparison
   # Calculate the difference between the two
@@ -43,14 +50,12 @@ SmokePlot <- function(
   ###################
   # Trim the time for the stat
   # y.StandardizedDifference.trim <- y.StandardizedDifference[StartTime:EndTime,unlist(y.CohenD[1,])]
-  y.StandardizedDifference.trim <- data.frame(y.StandardizedDifference[StartTime:EndTime,])
+  y.StandardizedDifference.trim <- data.frame(y.StandardizedDifference)
 
   ###################
   #Set up placebo distribution
-  placebo.distribution.trim <- x.PlaceboPool.StandardizedDiff.full[StartTime:EndTime,x.PlaceboPool.CohensD<=CohensD]
+  placebo.distribution.trim <- x.PlaceboPool.StandardizedDiff.full[,x.PlaceboPool.CohensD<=CohensD]
   # placebo.distribution.trim <- data.frame(placebo.distribution.full[StartTime:EndTime,cd<=CohensD])
-
-
 
   # reshape the placebo data to be in long form
   data_to_plot_wide_y <- cbind( SCUL.input$time, Results.y.StandardizedDiff)
@@ -59,46 +64,49 @@ SmokePlot <- function(
   data_to_plot_wide <- cbind( SCUL.input$time, placebo.distribution.trim)
   names(data_to_plot_wide)[1] <- c("time")
 
+  data_to_plot_long <- pivot_longer(data = data_to_plot_wide,
+                                    cols = -c("time"),
+                                    names_to = "group",
+                                    names_prefix = "X",
+                                    values_to = "std_diff",
+                                    values_drop_na = TRUE
+  )
 
-  # Trim placebos with poor pre-treatment fit
-  placebo.distribution.trim <- data.frame(SCUL.inference$y.placebo.StandardizedDifference.Full)[,data.frame(SCUL.inference$y.placebo.CohensD) <=.25 ]
+  # create smoke plot
+  smoke_plot <- ggplot(data = data_to_plot_long, aes(x = time, y = std_diff)) +
+    geom_line(aes(group = group), alpha = .5, size = 1) +
+    theme_classic() +
+    geom_line(data = data_to_plot_wide_y, aes(x = time, y = std_diff), alpha = 1, size = 2., color = "black") +
+    geom_line(data = data_to_plot_wide_y, aes(x = time, y = std_diff), alpha = 1, size = 1.75, color = "#4dac26") +
+    geom_vline(
+      xintercept = SCUL.input$time[TreatmentBeginsAt,1],
+      linetype = "dashed",
+      size = 1,
+      color = "grey37"
+    ) +
+    labs(
+      title = fig.title,
+      x = "Time",
+      y = "Difference between actual data and scul prediction\n in pre-treatment standard deviations for each product"
+    ) +
+    theme(
+      axis.text = element_text(size = 18),
+      axis.title.y = element_text(size = 12),
+      axis.title.x = element_text(size = 18),
+      title = element_text(size = 12),
+      legend.position = "none"
+    )
 
-
-
-  y.placebo.StandardizedDifference <- cbind(time,y.placebo.StandardizedDifference)
-  y.StandardizedDifference <- cbind(time,y.StandardizedDifference)
-
-  colname <-colnames(y.placebo.StandardizedDifference[1])
-  melted = melt(y.placebo.StandardizedDifference, id.vars=colname)
-
-  # Plot all the differences
-  BasePlot <- ggplot() +
-    geom_line(data=melted, aes(x=melted[,1], y=value, group=variable), alpha=.1, size=.5) +
-    geom_line()
-
-
-
-  BasePlot <- BasePlot +
-    geom_line(data = y.StandardizedDifference, aes(x=y.StandardizedDifference[,1] ,y = y.StandardizedDifference[,2],color='outline'),size=1.1,linetype = 1) +
-    geom_line(data = y.StandardizedDifference, aes(x=y.StandardizedDifference[,1] ,y = y.StandardizedDifference[,2],color='fill'),size=.75,linetype = 1) +
-    scale_colour_manual(name = 'the colour', values =c('outline'='black','fill'='darkorange2'))
-
-
-  SmokePlot<- BasePlot +
-    theme_bw() +
-    ylab("") +
-    xlab(colname) +
-    theme(legend.title=element_blank(),
-          panel.border = element_blank(),
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank(),
-          axis.line = element_line(colour = "black"),
-          legend.position="none")
-  SmokePlot
   # Save graph
-  SmokePlotPath<-paste(OutputFilePath,"smoke_plot.png",sep='')
-  ggsave(SmokePlotPath, dpi=300)
+  SmokePlotPath<-paste0(SCUL.input$OutputFilePath,"smoke_plot.png")
+  ggsave(SmokePlotPath,
+         plot = smoke_plot,
+         width = 8,
+         height = 5,
+         dpi = 300,
+         units = "in")
+
   ####################
   ## Return plot
-  return(SmokePlot)
+  return(smoke_plot)
 }
