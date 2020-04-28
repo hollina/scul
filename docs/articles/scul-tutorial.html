@@ -6,6 +6,12 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SCUL Tutorial • scul</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="../apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="../apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="../apple-touch-icon-60x60.png">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="../bootstrap-toc.css">
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
@@ -13,6 +19,7 @@
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="SCUL Tutorial">
 <meta property="og:description" content="scul">
+<meta property="og:image" content="https://hollina.github.io/scul/logo.png">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:creator" content="@ajhollingsworth">
 <meta name="twitter:site" content="@ajhollingsworth">
@@ -74,7 +81,7 @@
             <h3 class="subtitle">Overview of R package, extended example using publicly available data, and brief comparison to traditional method</h3>
                         <h4 class="author">Alex Hollingsworth</h4>
             
-            <h4 class="date">2020-04-17</h4>
+            <h4 class="date">2020-04-24</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hollina/scul/blob/master/vignettes/scul-tutorial.Rmd"><code>vignettes/scul-tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>scul-tutorial.Rmd</code></div>
@@ -831,7 +838,7 @@ This negative contribution of a donor series is not possible in the traditional 
     <span class="kw">EndTime</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">Results.y.StandardizedDiff</span>)
 )
 <span class="co">#&gt;   p.value.high</span>
-<span class="co">#&gt; 1         0.37</span>
+<span class="co">#&gt; 1         0.13</span>
 
 <span class="fu"><a href="../reference/PValue.html">PValue</a></span>(
     <span class="kw">CohensD</span> <span class="kw">=</span> <span class="fl">.25</span>,
@@ -839,7 +846,7 @@ This negative contribution of a donor series is not possible in the traditional 
     <span class="kw">EndTime</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">Results.y.StandardizedDiff</span>)
 )
 <span class="co">#&gt;   p.value.high</span>
-<span class="co">#&gt; 1            0</span></pre></body></html></div>
+<span class="co">#&gt; 1         0.07</span></pre></body></html></div>
 <p>As could also be seen in the first density plot, when we allow all units in the placebo pool (i.e., no Cohen’s D restriction) to contribute to the null distribution estimate, our treatment effect estimate does not appear sufficiently rare. It has a p-value of 0.4. However, when we include only those placebos where the SCUL procedure found a suitable counterfactual (judged by Cohen’s D less than or equal to 0.25), our treatment effect estimate is extremely rare with a p-value of 0.02.</p>
 </div>
 </div>
@@ -1513,8 +1520,8 @@ Coefficient
 <span class="co">#&gt;  [1] Synth_1.1-5         formattable_0.2.0.1 cowplot_1.0.0      </span>
 <span class="co">#&gt;  [4] kableExtra_1.1.0    knitr_1.28          pBrackets_1.0      </span>
 <span class="co">#&gt;  [7] glmnet_3.0-2        Matrix_1.2-17       forcats_0.5.0      </span>
-<span class="co">#&gt; [10] stringr_1.4.0       dplyr_0.8.5         purrr_0.3.3        </span>
-<span class="co">#&gt; [13] readr_1.3.1         tidyr_1.0.2         tibble_3.0.0       </span>
+<span class="co">#&gt; [10] stringr_1.4.0       dplyr_0.8.5         purrr_0.3.4        </span>
+<span class="co">#&gt; [13] readr_1.3.1         tidyr_1.0.2         tibble_3.0.1       </span>
 <span class="co">#&gt; [16] ggplot2_3.3.0       tidyverse_1.3.0     scul_0.1.0.0       </span>
 <span class="co">#&gt; [19] pacman_0.5.1       </span>
 <span class="co">#&gt; </span>
@@ -1523,32 +1530,31 @@ Coefficient
 <span class="co">#&gt;  [4] webshot_0.5.2        httr_1.4.1           rprojroot_1.3-2     </span>
 <span class="co">#&gt;  [7] numDeriv_2016.8-1.1  tools_3.6.1          backports_1.1.6     </span>
 <span class="co">#&gt; [10] R6_2.4.1             rpart_4.1-15         DBI_1.1.0           </span>
-<span class="co">#&gt; [13] colorspace_1.4-1     nnet_7.3-12          withr_2.1.2         </span>
-<span class="co">#&gt; [16] processx_3.4.2       tidyselect_1.0.0     compiler_3.6.1      </span>
-<span class="co">#&gt; [19] cli_2.0.2            rvest_0.3.5          xml2_1.3.1          </span>
-<span class="co">#&gt; [22] desc_1.2.0           labeling_0.3         scales_1.1.0        </span>
-<span class="co">#&gt; [25] callr_3.4.3          pkgdown_1.5.1        digest_0.6.25       </span>
-<span class="co">#&gt; [28] rmarkdown_2.1        pkgconfig_2.0.3      htmltools_0.4.0     </span>
-<span class="co">#&gt; [31] highr_0.8            dbplyr_1.4.2         htmlwidgets_1.5.1   </span>
-<span class="co">#&gt; [34] rlang_0.4.5          readxl_1.3.1         rstudioapi_0.11     </span>
-<span class="co">#&gt; [37] farver_2.0.3         shape_1.4.4          generics_0.0.2      </span>
-<span class="co">#&gt; [40] jsonlite_1.6.1       ModelMetrics_1.2.2.2 magrittr_1.5        </span>
-<span class="co">#&gt; [43] Rcpp_1.0.4.6         munsell_0.5.0        fansi_0.4.1         </span>
-<span class="co">#&gt; [46] lifecycle_0.2.0      stringi_1.4.6        pROC_1.16.2         </span>
-<span class="co">#&gt; [49] yaml_2.2.1           MASS_7.3-51.4        plyr_1.8.6          </span>
-<span class="co">#&gt; [52] recipes_0.1.10       grid_3.6.1           crayon_1.3.4        </span>
-<span class="co">#&gt; [55] lattice_0.20-38      haven_2.2.0          splines_3.6.1       </span>
-<span class="co">#&gt; [58] hms_0.5.3            ps_1.3.2             pillar_1.4.3        </span>
-<span class="co">#&gt; [61] reshape2_1.4.4       codetools_0.2-16     stats4_3.6.1        </span>
-<span class="co">#&gt; [64] reprex_0.3.0         glue_1.4.0           evaluate_0.14       </span>
-<span class="co">#&gt; [67] data.table_1.12.8    modelr_0.1.6         vctrs_0.2.4         </span>
-<span class="co">#&gt; [70] foreach_1.5.0        cellranger_1.1.0     gtable_0.3.0        </span>
-<span class="co">#&gt; [73] kernlab_0.9-29       assertthat_0.2.1     xfun_0.12           </span>
-<span class="co">#&gt; [76] gower_0.2.1          prodlim_2019.11.13   broom_0.5.5         </span>
-<span class="co">#&gt; [79] viridisLite_0.3.0    class_7.3-15         survival_2.44-1.1   </span>
-<span class="co">#&gt; [82] timeDate_3043.102    optimx_2018-7.10     iterators_1.0.12    </span>
-<span class="co">#&gt; [85] memoise_1.1.0        lava_1.6.7           ellipsis_0.3.0      </span>
-<span class="co">#&gt; [88] caret_6.0-86         ipred_0.9-9</span></pre></body></html></div>
+<span class="co">#&gt; [13] colorspace_1.4-1     nnet_7.3-12          withr_2.2.0         </span>
+<span class="co">#&gt; [16] tidyselect_1.0.0     compiler_3.6.1       cli_2.0.2           </span>
+<span class="co">#&gt; [19] rvest_0.3.5          xml2_1.3.1           desc_1.2.0          </span>
+<span class="co">#&gt; [22] labeling_0.3         scales_1.1.0         pkgdown_1.5.1       </span>
+<span class="co">#&gt; [25] digest_0.6.25        rmarkdown_2.1        pkgconfig_2.0.3     </span>
+<span class="co">#&gt; [28] htmltools_0.4.0      highr_0.8            dbplyr_1.4.2        </span>
+<span class="co">#&gt; [31] htmlwidgets_1.5.1    rlang_0.4.5          readxl_1.3.1        </span>
+<span class="co">#&gt; [34] rstudioapi_0.11      farver_2.0.3         shape_1.4.4         </span>
+<span class="co">#&gt; [37] generics_0.0.2       jsonlite_1.6.1       ModelMetrics_1.2.2.2</span>
+<span class="co">#&gt; [40] magrittr_1.5         Rcpp_1.0.4.6         munsell_0.5.0       </span>
+<span class="co">#&gt; [43] fansi_0.4.1          lifecycle_0.2.0      stringi_1.4.6       </span>
+<span class="co">#&gt; [46] pROC_1.16.2          yaml_2.2.1           MASS_7.3-51.4       </span>
+<span class="co">#&gt; [49] plyr_1.8.6           recipes_0.1.10       grid_3.6.1          </span>
+<span class="co">#&gt; [52] crayon_1.3.4         lattice_0.20-38      haven_2.2.0         </span>
+<span class="co">#&gt; [55] splines_3.6.1        hms_0.5.3            pillar_1.4.3        </span>
+<span class="co">#&gt; [58] reshape2_1.4.4       codetools_0.2-16     stats4_3.6.1        </span>
+<span class="co">#&gt; [61] reprex_0.3.0         glue_1.4.0           evaluate_0.14       </span>
+<span class="co">#&gt; [64] data.table_1.12.8    modelr_0.1.6         vctrs_0.2.4         </span>
+<span class="co">#&gt; [67] foreach_1.5.0        cellranger_1.1.0     gtable_0.3.0        </span>
+<span class="co">#&gt; [70] kernlab_0.9-29       assertthat_0.2.1     xfun_0.12           </span>
+<span class="co">#&gt; [73] gower_0.2.1          prodlim_2019.11.13   broom_0.5.5         </span>
+<span class="co">#&gt; [76] class_7.3-15         survival_2.44-1.1    viridisLite_0.3.0   </span>
+<span class="co">#&gt; [79] timeDate_3043.102    optimx_2020-2.2      iterators_1.0.12    </span>
+<span class="co">#&gt; [82] memoise_1.1.0        lava_1.6.7           ellipsis_0.3.0      </span>
+<span class="co">#&gt; [85] caret_6.0-86         ipred_0.9-9</span></pre></body></html></div>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1 class="hasAnchor">

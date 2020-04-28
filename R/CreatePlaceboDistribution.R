@@ -62,7 +62,8 @@ CreatePlaceboDistribution <- function(
 
     # Remove the target variable and any variables from the same state as the target
     x.PlaceboPoolWithoutTarget <- x.PlaceboPool[,-h]
-    x.PlaceboPoolWithoutTargetOrOwnState<-x.PlaceboPoolWithoutTarget[, -grep(substring(names(x.PlaceboPool)[h],1, 2), colnames(x.PlaceboPoolWithoutTarget))]
+    #x.PlaceboPoolWithoutTargetOrOwnState<-x.PlaceboPoolWithoutTarget[, -grep(substring(names(x.PlaceboPool)[h],1, 2), colnames(x.PlaceboPoolWithoutTarget))]
+    x.PlaceboPoolWithoutTargetOrOwnState<-x.PlaceboPoolWithoutTarget
 
     # Split into pre and post period
     x.PlaceboPool.PreTreatment <- as.matrix(x.PlaceboPoolWithoutTargetOrOwnState [(1:TreatmentBeginsAt-1),])
