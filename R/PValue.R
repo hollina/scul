@@ -41,7 +41,7 @@ PValue <-  function(
   #Set up actual scul results for future comparison
   # Calculate the difference between the two
   y.difference <- data.frame(y.actual - y.scul)
-  names(y.difference)<- names(y.actual)
+  names(y.difference) <- names(y.actual)
 
   # Calculate the standard deviation of the outcome variable in the pre-treatment period
   y.PreTreatmentSD <-t(apply(data.frame(y.actual[1:(TreatmentBeginsAt-1),]), 2, sd))

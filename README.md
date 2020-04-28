@@ -33,8 +33,8 @@ An in-depth tutorial of the package and overview of every function in
 the package is available here,
 <https://hollina.github.io/scul/articles/scul-tutorial.html>. The
 tutorial uses publicly available data and discusses many features of the
-SCUL procedure. The tutorial also provides a simple comparison the SCUL
-method to the traditional synthetic control method.
+SCUL procedure. The tutorial also provides a simple comparison of the
+SCUL method to the traditional synthetic control method.
 
 More details on SCUL can be found in our working paper, (link to be
 posted 3 May 2020). The paper, joint with Coady Wing, desribes
@@ -51,11 +51,11 @@ treatment effects for idiosyncratic historical events. In the typical
 application developed by Abadie, Diamond, and Hainmueller (2010),
 researchers observe time series outcomes for both a treated unit and a
 number of untreated units. A weighted average of the untreated series is
-used to construct a counterfactual estimate of the treated series, which
-is referred to as a synthetic comparison group. Weights are chosen to
+used as a counterfactual estimate of the treated series, which is
+referred to as a synthetic comparison group. Weights are chosen to
 minimize discrepancies between the synthetic comparison group and the
 treated unit in the pre-treatment time period. Treatment effect
-estimates are taken to be the difference between observed outcomes and a
+estimates are usually the difference between observed outcomes and the
 synthetic counterfactual. Statistical inference is normally organized
 around a placebo analysis; in which, pseudo-treatment effects are
 estimated for many untreated placebo units, and the distribution of
@@ -94,8 +94,8 @@ In general, our approach allows for:
   - extrapolation from the donor pool
   - counter-cyclical weights
 
-We jointly view our statistical approach and following these
-recommendations as the `SCUL`
+We consider the combination of this statistical approach and following
+these recommendations as the `SCUL`
 procedure
 
 ## What are the contributions of SCUL?
@@ -206,8 +206,7 @@ package used. Documentation was made using `roxygen2`, `pkgdown`, and
 2.  Add examples to each function
 3.  Create function for smoke plot
 4.  Proof read documentation
-5.  Add content from readme to tutorial
-6.  Submit package via CRAN
+5.  Release package via CRAN
 
 ## References
 

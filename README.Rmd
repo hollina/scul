@@ -36,7 +36,7 @@ devtools::install_github("hollina/scul")`
 ```
 
 ## Tutorial/More details
-An in-depth tutorial of the package and overview of every function in the package is available here, <https://hollina.github.io/scul/articles/scul-tutorial.html>. The tutorial uses publicly available data and discusses many features of the SCUL procedure. The tutorial also provides a simple comparison the SCUL method to the traditional synthetic control method. 
+An in-depth tutorial of the package and overview of every function in the package is available here, <https://hollina.github.io/scul/articles/scul-tutorial.html>. The tutorial uses publicly available data and discusses many features of the SCUL procedure. The tutorial also provides a simple comparison of the SCUL method to the traditional synthetic control method. 
 
 More details on SCUL can be found in our working paper, (link to be posted 3 May 2020).
 The paper, joint with Coady Wing, desribes identification assumptions and recommendations for key---and normally ad hoc---decisions that arise in most synthetic control studies. 
@@ -46,9 +46,9 @@ The paper then describes the SCUL method and uses the procedure to estimate how 
 
 The synthetic control methodology is a strategy for estimating causal treatment effects for idiosyncratic historical events.
 In the typical application developed by @Abadie2010, researchers observe time series outcomes for both a treated unit and a number of untreated units.
-A weighted average of the untreated series is used to construct a counterfactual estimate of the treated series, which is referred to as a synthetic comparison group.
+A weighted average of the untreated series is used as a counterfactual estimate of the treated series, which is referred to as a synthetic comparison group.
 Weights are chosen to minimize discrepancies between the synthetic comparison group and the treated unit in the pre-treatment time period.
-Treatment effect estimates are taken to be the difference between observed outcomes and a synthetic counterfactual.
+Treatment effect estimates are usually the difference between observed outcomes and the synthetic counterfactual.
 Statistical inference is normally organized around a placebo analysis; in which, pseudo-treatment effects are estimated for many untreated placebo units, and the distribution of pseudo-estimates represents the null distribution of no treatment effect.
 
 A useful way to think about synthetic controls is as a procedure that attempts to *match* donor series to target series based on the unobserved factors that determine the data generating process.
@@ -72,7 +72,7 @@ In general, our approach allows for:
   - extrapolation from the donor pool
   - counter-cyclical weights
 
-We jointly view our statistical approach and following these recommendations as the `SCUL` procedure
+We consider the combination of this statistical approach and following these recommendations as the SCUL procedure
 
 ## What are the contributions of SCUL? 
 
@@ -140,7 +140,6 @@ The package is made for R. and was developed on a Unix machine using R 3.6.1. Se
 1. Add examples to each function
 1. Create function for smoke plot
 1. Proof read documentation
-1. Add content from readme to tutorial
-1. Submit package via CRAN
+1. Release package via CRAN
 
 ## References 

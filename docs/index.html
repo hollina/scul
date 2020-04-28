@@ -86,13 +86,13 @@ devtools::install_github("hollina/scul")`</pre></div>
 <div id="tutorialmore-details" class="section level2">
 <h2 class="hasAnchor">
 <a href="#tutorialmore-details" class="anchor"></a>Tutorial/More details</h2>
-<p>An in-depth tutorial of the package and overview of every function in the package is available here, <a href="https://hollina.github.io/scul/articles/scul-tutorial.html" class="uri">https://hollina.github.io/scul/articles/scul-tutorial.html</a>. The tutorial uses publicly available data and discusses many features of the SCUL procedure. The tutorial also provides a simple comparison the SCUL method to the traditional synthetic control method.</p>
+<p>An in-depth tutorial of the package and overview of every function in the package is available here, <a href="https://hollina.github.io/scul/articles/scul-tutorial.html" class="uri">https://hollina.github.io/scul/articles/scul-tutorial.html</a>. The tutorial uses publicly available data and discusses many features of the SCUL procedure. The tutorial also provides a simple comparison of the SCUL method to the traditional synthetic control method.</p>
 <p>More details on SCUL can be found in our working paper, (link to be posted 3 May 2020). The paper, joint with Coady Wing, desribes identification assumptions and recommendations for key—and normally ad hoc—decisions that arise in most synthetic control studies. The paper then describes the SCUL method and uses the procedure to estimate how recreational marijuana legalization affects sales of alcohol and over-the-counter painkillers, finding reductions in alcohol sales.</p>
 </div>
 <div id="what-is-a-synthetic-control" class="section level2">
 <h2 class="hasAnchor">
 <a href="#what-is-a-synthetic-control" class="anchor"></a>What is a synthetic control?</h2>
-<p>The synthetic control methodology is a strategy for estimating causal treatment effects for idiosyncratic historical events. In the typical application developed by Abadie, Diamond, and Hainmueller (2010), researchers observe time series outcomes for both a treated unit and a number of untreated units. A weighted average of the untreated series is used to construct a counterfactual estimate of the treated series, which is referred to as a synthetic comparison group. Weights are chosen to minimize discrepancies between the synthetic comparison group and the treated unit in the pre-treatment time period. Treatment effect estimates are taken to be the difference between observed outcomes and a synthetic counterfactual. Statistical inference is normally organized around a placebo analysis; in which, pseudo-treatment effects are estimated for many untreated placebo units, and the distribution of pseudo-estimates represents the null distribution of no treatment effect.</p>
+<p>The synthetic control methodology is a strategy for estimating causal treatment effects for idiosyncratic historical events. In the typical application developed by Abadie, Diamond, and Hainmueller (2010), researchers observe time series outcomes for both a treated unit and a number of untreated units. A weighted average of the untreated series is used as a counterfactual estimate of the treated series, which is referred to as a synthetic comparison group. Weights are chosen to minimize discrepancies between the synthetic comparison group and the treated unit in the pre-treatment time period. Treatment effect estimates are usually the difference between observed outcomes and the synthetic counterfactual. Statistical inference is normally organized around a placebo analysis; in which, pseudo-treatment effects are estimated for many untreated placebo units, and the distribution of pseudo-estimates represents the null distribution of no treatment effect.</p>
 <p>A useful way to think about synthetic controls is as a procedure that attempts to <em>match</em> donor series to target series based on the unobserved factors that determine the data generating process. When framed in this manner identification assumptions and strategies for model selection/inference become more salient.</p>
 <p>Recent methodological work has proposed a number of innovative strategies for estimating synthetic control weights (Arkhangelsky et al. 2018; Doudchenko and Imbens 2017; Powell 2019). In a similar vein, we construct donor weights using a method we call <strong>Synthetic Control Using Lasso (SCUL)</strong>.</p>
 </div>
@@ -109,7 +109,7 @@ devtools::install_github("hollina/scul")`</pre></div>
 <li>extrapolation from the donor pool</li>
 <li>counter-cyclical weights</li>
 </ul>
-<p>We jointly view our statistical approach and following these recommendations as the <code>SCUL</code> procedure</p>
+<p>We consider the combination of this statistical approach and following these recommendations as the <code>SCUL</code> procedure</p>
 </div>
 <div id="what-are-the-contributions-of-scul" class="section level2">
 <h2 class="hasAnchor">
@@ -174,8 +174,7 @@ devtools::install_github("hollina/scul")`</pre></div>
 <li>Add examples to each function</li>
 <li>Create function for smoke plot</li>
 <li>Proof read documentation</li>
-<li>Add content from readme to tutorial</li>
-<li>Submit package via CRAN</li>
+<li>Release package via CRAN</li>
 </ol>
 </div>
 <div id="references" class="section level2">
