@@ -17,7 +17,12 @@
 #' @param x.PlaceboPool A (T by J) data frame containing all products that you wish to include in the placebo distribution
 #'         Must be sorted by time. Default is SCUL.input$x.PlaceboPool.
 #' @param TrainingPostPeriodLength The number of timer periods post-treatment for training data. Defaults to all time since treatment begins.
-
+#' @param DonorPoolRestrictionForEachPlacebo This is a customizeable restriction on the placebo pool.
+#'         In Hollingsworth and Wing (2020) we use it to ensure that no analysis on a placebo series uses donors from the same state.
+#'         Where state is identified by a pattern in each variable name. Default is no restriction.
+#'         The placebo pool is indexed by `h`:
+#'         For a restriction based on the first two characters: "select(-starts_with(substring(names(x.PlaceboPool)[h],1, 2)))"
+#'         For a restriction based on the last two characters: "select(-ends_with(substring(names(x.PlaceboPool)[h],nchar(names(x.PlaceboPool)[h]) - 2 + 1, nchar(names(x.PlaceboPool)[h]))))"
 #' @return list  A list of standardized placbo effect sizes
 #' @import glmnet
 #'
@@ -31,7 +36,8 @@ CreatePlaceboDistribution <- function(
   NumberInitialTimePeriods = SCUL.input$NumberInitialTimePeriods,
   OutputFilePath = SCUL.input$OutputFilePath,
   CohensDThreshold = SCUL.input$CohensDThreshold,
-  TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength
+  TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength,
+  DonorPoolRestrictionForEachPlacebo = ""
 ) {
 
 
@@ -62,12 +68,20 @@ CreatePlaceboDistribution <- function(
 
     # Remove the target variable and any variables from the same state as the target
     x.PlaceboPoolWithoutTarget <- x.PlaceboPool[,-h]
-    #x.PlaceboPoolWithoutTargetOrOwnState<-x.PlaceboPoolWithoutTarget[, -grep(substring(names(x.PlaceboPool)[h],1, 2), colnames(x.PlaceboPoolWithoutTarget))]
-    x.PlaceboPoolWithoutTargetOrOwnState<-x.PlaceboPoolWithoutTarget
+
+    # If there is a restriction, apply it
+    if (nchar(DonorPoolRestrictionForEachPlacebo) > 0){
+      full_statement <- paste("x.PlaceboPoolWithoutTarget %>% ", DonorPoolRestrictionForEachPlacebo)
+      x.PlaceboPoolRestricted <- eval(parse(text = full_statement))
+    }
+    # If there is not a restriction, leave the donor pool for the placebo as is
+    if (nchar(DonorPoolRestrictionForEachPlacebo) == 0){
+      x.PlaceboPoolRestricted <- x.PlaceboPoolWithoutTarget
+    }
 
     # Split into pre and post period
-    x.PlaceboPool.PreTreatment <- as.matrix(x.PlaceboPoolWithoutTargetOrOwnState [(1:TreatmentBeginsAt-1),])
-    x.PlaceboPool.PostTreatment <- as.matrix(x.PlaceboPoolWithoutTargetOrOwnState [(TreatmentBeginsAt:PostPeriodLength),])
+    x.PlaceboPool.PreTreatment <- as.matrix(x.PlaceboPoolRestricted [(1:TreatmentBeginsAt-1),])
+    x.PlaceboPool.PostTreatment <- as.matrix(x.PlaceboPoolRestricted [(TreatmentBeginsAt:PostPeriodLength),])
 
 
     ###################
@@ -153,7 +167,7 @@ CreatePlaceboDistribution <- function(
     EntirePretreatmentFit=glmnet(x.PlaceboPool.PreTreatment,y.PlaceboPool.PreTreatment)
 
     # Extract the exact prediction for the cross-validated lambda
-    placebo.y.scul <- predict(x=x.PlaceboPool.PreTreatment, y=y.PlaceboPool.PreTreatment, newx = as.matrix(x.PlaceboPoolWithoutTargetOrOwnState), EntirePretreatmentFit,s = CrossValidatedLambda, exact = TRUE)
+    placebo.y.scul <- predict(x=x.PlaceboPool.PreTreatment, y=y.PlaceboPool.PreTreatment, newx = as.matrix(x.PlaceboPoolRestricted), EntirePretreatmentFit,s = CrossValidatedLambda, exact = TRUE)
 
     # Calculate the standard deviation of the outcome variable in the pre-treatment period
     PreTreatmentSD <-sd(y.PlaceboPool.PreTreatment)

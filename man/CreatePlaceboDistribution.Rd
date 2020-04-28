@@ -12,7 +12,8 @@ CreatePlaceboDistribution(
   NumberInitialTimePeriods = SCUL.input$NumberInitialTimePeriods,
   OutputFilePath = SCUL.input$OutputFilePath,
   CohensDThreshold = SCUL.input$CohensDThreshold,
-  TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength
+  TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength,
+  DonorPoolRestrictionForEachPlacebo = ""
 )
 }
 \arguments{
@@ -36,6 +37,13 @@ Default is the stated amount in SCUL.input data.}
 fit is determined to be "poor". The difference is in standard deviation units. Default is SCUL.input$CohensDThreshold.}
 
 \item{TrainingPostPeriodLength}{The number of timer periods post-treatment for training data. Defaults to all time since treatment begins.}
+
+\item{DonorPoolRestrictionForEachPlacebo}{This is a customizeable restriction on the placebo pool.
+In Hollingsworth and Wing (2020) we use it to ensure that no analysis on a placebo series uses donors from the same state.
+Where state is identified by a pattern in each variable name. Default is no restriction.
+The placebo pool is indexed by `h`:
+For a restriction based on the first two characters: "select(-starts_with(substring(names(x.PlaceboPool)[h],1, 2)))"
+For a restriction based on the last two characters: "select(-ends_with(substring(names(x.PlaceboPool)[h],nchar(names(x.PlaceboPool)[h]) - 2 + 1, nchar(names(x.PlaceboPool)[h]))))"}
 }
 \value{
 list  A list of standardized placbo effect sizes
