@@ -13,6 +13,7 @@
 #' @param  y.actual The actual (target) data. Default is SCUL.output$y.actual.
 #' @param  y.scul Synthetic data created by SCUL procedure. Default is SCUL.output$y.scul.
 #' @param  fig.title Title of smoke-plot. Default is "Standardized difference for target variable compared to standardized difference for each placebo"
+#' @param  custom.alpha Choose transparancy of placebo pool lines. Default is .33.
 #'
 #' @return graph  A smoke plot of the standardized effect size compared to placbos.
 #' @import tidyverse
@@ -27,7 +28,8 @@ SmokePlot <- function(
   CohensD = SCUL.input$CohensDThreshold,
   y.actual = SCUL.output$y.actual,
   y.scul = SCUL.output$y.scul,
-  fig.title =  "Standardized difference for target variable compared to standardized\n difference for each placebo"
+  fig.title =  "Standardized difference for target variable compared to standardized\n difference for each placebo",
+  custom.alpha = 0.33
                   ) {
   ###################
   #Set up actual scul results for future comparison
@@ -74,7 +76,7 @@ SmokePlot <- function(
 
   # create smoke plot
   smoke_plot <- ggplot(data = data_to_plot_long, aes(x = time, y = std_diff)) +
-    geom_line(aes(group = group), alpha = .5, size = 1) +
+    geom_line(aes(group = group), alpha = custom.alpha, size = 1) +
     theme_classic() +
     geom_line(data = data_to_plot_wide_y, aes(x = time, y = std_diff), alpha = 1, size = 2., color = "black") +
     geom_line(data = data_to_plot_wide_y, aes(x = time, y = std_diff), alpha = 1, size = 1.75, color = "#4dac26") +

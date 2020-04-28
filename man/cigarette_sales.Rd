@@ -4,7 +4,9 @@
 \name{cigarette_sales}
 \alias{cigarette_sales}
 \title{Cigarette sales and retail prices by state}
-\format{Each row is a year, each column is either cigarette sales or retail cigarette price by state. State is indicated by suffix with FIPS code.}
+\format{
+Each row is a year, each column is either cigarette sales or retail cigarette price by state. State is indicated by suffix with FIPS code.
+}
 \usage{
 data(cigarette_sales)
 }

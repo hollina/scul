@@ -636,9 +636,32 @@ The first step in this procedure is to estimate a pseudo-treatment effect for ea
 
 ###  Run SCUL procedure on placebo pool to estimate pseudo-treatment effects using `CreatePlaceboDistribution()`
 
-```{r, results='hide'}
-SCUL.inference <- CreatePlaceboDistribution()
+
+If you'd like to specify any restrictions on the donor pool in each placebo run, you can do so by modifying the `DonorPoolRestrictionForEachPlacebo` argument. 
+
+To avoid including an endogenous donor variable, we don't include the retail cigarette price in california `retprice_6` as a donor in the `SCUL` prediction for our target variable. For consistency we should apply a similar restriction for each donor pool for each placebo analysis. 
+
+This is simple to do because of the structure of our data. Recall that the digits  following the `_` character in each variable name indicate the state FIPS. All we need to do is add a selection that removes any donor variables that have the same state FIPS as the target. 
+
+In our placebo analysis the target loops across every placebo and is indexed by `h`, so we first extract the relevant substring (last two characters) from the `h`th placebo unit. We then drop any varaibles that end with this substring.
+
+This restriction will be passed to the donor pool using the `%>%` feature so  write it using `dplyr` language.  
+
+```{r}
+ drop_vars_from_same_FIPS <-
+ "select(-ends_with(substring(names(x.PlaceboPool)[h],nchar(names(x.PlaceboPool)[h]) - 2 + 1, nchar(names(x.PlaceboPool)[h]))))"
 ```
+
+Note: depending on the structure of your data, you can change this restriction. For example, if you used state abbreviations *at the begining* of each variable name rather than FIPS codes at the end. Then all you would need to do is to drop any variable that had the same first two characters. This could be done by writing the restriction as `"select(-starts_with(substring(names(x.PlaceboPool)[h],1, 2)))"`
+
+Now we can run the analysis for each placebo unit. 
+
+```{r, results='hide'}
+SCUL.inference <- CreatePlaceboDistribution(
+  DonorPoolRestrictionForEachPlacebo = drop_vars_from_same_FIPS
+)
+```
+
 
 
 We save the output from this procedure as the list `SCUL.inference`. This list contains

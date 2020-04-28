@@ -14,7 +14,8 @@ SmokePlot(
   y.actual = SCUL.output$y.actual,
   y.scul = SCUL.output$y.scul,
  
-    fig.title = "Standardized difference for target variable compared to standardized\\n difference for each placebo"
+    fig.title = "Standardized difference for target variable compared to standardized\\n difference for each placebo",
+  custom.alpha = 0.33
 )
 }
 \arguments{
@@ -36,6 +37,8 @@ fit is determined to be "poor". The difference is in standard deviation units. D
 \item{y.scul}{Synthetic data created by SCUL procedure. Default is SCUL.output$y.scul.}
 
 \item{fig.title}{Title of smoke-plot. Default is "Standardized difference for target variable compared to standardized difference for each placebo"}
+
+\item{custom.alpha}{Choose transparancy of placebo pool lines. Default is .33.}
 }
 \value{
 graph  A smoke plot of the standardized effect size compared to placbos.
