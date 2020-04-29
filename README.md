@@ -154,15 +154,15 @@ out-of-sample prediction.
 By automating model selection and allowing for a large number of donors,
 we reduce “researcher degrees of freedom.” It is easy to imagine that
 the best synthetic prediction could be created for each target series,
-but less time would be spent perfect the model for each placebo series.
-If the automated model selection results in better fit for placebo
-series, we also improve the statistical power. This occurs if better fit
-in the pre-treatment period results in less deterioration (i.e., better
-fit) in the post-period. This improves statistical power because
-statistical inference in done by comparing deviations of the treated
-series to the distribution of placebo deviations. Therefore reducing the
-spread of the placebo null-distribution allows for smaller deviations of
-the treated unit to be considered statistically rare.
+but less time would be spent perfecting the model for each placebo
+series. If the automated model selection results in better fit for
+placebo series, we also improve the statistical power. This occurs if
+better fit in the pre-treatment period results in less deterioration
+(i.e., better fit) in the post-period. This improves statistical power
+because statistical inference in done by comparing deviations of the
+treated series to the distribution of placebo deviations. Therefore
+reducing the spread of the placebo null-distribution allows for smaller
+deviations of the treated unit to be considered statistically rare.
 
 ### 4\. Includes a wide variety of donor types
 
