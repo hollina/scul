@@ -28,6 +28,7 @@ Suggests:
     rmarkdown, 
     Synth, 
     cowplot, 
-    kableExtra 
+    kableExtra,
+    pacman 
 VignetteBuilder: knitr
 BugReports: https://github.com/hollina/scul/issues/

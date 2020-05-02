@@ -5,21 +5,20 @@
 \title{Make smoke plot}
 \usage{
 SmokePlot(
- 
-    x.PlaceboPool.StandardizedDiff.full = SCUL.inference$y.placebo.StandardizedDifference.Full,
+  x.PlaceboPool.full = SCUL.inference$y.placebo.StandardizedDifference.Full,
   x.PlaceboPool.CohensD = SCUL.inference$y.placebo.CohensD,
   TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
   OutputFilePath = SCUL.input$OutputFilePath,
   CohensD = SCUL.input$CohensDThreshold,
   y.actual = SCUL.output$y.actual,
   y.scul = SCUL.output$y.scul,
- 
-    fig.title = "Standardized difference for target variable compared to standardized\\n difference for each placebo",
-  custom.alpha = 0.33
+  fig.title = "Standardized differences of target compared\\n and each placebo",
+  custom.alpha = 0.33,
+  save.figure = FALSE
 )
 }
 \arguments{
-\item{x.PlaceboPool.StandardizedDiff.full}{A (T by L), where L<=J)  data frame containing all products that are included in the placebo distribution
+\item{x.PlaceboPool.full}{A (T by L), where L<=J)  data frame containing all products that are included in the placebo distribution
 Default is SCUL.inference$y.placebo.StandardizedDifference.Full}
 
 \item{x.PlaceboPool.CohensD}{A (1 by L)  data frame containing all pre-period Cohen's D fit statistic for each placebo unit.
@@ -39,6 +38,8 @@ fit is determined to be "poor". The difference is in standard deviation units. D
 \item{fig.title}{Title of smoke-plot. Default is "Standardized difference for target variable compared to standardized difference for each placebo"}
 
 \item{custom.alpha}{Choose transparancy of placebo pool lines. Default is .33.}
+
+\item{save.figure}{Boolean, set to TRUE if you want output saved as figure to OutputFilePath automatically. Default is FALSE}
 }
 \value{
 graph  A smoke plot of the standardized effect size compared to placbos.

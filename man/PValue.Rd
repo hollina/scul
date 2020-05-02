@@ -5,8 +5,7 @@
 \title{Calculate a simple bounded p-value for the treatment effect reporting the larger end of the bound}
 \usage{
 PValue(
- 
-    x.PlaceboPool.StandardizedDiff.full = SCUL.inference$y.placebo.StandardizedDifference.Full,
+  x.PlaceboPool.full = SCUL.inference$y.placebo.StandardizedDifference.Full,
   x.PlaceboPool.CohensD = SCUL.inference$y.placebo.CohensD,
   TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
   OutputFilePath = SCUL.input$OutputFilePath,
@@ -18,7 +17,7 @@ PValue(
 )
 }
 \arguments{
-\item{x.PlaceboPool.StandardizedDiff.full}{A (T by L), where L<=J)  data frame containing all products that are included in the placebo distribution
+\item{x.PlaceboPool.full}{A (T by L), where L<=J)  data frame containing all products that are included in the placebo distribution
 Default is SCUL.inference$y.placebo.StandardizedDifference.Full}
 
 \item{x.PlaceboPool.CohensD}{A (1 by L)  data frame containing all pre-period Cohen's D fit statistic for each placebo unit.

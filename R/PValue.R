@@ -13,7 +13,7 @@
 #' @param EndTime The end time period for which the average pseduo treatment effect is calculated. T
 #' @param OutputFilePath Output file path. Default is  SCUL.input$OutputFilePath.
 #' @param TreatmentBeginsAt  An integer indicating which row begins treatment. Default is  SCUL.output$TreatmentBeginsAt.
-#' @param x.PlaceboPool.StandardizedDiff.full A (T by L), where L<=J)  data frame containing all products that are included in the placebo distribution
+#' @param x.PlaceboPool.full A (T by L), where L<=J)  data frame containing all products that are included in the placebo distribution
 #'        Default is SCUL.inference$y.placebo.StandardizedDifference.Full
 #' @param x.PlaceboPool.CohensD A (1 by L)  data frame containing all pre-period Cohen's D fit statistic for each placebo unit.
 #'        Default is SCUL.inference$y.placebo.CohensD,
@@ -21,11 +21,12 @@
 #'
 #' @return list  The bounds for the rank based p-value based upon rank of mean absolute value of post-treatment standardized effect against null distribution.
 #' @import glmnet
+#' @import stats
 #'
 #' @export
 
 PValue <-  function(
-  x.PlaceboPool.StandardizedDiff.full = SCUL.inference$y.placebo.StandardizedDifference.Full,
+  x.PlaceboPool.full = SCUL.inference$y.placebo.StandardizedDifference.Full,
   x.PlaceboPool.CohensD = SCUL.inference$y.placebo.CohensD,
   TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
   OutputFilePath = SCUL.input$OutputFilePath,
@@ -62,7 +63,7 @@ PValue <-  function(
 
   ###################
   #Set up placebo distribution
-  placebo.distribution.trim <- x.PlaceboPool.StandardizedDiff.full[StartTime:EndTime,x.PlaceboPool.CohensD<=CohensD]
+  placebo.distribution.trim <- x.PlaceboPool.full[StartTime:EndTime,x.PlaceboPool.CohensD<=CohensD]
   # placebo.distribution.trim <- data.frame(placebo.distribution.full[StartTime:EndTime,cd<=CohensD])
 
   ####################

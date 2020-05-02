@@ -8,21 +8,24 @@ GraphTargetData(
   time = SCUL.input$time,
   TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
   y = SCUL.input$y,
-  OutputFilePath = SCUL.input$OutputFilePath
+  OutputFilePath = SCUL.input$OutputFilePath,
+  save.figure = FALSE
 )
 }
 \arguments{
 \item{time}{A dataframe that is a column vector (T by 1) with the running time variable.
 Must be sorted by time (oldest to most recent). Default is taken from SCUL.input$time.}
 
-\item{TreatmentBeginsAt}{An integer indicating the time period (<T) in which treatment begins. 
+\item{TreatmentBeginsAt}{An integer indicating the time period (<T) in which treatment begins.
 Defailt is taken from SCUL.input$TreatmentBeginsAt.}
 
 \item{y}{A dataframe that is a column vector (T by 1) containing the target variable of interest.
 Must be sorted by time (oldest to most recent). Default is SCUL.input$y.}
 
-\item{OutputFilePath}{A file path to store output. Default is taken from 
+\item{OutputFilePath}{A file path to store output. Default is taken from
 SCUL.input$OutputFilePath}
+
+\item{save.figure}{Boolean, set to TRUE if you want output saved as figure to OutputFilePath automatically. Default is FALSE}
 }
 \value{
 FullPlotFilePath A plot of the target varibale across time, with the pre and post treatment periods clearly marked

@@ -357,9 +357,6 @@ lasso_plot <-
   guides(color=guide_legend(ncol=3))
 
  lasso_plot
-
- various_scul_options_path<-paste(SCUL.input$OutputFilePath,"various_scul_options.pdf",sep='')
- ggsave(various_scul_options_path, width=12, height=8, dpi=100)
 ```
 
 So how do we pick between these options? Should we pick the one that fits the line the best during the pre-treatment period? During the post-treatment period?
@@ -477,9 +474,6 @@ TrainingPostPeriodLength <- 7
   #title(main = "Example of rolling origin cross-validation procedure",line = -.8)
   text(-3.75, 1.5, "Example of rolling-origin k-fold cross-validation",cex=1.5,adj=0)
 
-  # Save graph
-  FullPlotPath<-paste0(SCUL.input$OutputFilePath,"visual_illustration_of_cross_validation.pdf")
-  dev.copy(pdf,FullPlotPath, width=12, height=8)
   dev.off()
 ```
 
@@ -762,14 +756,6 @@ combined_plot <- plot_grid(
     NullDist.Full,NullDist.25,
     ncol = 1)
 
-# Save the plot
-FilePath <- paste0(SCUL.input$OutputFilePath,"mde_graph.pdf")
-ggsave(FilePath,
-       plot = combined_plot,
-       width = 4,
-       height = 8,
-       units = "in")
-
 # Display the plot
 combined_plot
 ```
@@ -994,17 +980,6 @@ difference_plot <- ggplot() +
         title = element_text(size = 12)
     )
 
-
-# Save graph
-difference_plotPath <- paste0(SCUL.input$OutputFilePath,"difference_plot.png")
-
-ggsave(difference_plotPath,
-       plot = difference_plot,
-       width = 8,
-       height = 5,
-       dpi = 300,
-       units = "in")
-
 # Display graph
 difference_plot
 ```
@@ -1115,15 +1090,13 @@ Also of note. Many of these variable receive nearly, but not exactly zero weight
   SharesInTable
 ```
 
-```{r, echo = FALSE, results = 'hide'}
+```{r, echo = FALSE, results = 'hide', eval = FALSE}
 # Combine the two plots for the readme
 PlotForReadMe <- plot_grid(
     smoke_plot, combined_plot,
     ncol = 2, rel_widths = c(1, .45))
 
-ReadMePlotPath <- paste0(SCUL.input$OutputFilePath,"ReadMeFigure.png")
-
-ggsave(ReadMePlotPath,
+ggsave("man/figures/ReadMeFigure.png",
        plot = PlotForReadMe,
        width = 12,
        height = 6,
@@ -1543,18 +1516,13 @@ inv_plot <- ggplot(data = df_with_inverse, aes(x = time, y = value)) +
   )
 
 combined_plot
-  ggsave("vignette_output/ReadMeFigure.png",
-         plot = PlotForReadMe,
-         dpi = 300,
-         width = 12,
-         height = 6,
-         units = "in")
-  ggsave("vignette_output/time_series_convex_hull.png",
-         plot = combined_plot,
-         dpi = 300,
-         width = 18,
-         height = 12,
-         units = "in")
+
+#  ggsave("man/figures/time_series_convex_hull.png",
+#         plot = combined_plot,
+#         dpi = 300,
+#         width = 18,
+#         height = 12,
+#         units = "in")
 ```
 The SCUL procedure is a flexible synthetic control method that accommodates both of these scenarios. It also allows for more donors than time periods (i.e., high-dimensional data), which is not possible using the traditional method.
 

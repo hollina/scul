@@ -25,7 +25,7 @@ library(knitr)
 
 This repository contains the R package `scul` that is used in Hollingsworth and Wing (2020) *"Tactics for design and inference in synthetic control studies: An applied example using high-dimensional data."* (link to be posted 3 May 2020)
 
-![figure1](vignettes/vignette_output/ReadMeFigure.png)
+![figure1](man/figures/ReadMeFigure.png)
 
 ## Installation
 
@@ -127,7 +127,7 @@ However there are some situations where these restrictions that prevent extrapol
   - Case 1: When the target series is outside the the support of the donor pool (i.e. you need extrapolation to match the target series
   - Case 2: When negatively correlated donors can help identify underlying data generating process (e.g., two financial assets, or a price and consumption series)
                                                                                
-![figure2](vignettes/vignette_output/time_series_convex_hull.png)
+![figure2](man/figures/time_series_convex_hull.png)
 
 
                                                                       

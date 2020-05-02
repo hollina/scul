@@ -9,7 +9,8 @@ PlotDiffOfActualvSCUL(
   y.scul = SCUL.output$y.scul,
   time = SCUL.output$time,
   OutputFilePath = SCUL.input$OutputFilePath,
-  TreatmentBeginsAt = SCUL.output$TreatmentBeginsAt
+  TreatmentBeginsAt = SCUL.output$TreatmentBeginsAt,
+  save.figure = FALSE
 )
 }
 \arguments{
@@ -22,6 +23,8 @@ PlotDiffOfActualvSCUL(
 \item{OutputFilePath}{Default is  SCUL.input$OutputFilePath.}
 
 \item{TreatmentBeginsAt}{Default is  SCUL.output$TreatmentBeginsAt.}
+
+\item{save.figure}{Boolean, set to TRUE if you want output saved as figure to OutputFilePath automatically. Default is FALSE}
 }
 \value{
 plots  Three plots that compare scul results to actual data; in levels, difference, and standardized difference.

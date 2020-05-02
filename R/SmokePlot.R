@@ -2,7 +2,7 @@
 #'
 #' Plot standardized differences of all placebo goods and target good.
 #'
-#' @param  x.PlaceboPool.StandardizedDiff.full A (T by L), where L<=J)  data frame containing all products that are included in the placebo distribution
+#' @param  x.PlaceboPool.full A (T by L), where L<=J)  data frame containing all products that are included in the placebo distribution
 #'        Default is SCUL.inference$y.placebo.StandardizedDifference.Full
 #' @param  x.PlaceboPool.CohensD A (1 by L)  data frame containing all pre-period Cohen's D fit statistic for each placebo unit.
 #'        Default is SCUL.inference$y.placebo.CohensD,
@@ -14,6 +14,7 @@
 #' @param  y.scul Synthetic data created by SCUL procedure. Default is SCUL.output$y.scul.
 #' @param  fig.title Title of smoke-plot. Default is "Standardized difference for target variable compared to standardized difference for each placebo"
 #' @param  custom.alpha Choose transparancy of placebo pool lines. Default is .33.
+#' @param  save.figure Boolean, set to TRUE if you want output saved as figure to OutputFilePath automatically. Default is FALSE
 #'
 #' @return graph  A smoke plot of the standardized effect size compared to placbos.
 #' @import tidyverse
@@ -21,15 +22,16 @@
 #' @export
 
 SmokePlot <- function(
-  x.PlaceboPool.StandardizedDiff.full = SCUL.inference$y.placebo.StandardizedDifference.Full,
+  x.PlaceboPool.full = SCUL.inference$y.placebo.StandardizedDifference.Full,
   x.PlaceboPool.CohensD = SCUL.inference$y.placebo.CohensD,
   TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
   OutputFilePath = SCUL.input$OutputFilePath,
   CohensD = SCUL.input$CohensDThreshold,
   y.actual = SCUL.output$y.actual,
   y.scul = SCUL.output$y.scul,
-  fig.title =  "Standardized difference for target variable compared to standardized\n difference for each placebo",
-  custom.alpha = 0.33
+  fig.title =  "Standardized differences of target compared\n and each placebo",
+  custom.alpha = 0.33,
+  save.figure = FALSE
                   ) {
   ###################
   #Set up actual scul results for future comparison
@@ -56,7 +58,7 @@ SmokePlot <- function(
 
   ###################
   #Set up placebo distribution
-  placebo.distribution.trim <- x.PlaceboPool.StandardizedDiff.full[,x.PlaceboPool.CohensD<=CohensD]
+  placebo.distribution.trim <- x.PlaceboPool.full[,x.PlaceboPool.CohensD<=CohensD]
   # placebo.distribution.trim <- data.frame(placebo.distribution.full[StartTime:EndTime,cd<=CohensD])
 
   # reshape the placebo data to be in long form
@@ -98,16 +100,16 @@ SmokePlot <- function(
       title = element_text(size = 12),
       legend.position = "none"
     )
-
-  # Save graph
-  SmokePlotPath<-paste0(SCUL.input$OutputFilePath,"smoke_plot.png")
-  ggsave(SmokePlotPath,
-         plot = smoke_plot,
-         width = 8,
-         height = 5,
-         dpi = 300,
-         units = "in")
-
+  if (save.figure == TRUE) {
+    # Save graph
+    SmokePlotPath<-paste0(SCUL.input$OutputFilePath,"smoke_plot.png")
+    ggsave(SmokePlotPath,
+           plot = smoke_plot,
+           width = 8,
+           height = 5,
+           dpi = 300,
+           units = "in")
+  }
   ####################
   ## Return plot
   return(smoke_plot)

@@ -25,6 +25,7 @@
 #'         For a restriction based on the last two characters: "select(-ends_with(substring(names(x.PlaceboPool)[h],nchar(names(x.PlaceboPool)[h]) - 2 + 1, nchar(names(x.PlaceboPool)[h]))))"
 #' @return list  A list of standardized placbo effect sizes
 #' @import glmnet
+#' @import stats
 #'
 #' @export
 

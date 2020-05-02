@@ -11,11 +11,12 @@ PlotShareTable(
   y.actual = SCUL.output$y.actual,
   time = SCUL.output$time,
   OutputFilePath = SCUL.input$OutputFilePath,
-  TreatmentBeginsAt = SCUL.output$TreatmentBeginsAt
+  TreatmentBeginsAt = SCUL.output$TreatmentBeginsAt,
+  save.figure = FALSE
 )
 }
 \arguments{
-\item{coef.exact}{The sparse matrix of coefficients used to construc the synthetic estimate. 
+\item{coef.exact}{The sparse matrix of coefficients used to construc the synthetic estimate.
 Default is SCUL.output$coef.exact.}
 
 \item{x.DonorPool}{The (T by K) donor pool matrix. Default is SCUL.input$x.DonorPool.}
@@ -29,6 +30,8 @@ Default is SCUL.output$coef.exact.}
 \item{OutputFilePath}{Output file path. Default is  SCUL.input$OutputFilePath.}
 
 \item{TreatmentBeginsAt}{An integer indicating which row begins treatment. Default is  SCUL.output$TreatmentBeginsAt.}
+
+\item{save.figure}{Boolean, set to TRUE if you want output saved as figure to OutputFilePath automatically. Default is FALSE}
 }
 \value{
 graphs  Four plots that show contribution of each donor to synthetic estimate and a similar table.

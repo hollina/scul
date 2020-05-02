@@ -19,9 +19,11 @@
 #' @param title_label Graph title
 #' @param subtitle_label  Graph sub-title
 #' @param rejection_label Label for the top of the red rejection region
+#' @param save.figure Boolean, set to TRUE if you want output saved as figure to OutputFilePath automatically. Default is FALSE
 #'
 #' @return graph  A denisty plot of the null distribution conditional on satisfactory fit
 #' @import ggplot2
+#' @import stats
 #'
 #' @export
 
@@ -37,7 +39,8 @@ PlotNullDistribution <- function(
   subtitle_label = "",
   x_label = "Distribution of standardized difference\n for placebo donor pool",
   title_label = "Cohen's-D restriction: None",
-  rejection_label = "Rejection region\n for null hypothesis\n of no treatment effect"
+  rejection_label = "Rejection region\n for null hypothesis\n of no treatment effect",
+  save.figure = FALSE
 ) {
 
 
@@ -99,6 +102,11 @@ PlotNullDistribution <- function(
       plot.subtitle = element_text(hjust = 0.05, size = 10)
     )
 
+  if (save.figure == TRUE) {
+    # Save graph
+    PlotPath<-paste(OutputFilePath,"null_density.pdf",sep='')
+    ggsave(PlotPath, width=12, height=8, dpi=300)
+  }
 
   return(OutputGraphName)
 }
