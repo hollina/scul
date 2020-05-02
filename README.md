@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# Synthetic Control Using Lasso (scul) <img src="man/figures/logo.svg" align="right" alt="" width="120" />
+# Synthetic Control Using Lasso (scul) <img src="man/figures/logo_large.png" align="right" alt="" width="120" />
 
 <!-- badges: start -->
 
