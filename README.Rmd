@@ -19,6 +19,8 @@ library(knitr)
 # Synthetic Control Using Lasso (scul) <img src="man/figures/logo_large.png" align="right" alt="" width="120" />
 
 <!-- badges: start -->
+
+[![Build Status](https://travis-ci.com/hollina/scul.svg?branch=master)](https://travis-ci.com/hollina/scul)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
@@ -136,9 +138,10 @@ The package is made for R. and was developed on a Unix machine using R 3.6.1. Se
 
 ## To Do:
 
-1. Post working paper
+1. Post link to paper on package site
 1. Add examples to each function
 1. Proof read documentation
 1. Release package via CRAN
+1. Distribute video FAQs
 
 ## References 

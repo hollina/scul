@@ -101,9 +101,6 @@ This is a simple example of one such way." />
 <li>
   <a href="https://hollina.github.io">Paper</a>
 </li>
-<li>
-  <a href="https://hollina.github.io">Video FAQ</a>
-</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -149,7 +146,10 @@ This is a simple example of one such way.</p>
   <span class='kw'>subtitle_label</span> <span class='kw'>=</span> <span class='st'>""</span>,
   <span class='kw'>x_label</span> <span class='kw'>=</span> <span class='st'>"Distribution of standardized difference\n for placebo donor pool"</span>,
   <span class='kw'>title_label</span> <span class='kw'>=</span> <span class='st'>"Cohen's-D restriction: None"</span>,
-  <span class='kw'>rejection_label</span> <span class='kw'>=</span> <span class='st'>"Rejection region\n for null hypothesis\n of no treatment effect"</span>
+  <span class='kw'>rejection_label</span> <span class='kw'>=</span> <span class='st'>"Rejection region\n for null hypothesis\n of no treatment effect"</span>,
+  <span class='kw'>save.figure</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>,
+  <span class='kw'>OutputFilePath</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>OutputFilePath</span>,
+  <span class='kw'>TreatmentBeginsAt</span> <span class='kw'>=</span> <span class='no'>SCUL.output</span>$<span class='no'>TreatmentBeginsAt</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -203,6 +203,18 @@ fit is determined to be "poor". The difference is in standard deviation units. D
     <tr>
       <th>rejection_label</th>
       <td><p>Label for the top of the red rejection region</p></td>
+    </tr>
+    <tr>
+      <th>save.figure</th>
+      <td><p>Boolean, set to TRUE if you want output saved as figure to OutputFilePath automatically. Default is FALSE</p></td>
+    </tr>
+    <tr>
+      <th>OutputFilePath</th>
+      <td><p>Output file path. Default is  SCUL.input$OutputFilePath.</p></td>
+    </tr>
+    <tr>
+      <th>TreatmentBeginsAt</th>
+      <td><p>An integer indicating which row begins treatment. Default is  SCUL.output$TreatmentBeginsAt.</p></td>
     </tr>
     </table>
 

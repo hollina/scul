@@ -5,6 +5,8 @@
 
 <!-- badges: start -->
 
+[![Build
+Status](https://travis-ci.com/hollina/scul.svg?branch=master)](https://travis-ci.com/hollina/scul)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 [![License:
@@ -17,7 +19,7 @@ synthetic control studies: An applied example using high-dimensional
 data.”* (link to be posted 3 May
 2020)
 
-![figure1](vignettes/vignette_output/ReadMeFigure.png)
+![figure1](man/figures/ReadMeFigure.png)
 
 ## Installation
 
@@ -191,7 +193,7 @@ finding a perfect donor series.
     underlying data generating process (e.g., two financial assets, or a
     price and consumption series)
 
-![figure2](vignettes/vignette_output/time_series_convex_hull.png)
+![figure2](man/figures/time_series_convex_hull.png)
 
 ## Software Used:
 
@@ -202,10 +204,11 @@ package used. Documentation was made using `roxygen2`, `pkgdown`, and
 
 ## To Do:
 
-1.  Post working paper
+1.  Post link to paper on package site
 2.  Add examples to each function
 3.  Proof read documentation
 4.  Release package via CRAN
+5.  Distribute video FAQs
 
 ## References
 

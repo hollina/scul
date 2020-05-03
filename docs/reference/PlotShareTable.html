@@ -99,9 +99,6 @@ Must also have run this command. webshot::install_phantomjs()" />
 <li>
   <a href="https://hollina.github.io">Paper</a>
 </li>
-<li>
-  <a href="https://hollina.github.io">Video FAQ</a>
-</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -140,7 +137,8 @@ Must also have run this command. webshot::install_phantomjs()</p>
   <span class='kw'>y.actual</span> <span class='kw'>=</span> <span class='no'>SCUL.output</span>$<span class='no'>y.actual</span>,
   <span class='kw'>time</span> <span class='kw'>=</span> <span class='no'>SCUL.output</span>$<span class='no'>time</span>,
   <span class='kw'>OutputFilePath</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>OutputFilePath</span>,
-  <span class='kw'>TreatmentBeginsAt</span> <span class='kw'>=</span> <span class='no'>SCUL.output</span>$<span class='no'>TreatmentBeginsAt</span>
+  <span class='kw'>TreatmentBeginsAt</span> <span class='kw'>=</span> <span class='no'>SCUL.output</span>$<span class='no'>TreatmentBeginsAt</span>,
+  <span class='kw'>save.figure</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -148,7 +146,7 @@ Must also have run this command. webshot::install_phantomjs()</p>
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
       <th>coef.exact</th>
-      <td><p>The sparse matrix of coefficients used to construc the synthetic estimate. 
+      <td><p>The sparse matrix of coefficients used to construc the synthetic estimate.
 Default is SCUL.output$coef.exact.</p></td>
     </tr>
     <tr>
@@ -174,6 +172,10 @@ Default is SCUL.output$coef.exact.</p></td>
     <tr>
       <th>TreatmentBeginsAt</th>
       <td><p>An integer indicating which row begins treatment. Default is  SCUL.output$TreatmentBeginsAt.</p></td>
+    </tr>
+    <tr>
+      <th>save.figure</th>
+      <td><p>Boolean, set to TRUE if you want output saved as figure to OutputFilePath automatically. Default is FALSE</p></td>
     </tr>
     </table>
 

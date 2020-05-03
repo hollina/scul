@@ -3,7 +3,7 @@ pkgdown: 1.5.1
 pkgdown_sha: ~
 articles:
   scul-tutorial: scul-tutorial.html
-last_built: 2020-05-02T02:08Z
+last_built: 2020-05-03T05:12Z
 urls:
   reference: https://hollina.github.io/scul/reference
   article: https://hollina.github.io/scul/articles

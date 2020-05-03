@@ -101,9 +101,6 @@ This is a simple example of one such way." />
 <li>
   <a href="https://hollina.github.io">Paper</a>
 </li>
-<li>
-  <a href="https://hollina.github.io">Video FAQ</a>
-</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -138,8 +135,7 @@ This is a simple example of one such way.</p>
     </div>
 
     <pre class="usage"><span class='fu'>PValue</span>(
-
-    <span class='kw'>x.PlaceboPool.StandardizedDiff.full</span> <span class='kw'>=</span> <span class='no'>SCUL.inference</span>$<span class='no'>y.placebo.StandardizedDifference.Full</span>,
+  <span class='kw'>x.PlaceboPool.full</span> <span class='kw'>=</span> <span class='no'>SCUL.inference</span>$<span class='no'>y.placebo.StandardizedDifference.Full</span>,
   <span class='kw'>x.PlaceboPool.CohensD</span> <span class='kw'>=</span> <span class='no'>SCUL.inference</span>$<span class='no'>y.placebo.CohensD</span>,
   <span class='kw'>TreatmentBeginsAt</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>TreatmentBeginsAt</span>,
   <span class='kw'>OutputFilePath</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>OutputFilePath</span>,
@@ -154,7 +150,7 @@ This is a simple example of one such way.</p>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>x.PlaceboPool.StandardizedDiff.full</th>
+      <th>x.PlaceboPool.full</th>
       <td><p>A (T by L), where L&lt;=J)  data frame containing all products that are included in the placebo distribution
 Default is SCUL.inference$y.placebo.StandardizedDifference.Full</p></td>
     </tr>

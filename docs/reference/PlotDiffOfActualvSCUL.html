@@ -98,9 +98,6 @@
 <li>
   <a href="https://hollina.github.io">Paper</a>
 </li>
-<li>
-  <a href="https://hollina.github.io">Video FAQ</a>
-</li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
@@ -136,7 +133,8 @@
   <span class='kw'>y.scul</span> <span class='kw'>=</span> <span class='no'>SCUL.output</span>$<span class='no'>y.scul</span>,
   <span class='kw'>time</span> <span class='kw'>=</span> <span class='no'>SCUL.output</span>$<span class='no'>time</span>,
   <span class='kw'>OutputFilePath</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>OutputFilePath</span>,
-  <span class='kw'>TreatmentBeginsAt</span> <span class='kw'>=</span> <span class='no'>SCUL.output</span>$<span class='no'>TreatmentBeginsAt</span>
+  <span class='kw'>TreatmentBeginsAt</span> <span class='kw'>=</span> <span class='no'>SCUL.output</span>$<span class='no'>TreatmentBeginsAt</span>,
+  <span class='kw'>save.figure</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>
 )</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
@@ -161,6 +159,10 @@
     <tr>
       <th>TreatmentBeginsAt</th>
       <td><p>Default is  SCUL.output$TreatmentBeginsAt.</p></td>
+    </tr>
+    <tr>
+      <th>save.figure</th>
+      <td><p>Boolean, set to TRUE if you want output saved as figure to OutputFilePath automatically. Default is FALSE</p></td>
     </tr>
     </table>
 

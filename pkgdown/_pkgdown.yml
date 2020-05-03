@@ -21,8 +21,7 @@ navbar:
       href: reference/index.html
     - text: "Paper"
       href: https://hollina.github.io
-    - text: "Video FAQ"
-      href: https://hollina.github.io
+
   right:
    - icon: fa-github
      href: https://github.com/hollina/scul
