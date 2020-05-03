@@ -20,7 +20,7 @@ navbar:
     - text: "Functions"
       href: reference/index.html
     - text: "Paper"
-      href: https://hollina.github.io
+      href: https://doi.org/10.31235/osf.io/fc9xt
 
   right:
    - icon: fa-github

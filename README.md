@@ -16,8 +16,8 @@ MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.or
 This repository contains the R package `scul` that is used in
 Hollingsworth and Wing (2020) *“Tactics for design and inference in
 synthetic control studies: An applied example using high-dimensional
-data.”* (link to be posted 3 May
-2020)
+data.”*
+<https://doi.org/10.31235/osf.io/fc9xt>
 
 ![figure1](man/figures/ReadMeFigure.png)
 
@@ -38,13 +38,14 @@ tutorial uses publicly available data and discusses many features of the
 SCUL procedure. The tutorial also provides a simple comparison of the
 SCUL method to the traditional synthetic control method.
 
-More details on SCUL can be found in our working paper, (link to be
-posted 3 May 2020). The paper, joint with Coady Wing, desribes
-identification assumptions and recommendations for key—and normally ad
-hoc—decisions that arise in most synthetic control studies. The paper
-then describes the SCUL method and uses the procedure to estimate how
-recreational marijuana legalization affects sales of alcohol and
-over-the-counter painkillers, finding reductions in alcohol sales.
+More details on SCUL can be found in our [working
+paper](https://doi.org/10.31235/osf.io/fc9xt). The paper, joint with
+Coady Wing, desribes identification assumptions and recommendations for
+key—and normally ad hoc—decisions that arise in most synthetic control
+studies. The paper then describes the SCUL method and uses the procedure
+to estimate how recreational marijuana legalization affects sales of
+alcohol and over-the-counter painkillers, finding reductions in alcohol
+sales.
 
 ## What is a synthetic control?
 
@@ -204,11 +205,10 @@ package used. Documentation was made using `roxygen2`, `pkgdown`, and
 
 ## To Do:
 
-1.  Post link to paper on package site
-2.  Add examples to each function
-3.  Proof read documentation
-4.  Release package via CRAN
-5.  Distribute video FAQs
+1.  Add examples to each function
+2.  Proof read documentation
+3.  Release package via CRAN
+4.  Distribute video FAQs
 
 ## References
 

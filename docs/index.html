@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="pkgdown.css" rel="stylesheet">
 <script src="pkgdown.js"></script><meta property="og:title" content="Synthetic Control Using Lasso (SCUL)">
-<meta property="og:description" content='Synthetic control methods are a popular strategy for estimating counterfactual outcomes using weighted averages of untreated groups. We use lasso regressions to construct synthetic control weights, allowing for a high-dimensional donor pool and for negatively correlated donors to contribute to the synthetic prediction; neither of which is possible using traditional methods. This package provides code to run the synthetic control using lasso (SCUL) estimator that is outlined in Hollingsworth and Wing (2020) "Tactics for design and inference in synthetic control studies: An applied example using high-dimensional data." '>
+<meta property="og:description" content='Synthetic control methods are a popular strategy for estimating counterfactual outcomes using weighted averages of untreated groups. We use lasso regressions to construct synthetic control weights, allowing for a high-dimensional donor pool and for negatively correlated donors to contribute to the synthetic prediction; neither of which is possible using traditional methods. This package provides code to run the synthetic control using lasso (SCUL) estimator that is outlined in Hollingsworth and Wing (2020) "Tactics for design and inference in synthetic control studies: An applied example using high-dimensional data." https://doi.org/10.31235/osf.io/fc9xt'>
 <meta property="og:image" content="https://hollina.github.io/scul/logo.svg">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:creator" content="@ajhollingsworth">
@@ -54,7 +54,7 @@
   <a href="reference/index.html">Functions</a>
 </li>
 <li>
-  <a href="https://hollina.github.io">Paper</a>
+  <a href="https://doi.org/10.31235/osf.io/fc9xt">Paper</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
@@ -82,7 +82,7 @@
 </h1></div>
 <!-- badges: start -->
 
-<p>This repository contains the R package <code>scul</code> that is used in Hollingsworth and Wing (2020) <em>“Tactics for design and inference in synthetic control studies: An applied example using high-dimensional data.”</em> (link to be posted 3 May 2020)</p>
+<p>This repository contains the R package <code>scul</code> that is used in Hollingsworth and Wing (2020) <em>“Tactics for design and inference in synthetic control studies: An applied example using high-dimensional data.”</em> <a href="https://doi.org/10.31235/osf.io/fc9xt" class="uri">https://doi.org/10.31235/osf.io/fc9xt</a></p>
 <p><img src="reference/figures/ReadMeFigure.png" alt="figure1"></p>
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
@@ -95,7 +95,7 @@ devtools::install_github("hollina/scul")`</pre></div>
 <h2 class="hasAnchor">
 <a href="#tutorialmore-details" class="anchor"></a>Tutorial/More details</h2>
 <p>An in-depth tutorial of the package and overview of every function in the package is available here, <a href="https://hollina.github.io/scul/articles/scul-tutorial.html" class="uri">https://hollina.github.io/scul/articles/scul-tutorial.html</a>. The tutorial uses publicly available data and discusses many features of the SCUL procedure. The tutorial also provides a simple comparison of the SCUL method to the traditional synthetic control method.</p>
-<p>More details on SCUL can be found in our working paper, (link to be posted 3 May 2020). The paper, joint with Coady Wing, desribes identification assumptions and recommendations for key—and normally ad hoc—decisions that arise in most synthetic control studies. The paper then describes the SCUL method and uses the procedure to estimate how recreational marijuana legalization affects sales of alcohol and over-the-counter painkillers, finding reductions in alcohol sales.</p>
+<p>More details on SCUL can be found in our <a href="https://doi.org/10.31235/osf.io/fc9xt">working paper</a>. The paper, joint with Coady Wing, desribes identification assumptions and recommendations for key—and normally ad hoc—decisions that arise in most synthetic control studies. The paper then describes the SCUL method and uses the procedure to estimate how recreational marijuana legalization affects sales of alcohol and over-the-counter painkillers, finding reductions in alcohol sales.</p>
 </div>
 <div id="what-is-a-synthetic-control" class="section level2">
 <h2 class="hasAnchor">
@@ -178,7 +178,6 @@ devtools::install_github("hollina/scul")`</pre></div>
 <h2 class="hasAnchor">
 <a href="#to-do" class="anchor"></a>To Do:</h2>
 <ol>
-<li>Post link to paper on package site</li>
 <li>Add examples to each function</li>
 <li>Proof read documentation</li>
 <li>Release package via CRAN</li>

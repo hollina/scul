@@ -25,7 +25,7 @@ library(knitr)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 <!-- badges: end -->
 
-This repository contains the R package `scul` that is used in Hollingsworth and Wing (2020) *"Tactics for design and inference in synthetic control studies: An applied example using high-dimensional data."* (link to be posted 3 May 2020)
+This repository contains the R package `scul` that is used in Hollingsworth and Wing (2020) *"Tactics for design and inference in synthetic control studies: An applied example using high-dimensional data."* https://doi.org/10.31235/osf.io/fc9xt
 
 ![figure1](man/figures/ReadMeFigure.png)
 
@@ -40,7 +40,7 @@ devtools::install_github("hollina/scul")`
 ## Tutorial/More details
 An in-depth tutorial of the package and overview of every function in the package is available here, <https://hollina.github.io/scul/articles/scul-tutorial.html>. The tutorial uses publicly available data and discusses many features of the SCUL procedure. The tutorial also provides a simple comparison of the SCUL method to the traditional synthetic control method. 
 
-More details on SCUL can be found in our working paper, (link to be posted 3 May 2020).
+More details on SCUL can be found in our [working paper](https://doi.org/10.31235/osf.io/fc9xt).
 The paper, joint with Coady Wing, desribes identification assumptions and recommendations for key---and normally ad hoc---decisions that arise in most synthetic control studies. 
 The paper then describes the SCUL method and uses the procedure to estimate how recreational marijuana legalization affects sales of alcohol and over-the-counter painkillers, finding reductions in alcohol sales. 
 
@@ -138,7 +138,6 @@ The package is made for R. and was developed on a Unix machine using R 3.6.1. Se
 
 ## To Do:
 
-1. Post link to paper on package site
 1. Add examples to each function
 1. Proof read documentation
 1. Release package via CRAN
