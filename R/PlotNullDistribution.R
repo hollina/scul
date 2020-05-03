@@ -13,7 +13,8 @@
 #' @param height height of histogram. Default is 0.05
 #' @param AdjustmentParm Adjustment parameter for guassian histogram. Default is 3.
 #' @param BandwidthParm Bandwidth parameter for guassian histogram. Default is 3.
-
+#' @param OutputFilePath Output file path. Default is  SCUL.input$OutputFilePath.
+#' @param TreatmentBeginsAt  An integer indicating which row begins treatment. Default is  SCUL.output$TreatmentBeginsAt.
 #' @param y_label label for the y-axis
 #' @param x_label label for the x-axis
 #' @param title_label Graph title
@@ -40,7 +41,9 @@ PlotNullDistribution <- function(
   x_label = "Distribution of standardized difference\n for placebo donor pool",
   title_label = "Cohen's-D restriction: None",
   rejection_label = "Rejection region\n for null hypothesis\n of no treatment effect",
-  save.figure = FALSE
+  save.figure = FALSE,
+  OutputFilePath = SCUL.input$OutputFilePath,
+  TreatmentBeginsAt = SCUL.output$TreatmentBeginsAt
 ) {
 
 

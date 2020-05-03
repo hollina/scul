@@ -17,7 +17,9 @@ PlotNullDistribution(
   x_label = "Distribution of standardized difference\\n for placebo donor pool",
   title_label = "Cohen's-D restriction: None",
   rejection_label = "Rejection region\\n for null hypothesis\\n of no treatment effect",
-  save.figure = FALSE
+  save.figure = FALSE,
+  OutputFilePath = SCUL.input$OutputFilePath,
+  TreatmentBeginsAt = SCUL.output$TreatmentBeginsAt
 )
 }
 \arguments{
@@ -47,6 +49,10 @@ fit is determined to be "poor". The difference is in standard deviation units. D
 \item{rejection_label}{Label for the top of the red rejection region}
 
 \item{save.figure}{Boolean, set to TRUE if you want output saved as figure to OutputFilePath automatically. Default is FALSE}
+
+\item{OutputFilePath}{Output file path. Default is  SCUL.input$OutputFilePath.}
+
+\item{TreatmentBeginsAt}{An integer indicating which row begins treatment. Default is  SCUL.output$TreatmentBeginsAt.}
 }
 \value{
 graph  A denisty plot of the null distribution conditional on satisfactory fit

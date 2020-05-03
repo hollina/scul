@@ -62,7 +62,7 @@ SmokePlot <- function(
   # placebo.distribution.trim <- data.frame(placebo.distribution.full[StartTime:EndTime,cd<=CohensD])
 
   # reshape the placebo data to be in long form
-  data_to_plot_wide_y <- cbind( SCUL.input$time, Results.y.StandardizedDiff)
+  data_to_plot_wide_y <- cbind( SCUL.input$time, y.StandardizedDifference)
   names(data_to_plot_wide_y) <- c("time", "std_diff")
 
   data_to_plot_wide <- cbind( SCUL.input$time, placebo.distribution.trim)
