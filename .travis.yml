@@ -3,9 +3,7 @@ cache: packages
 warnings_are_errors: false
 
 r:
-  - oldrel
   - release
-  - devel
 
 notifications:
   email:
