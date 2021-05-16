@@ -15,10 +15,10 @@ y2 <- rnorm(n) + x2[ ,1]*3 + x2[ ,2]*-1 + x2[ , 3]*.5
 ## Standardize variables: (need to use n instead of (n-1) as denominator)
 mysd <- function(z) sqrt(sum((z-mean(z))^2)/length(z))
 sx1 <- scale(x1, scale = apply(x1, 2, mysd))
-sx1 <- as.matrix(sx1, ncol = 20, nrow = 100)
+#sx1 <- as.matrix(sx1, ncol = 20, nrow = 100)
 
 sx2 <- scale(x2, scale = apply(x2, 2, mysd))
-sx2 <- as.matrix(sx2, ncol = 20, nrow = 100)
+#sx2 <- as.matrix(sx2, ncol = 20, nrow = 100)
 
 
 ## Calculate lambda path (first get lambda_max):

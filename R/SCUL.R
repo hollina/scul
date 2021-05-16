@@ -45,7 +45,7 @@ SCUL <- function(
                   y.actual = SCUL.input$y,
                   TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
                   TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength,
-                  cvOption = lambda.1se
+                  cvOption = "lambda.1se"
 ){
   ### Function to standardize variables: (need to use n instead of (n-1) as denominator)
   ### Note: This came from https://stackoverflow.com/questions/23686067/default-lambda-sequence-in-glmnet-for-cross-validation
@@ -101,8 +101,7 @@ SCUL <- function(
         x.training <-x.DonorPool.PreTreatment[1:i,] # this had me switch row and column. Why?
         y.training <-y.PreTreatment[1:i] # this had me switch row and column. Why?
 
-        sx <- scale(x.training, scale = apply(x.training, 2, mysd))
-        sx <- as.matrix(x.training, ncol = 20, nrow = 100)
+        sx <- as.matrix(scale(x.training, scale = apply(x.training, 2, mysd)))
 
         # Get lambda_max: See https://stackoverflow.com/questions/25257780/how-does-glmnet-compute-the-maximal-lambda-value/
         MaxLambdaList[j] <- max(abs(colSums(sx*y.training)))/nrow(sx)
@@ -155,12 +154,12 @@ SCUL <- function(
         mse <- colMeans(squared_error)
 
         # Save MSE
-        MinimumLambdaRollingMSE[j, ] <- mse
+        MinimumLambdaRollingMSE[ , j ] <- mse
 
       }
 
         # Take mean of MSE to get mean MSE for each lambda across all CV runs
-        cvMSE <- colMeans(MinimumLambdaRollingMSE)
+        cvMSE <- rowMeans(MinimumLambdaRollingMSE)
 
         # Calculate standard error of MSE
         # length of y.testing*number of runs is N for SE calculation.
@@ -206,6 +205,10 @@ SCUL <- function(
       # Calculate the mean pre-treatment cohen's D
       MeanCohensD <- mean(CohensD)
 
+  # unlist y.actual
+  y.actual <- as.numeric(unlist(y.actual))
+  time <- as.numeric(unlist(time))
+
   # Wrap all of the items we will need for later into a list.
   OutputDataSCUL <- list(
     time = time,
@@ -218,5 +221,5 @@ SCUL <- function(
   )
   # Return list
   return(OutputDataSCUL)
-  # TODO (hollina): Make sure that y.actual and y.scul are the same type. Can't figure it out for now.
+  # TODO (hollina): Figure out why y.actual and time are coming in as a list.
 }
