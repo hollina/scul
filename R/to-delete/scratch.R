@@ -1,6 +1,8 @@
 rm(list=ls())
 ## Load library and generate some data to illustrate:
 library("glmnet")
+library(ggrepel)
+
 set.seed(1234)
 n <- 100
 x1 <- matrix(rnorm(n*3), n, 3)
@@ -116,3 +118,65 @@ CrossValidatedLambda <- switch(cvOption,
                                lambda.median = lambda$lambda.median,
 )
 CrossValidatedLambda
+
+# Function to plot mean CV with error bars across lambda grid
+plot.cv <-
+  function (lambdapath,
+            mse,
+            se,
+            lambda,
+            save.figure = TRUE,
+            OutputFilePath = SCUL.input$OutputFilePath){
+
+    # Create a dataframe of the data we want to plot
+    plotdata <- data.frame(cbind(lambdapath, mse, se))
+    names(plotdata) <- c("lambda", "MSE", "SE") # Add names
+    plotdata$lambda <- -log(plotdata$lambda) # Take the negative of the penalty parameter
+
+    # Create a mini-dataframe of the optimal lambdas
+    plotLambda <- data.frame(Ref = c("Min MSE", "Median Lambda", "1 SE"),
+                             vals = c(-log(lambda$lambda.min), -log(lambda$lambda.median), -log(lambda$lambda.1se)),
+                             lcols = c("red", "blue", "black"),
+                             ltype = c('solid', 'dashed', 'longdash'),
+                             stringsAsFactors = FALSE)
+
+    # Make plot
+    cvPLOT <- ggplot(data = plotdata, aes(x = lambda, y = MSE)) +
+      geom_vline(data = plotLambda,
+                 mapping = aes(xintercept = vals,
+                               linetype = ltype,
+                               color = lcols),
+                 show.legend = FALSE,
+                 size = 1, alpha = .75) +
+      geom_errorbar(aes(ymin = MSE - SE, ymax = MSE + SE), width=.25) +
+      geom_point(size = 3) +
+      theme_classic(base_size = 22) +
+      labs(title = "Cross-validated mean squared error vs. penalty parameter",
+           x = "-Log(Lambda)",
+           y = "Mean squared error") +
+      geom_label_repel(mapping = aes(x = vals,
+                                     y = max(plotdata$MSE + plotdata$SE),
+                                     label = Ref,
+                                     hjust = 1,
+                                     vjust = 0),
+                       data = plotLambda)
+
+    if (save.figure == TRUE) {
+      # Save graph
+      cvPLOTPath <- paste0(OutputFilePath,"cvPLOT.pdf")
+      ggsave(cvPLOTPath,
+             plot = cvPLOT,
+             width=12,
+             height=8,
+             dpi=300)
+     }
+  }
+
+plot.cv(lambdapath = lambdapath,
+        mse = cvMSE,
+        se = cvSE,
+        lambda = lambda,
+        save.figure = TRUE,
+        OutputFilePath = '/Users/hollinal/Desktop/')
+
+

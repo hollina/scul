@@ -28,6 +28,8 @@
 #'         lambda that produces a MSE within one standard error of the minimum MSE
 #'         (cvOption = lambda.1se).
 #'         Default is lambda.1se
+#' @param plotCV Create a plot of the cross-validated mean squared error against -log(lambda) of the penalty
+#'               parameter. Default is to not plot CV curve (plotCV == FALSE).
 #'
 #' @return OutputDataSCUL  A list with the synthetic series, weights used to construct the series, and measures of fit.
 #' @import glmnet
@@ -45,42 +47,9 @@ SCUL <- function(
                   y.actual = SCUL.input$y,
                   TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
                   TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength,
-                  cvOption = "lambda.1se"
+                  cvOption = "lambda.1se",
+                  plotCV = FALSE
 ){
-  ### Function to standardize variables: (need to use n instead of (n-1) as denominator)
-  ### Note: This came from https://stackoverflow.com/questions/23686067/default-lambda-sequence-in-glmnet-for-cross-validation
-  mysd <- function(z) sqrt(sum((z-mean(z))^2)/length(z))
-
-  # Function to get optimal cv. Simple adaptation from getOptcv.glmnet
-  # Function to get optimal cv
-  getOptcv.scul <-
-    function (lambdapath, mse, se, fullMSE)
-    {
-      # What is the minimum MSE
-      cvmin = min(mse, na.rm = TRUE)
-
-      # Where is the minimum MSE
-      idmin = mse <= cvmin
-
-      lambda.min = max(lambdapath[idmin], na.rm = TRUE)
-      idmin = match(lambda.min, lambdapath)
-      semin = (mse + se)[idmin]
-
-      id1se = mse <= semin
-      lambda.1se = max(lambdapath[id1se], na.rm = TRUE)
-      id1se = match(lambda.1se, lambdapath)
-
-      # Find the column id of the minimum cv in each row. then take the median
-      idmedian <-  median(apply(fullMSE, 1, which.min))
-
-      # Find the lambda associated with this median.
-      lambda.median = max(lambdapath[idmedian], na.rm = TRUE)
-      idmedian = match(lambda.median, lambdapath)
-
-      index=matrix(c(idmin,id1se, idmedian),3,1,dimnames=list(c("min", "1se", "median"),"Lambda"))
-      list(lambda.min = lambda.min, lambda.1se = lambda.1se,lambda.median = lambda.median, index = index)
-    }
-
   # Determine the maximum number of rolling-origin k-fold cross validations that can occur
   MaxCrossValidations <- PrePeriodLength-NumberInitialTimePeriods-TrainingPostPeriodLength+1
   # Determine the last position of the largest possible training dataset that only uses pre-treatment data
@@ -171,6 +140,17 @@ SCUL <- function(
                       se = cvSE,
                       fullMSE = MinimumLambdaRollingMSE)
 
+        # Plot CV
+        if (plotCV == TRUE) {
+          plot.cv(lambdapath = lambdapath,
+                  mse = cvMSE,
+                  se = cvSE,
+                  lambda = lambda,
+                  save.figure = TRUE,
+                  OutputFilePath = OutputFilePath)
+        }
+
+
       # Based on options, pick cross validated lambda
        CrossValidatedLambda <- switch(cvOption,
                                       lambda.1se = lambda$lambda.1se,
@@ -208,6 +188,7 @@ SCUL <- function(
   # unlist y.actual
   y.actual <- as.numeric(unlist(y.actual))
   time <- as.numeric(unlist(time))
+
 
   # Wrap all of the items we will need for later into a list.
   OutputDataSCUL <- list(

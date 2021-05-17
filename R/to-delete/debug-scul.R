@@ -27,8 +27,8 @@ processed.AllYData <- PreprocessSubset(processed.AllYData,
                                        PrePeriodLength)
 
 SCUL.input <- OrganizeDataAndSetup (
-  time =  data.frame(AllYData[, 1]),
-  y = data.frame(AllYData[, 2]),
+  time =  AllYData[, 1],
+  y = AllYData[, 2],
   TreatmentBeginsAt = TreatmentBeginsAt,
   x.DonorPool = AllXData[, -1],
   CohensDThreshold = 0.25,

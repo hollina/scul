@@ -15,7 +15,9 @@ SCUL(
   time = SCUL.input$time,
   y.actual = SCUL.input$y,
   TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
-  TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength
+  TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength,
+  cvOption = "lambda.1se",
+  plotCV = FALSE
 )
 }
 \arguments{
@@ -50,6 +52,15 @@ Default is taken from SCUL.input$y}
 Default is to begin this at SCUL.input$TreatmentBeginsAt.}
 
 \item{TrainingPostPeriodLength}{The number of timer periods post-treatment for training data. Defaults to all time since treatment begins.}
+
+\item{cvOption}{Do you want to use the median CV lambda (cvOption = lambda.median),
+one that produces the minimum MSE (cvOption = lambda.min), or the largest
+lambda that produces a MSE within one standard error of the minimum MSE
+(cvOption = lambda.1se).
+Default is lambda.1se}
+
+\item{plotCV}{Create a plot of the cross-validated mean squared error against -log(lambda) of the penalty
+parameter. Default is to not plot CV curve (plotCV == FALSE).}
 }
 \value{
 OutputDataSCUL  A list with the synthetic series, weights used to construct the series, and measures of fit.
