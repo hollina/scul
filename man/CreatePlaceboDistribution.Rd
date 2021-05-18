@@ -13,7 +13,8 @@ CreatePlaceboDistribution(
   OutputFilePath = SCUL.input$OutputFilePath,
   CohensDThreshold = SCUL.input$CohensDThreshold,
   TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength,
-  DonorPoolRestrictionForEachPlacebo = ""
+  DonorPoolRestrictionForEachPlacebo = "",
+  cvOption = "lambda.1se"
 )
 }
 \arguments{
@@ -44,6 +45,12 @@ Where state is identified by a pattern in each variable name. Default is no rest
 The placebo pool is indexed by `h`:
 For a restriction based on the first two characters: "select(-starts_with(substring(names(x.PlaceboPool)[h],1, 2)))"
 For a restriction based on the last two characters: "select(-ends_with(substring(names(x.PlaceboPool)[h],nchar(names(x.PlaceboPool)[h]) - 2 + 1, nchar(names(x.PlaceboPool)[h]))))"}
+
+\item{cvOption}{Do you want to use the median CV lambda (cvOption = lambda.median),
+one that produces the minimum MSE (cvOption = lambda.min), or the largest
+lambda that produces a MSE within one standard error of the minimum MSE
+(cvOption = lambda.1se).
+Default is lambda.1se}
 }
 \value{
 list  A list of standardized placbo effect sizes

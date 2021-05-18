@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Articles • scul</title>
+<title>Plot mean square error across potential penalty paramters, highlighting three options for cross-validated lambda — plot.cv • scul</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,7 +46,12 @@
 
 
 
-<meta property="og:title" content="Articles" />
+<meta property="og:title" content="Plot mean square error across potential penalty paramters, highlighting three options for cross-validated lambda — plot.cv" />
+<meta property="og:description" content="This is a simple adaptation of the getOptcv.glmnet function from  glmnet.
+The code takes a grid of lambda penalties along with a vector of associated mean squared errors (mse), standard errors (se), and the mean squared error from each cross-validation run (fullMSE).
+From this three potential options for the cross-validated penalty parameter are computed. 1) The lambda that has the minimum average mean squared error across all the cross-validation runs (lambda$lambda.min),
+2) The lambda the largest lambda that is associated with an average cross-validated mean squared error within one standard error of the minimum average cross-validated mean squared error (lambda$lambda.1se), and
+3) the lamda that is the median of the set of lambdas (lambda$lambda.median)." />
 <meta property="og:image" content="https://hollina.github.io/scul/logo.svg" />
 <meta name="twitter:card" content="summary" />
 <meta name="twitter:creator" content="@ajhollingsworth" />
@@ -69,7 +74,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-article-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -118,18 +123,68 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Articles</h1>
+    <h1>Plot mean square error across potential penalty paramters, highlighting three options for cross-validated <code>lambda</code></h1>
+    <small class="dont-index">Source: <a href='https://github.com/hollina/scul/blob/master/R/plot.cv.R'><code>R/plot.cv.R</code></a></small>
+    <div class="hidden name"><code>plot.cv.Rd</code></div>
     </div>
 
-    <div class="section ">
-      <h3>All vignettes</h3>
-      <p class="section-desc"></p>
-
-      <dl>
-        <dt><a href="scul-tutorial.html">SCUL Tutorial</a></dt>
-        <dd></dt>
-      </dl>
+    <div class="ref-description">
+    <p>This is a simple adaptation of the <code>getOptcv.glmnet</code> function from  <code>glmnet</code>.
+The code takes a grid of <code>lambda</code> penalties along with a vector of associated mean squared errors (<code>mse</code>), standard errors (<code>se</code>), and the mean squared error from each cross-validation run (<code>fullMSE</code>).
+From this three potential options for the cross-validated penalty parameter are computed. 1) The <code>lambda</code> that has the minimum average mean squared error across all the cross-validation runs (<code>lambda$lambda.min</code>),
+2) The <code>lambda</code> the largest <code>lambda</code> that is associated with an average cross-validated mean squared error within one standard error of the minimum average cross-validated mean squared error (<code>lambda$lambda.1se</code>), and
+3) the <code>lamda</code> that is the median of the set of <code>lambdas</code> (<code>lambda$lambda.median</code>).</p>
     </div>
+
+    <pre class="usage"><span class='co'># S3 method for cv</span>
+<span class='fu'><a href='https://rdrr.io/r/graphics/plot.default.html'>plot</a></span><span class='op'>(</span>
+  <span class='va'>lambdapath</span>,
+  <span class='va'>mse</span>,
+  <span class='va'>se</span>,
+  <span class='va'>lambda</span>,
+  save.figure <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  OutputFilePath <span class='op'>=</span> <span class='va'>SCUL.input</span><span class='op'>$</span><span class='va'>OutputFilePath</span>
+<span class='op'>)</span></pre>
+
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>lambdapath</th>
+      <td><p>A grid of lambdas that is used in each cross-validation run as potential options for the optimal penalty parameter.</p></td>
+    </tr>
+    <tr>
+      <th>mse</th>
+      <td><p>A vector of the average mean squared error (average across cross-validation runs) for each given <code>lambda</code> in the <code>lambdapath</code> grid.</p></td>
+    </tr>
+    <tr>
+      <th>se</th>
+      <td><p>A vector of the standard error associated with each average mean squared error (average across cross-validation runs) for each given <code>lambda</code> in the <code>lambdapath</code> grid.</p></td>
+    </tr>
+    <tr>
+      <th>lambda</th>
+      <td><p>Output from the <code>getOptcv.scul</code> function. Will have three candidate <code>lambdas</code>.</p></td>
+    </tr>
+    <tr>
+      <th>save.figure</th>
+      <td><p>Boolean if you want to save figure. Default is to save (save.figure = TRUE).</p></td>
+    </tr>
+    <tr>
+      <th>OutputFilePath</th>
+      <td><p>File path prefix if you are saving the figure. Default is file path set in <code>SCUL.inut</code> (OutputFilePath = SCUL.input$OutputFilePath).</p></td>
+    </tr>
+    <tr>
+      <th>fullMSE</th>
+      <td><p>A matrix of the mean squared error for each cross-validation run and each given <code>lambda</code> in the <code>lambdapath</code> grid.</p></td>
+    </tr>
+    </table>
+
+
+  </div>
+  <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
+    <nav id="toc" data-toggle="toc" class="sticky-top">
+      <h2 data-toc-skip>Contents</h2>
+    </nav>
   </div>
 </div>
 

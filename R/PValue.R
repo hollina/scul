@@ -42,16 +42,16 @@ PValue <-  function(
   #Set up actual scul results for future comparison
   # Calculate the difference between the two
   y.difference <- data.frame(y.actual - y.scul)
-  names(y.difference) <- names(y.actual)
+  #names(y.difference) <- names(y.actual)
 
   # Calculate the standard deviation of the outcome variable in the pre-treatment period
-  y.PreTreatmentSD <- t(apply(data.frame(y.actual[1:(TreatmentBeginsAt-1),]), 2, sd))
+  y.PreTreatmentSD <- sd(y.actual[1:(TreatmentBeginsAt-1)])
 
   # Take the absolute value of the difference between the prediction and the actual data divided by the standard deviation
-  y.StandardizedDifference <- sweep(y.difference,MARGIN=2,FUN="/",STATS=y.PreTreatmentSD)
+  y.StandardizedDifference <- y.difference/y.PreTreatmentSD
 
   # Calculate the Cohens D
-  y.CohenD <- (t(colMeans(abs(data.frame(y.StandardizedDifference[1:(TreatmentBeginsAt-1),])))))
+  y.CohenD <- abs(y.StandardizedDifference[1:(TreatmentBeginsAt-1),])
   y.CohenD <- data.frame(y.CohenD<=CohensD)
   # y.CohenD[1,1] <- FALSE
 
@@ -59,11 +59,11 @@ PValue <-  function(
   ###################
   # Trim the time for the stat
   # y.StandardizedDifference.trim <- y.StandardizedDifference[StartTime:EndTime,unlist(y.CohenD[1,])]
-  y.StandardizedDifference.trim <- data.frame(y.StandardizedDifference[StartTime:EndTime,])
+  y.StandardizedDifference.trim <- data.frame(y.StandardizedDifference)
 
   ###################
   #Set up placebo distribution
-  placebo.distribution.trim <- x.PlaceboPool.full[StartTime:EndTime,x.PlaceboPool.CohensD<=CohensD]
+  placebo.distribution.trim <- x.PlaceboPool.full[ , x.PlaceboPool.CohensD <= CohensD]
   # placebo.distribution.trim <- data.frame(placebo.distribution.full[StartTime:EndTime,cd<=CohensD])
 
   ####################
@@ -111,5 +111,4 @@ PValue <-  function(
 
   # Return list
   return(OutputDataPValue)
-
 }

@@ -60,7 +60,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/hollina/scul">
-    <span class="fa fa-github"></span>
+    <span class="fas fa-github"></span>
      
   </a>
 </li>
@@ -74,14 +74,15 @@
 
       
 
-      </header><script src="scul-tutorial_files/kePrint-0.0.1/kePrint.js"></script><div class="row">
+      </header><script src="scul-tutorial_files/header-attrs-2.7/header-attrs.js"></script><script src="scul-tutorial_files/kePrint-0.0.1/kePrint.js"></script><link href="scul-tutorial_files/lightable-0.0.1/lightable.css" rel="stylesheet">
+<div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>SCUL Tutorial</h1>
             <h3 class="subtitle">Overview of R package, extended example using publicly available data, and brief comparison to traditional method</h3>
                         <h4 class="author">Alex Hollingsworth</h4>
             
-            <h4 class="date">2020-05-03</h4>
+            <h4 class="date">2021-05-18</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/hollina/scul/blob/master/vignettes/scul-tutorial.Rmd"><code>vignettes/scul-tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>scul-tutorial.Rmd</code></div>
@@ -105,21 +106,24 @@
 <p>When in long form, the data are at the state-year level and range from 1970 to 1997 (28 years). For each state and year there are data on cigarette sales per capita (<code>cigsale</code>) and the retail price of cigarettes (<code>retprice</code>). To be used in the SCUL procedure, the data must be in wide format, where each row is a time-period (e.g., year) and each column is a unit-specific variable. In our data, for each variable the unit is identified by the end of each column name (e.g., variables from the state of California are indicated by <code>_6</code>, which is the FIPS code for California.)</p>
 <p>The dataset should be sorted by whatever variable you use to index time with the earliest date being first and the most recent date being last.</p>
 <p>The <code>cigarette_sales</code> dataset is stored in the <code>data</code> subdirectory of this package. It should be automatically loaded when the <code>scul</code> package is loaded.</p>
-<div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span>(<span class="no">cigarette_sales</span>)
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">cigarette_sales</span><span class="op">)</span>
 <span class="co">#&gt; [1] 28 79</span>
 
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(<span class="no">cigarette_sales</span>[,<span class="fl">1</span>:<span class="fl">6</span>])
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">cigarette_sales</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;   year cigsale_6 cigsale_1 retprice_1 cigsale_5 retprice_5</span>
 <span class="co">#&gt; 1 1970     123.0      89.8       39.6     100.3       36.7</span>
 <span class="co">#&gt; 2 1971     121.0      95.4       42.7     104.1       38.8</span>
 <span class="co">#&gt; 3 1972     123.5     101.1       42.3     103.9       44.1</span>
 <span class="co">#&gt; 4 1973     124.4     102.9       42.1     108.0       45.1</span>
 <span class="co">#&gt; 5 1974     126.7     108.2       43.1     109.7       45.5</span>
-<span class="co">#&gt; 6 1975     127.1     111.7       46.6     114.8       48.6</span></pre></body></html></div>
+<span class="co">#&gt; 6 1975     127.1     111.7       46.6     114.8       48.6</span></code></pre></div>
 <p>We will break this dataset into two: one containing data on the target product and another containing all other data that will be used to as the donor pool for our synthetic counterfactual. In each dataset we will leave the first column, which indexes time. We will not include the retail price in California as a potential donor variable as this is endogenous.</p>
-<div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="no">AllYData</span> <span class="kw">&lt;-</span> <span class="no">cigarette_sales</span>[, <span class="fl">1</span>:<span class="fl">2</span>]
-<span class="no">AllXData</span> <span class="kw">&lt;-</span> <span class="no">cigarette_sales</span> <span class="kw">%&gt;%</span>
-  <span class="fu">select</span>(-<span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"year"</span>, <span class="st">"cigsale_6"</span>, <span class="st">"retprice_6"</span>))</pre></body></html></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">AllYData</span> <span class="op">&lt;-</span> <span class="va">cigarette_sales</span> <span class="op">%&gt;%</span> 
+  <span class="fu">select</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"year"</span>, <span class="st">"cigsale_6"</span><span class="op">)</span><span class="op">)</span>
+<span class="va">AllXData</span> <span class="op">&lt;-</span> <span class="va">cigarette_sales</span> <span class="op">%&gt;%</span>
+  <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"year"</span>, <span class="st">"cigsale_6"</span>, <span class="st">"retprice_6"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <div id="pre-processingcleaning-data" class="section level2">
 <h2 class="hasAnchor">
 <a href="#pre-processingcleaning-data" class="anchor"></a>Pre-processing/cleaning data</h2>
@@ -135,7 +139,8 @@
 <li>and is not constant</li>
 </ul>
 <p>It drops any column that violate these conditions.</p>
-<div class="sourceCode" id="cb3"><html><body><pre class="r"><span class="no">processed.AllYData</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/Preprocess.html">Preprocess</a></span>(<span class="no">AllYData</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">processed.AllYData</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/Preprocess.html">Preprocess</a></span><span class="op">(</span><span class="va">AllYData</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="use-preprocesssubset-to-ensure-that-all-subsets-have-variation" class="section level3">
 <h3 class="hasAnchor">
@@ -143,7 +148,7 @@
 <p>To avoid over-fitting, we will use a cross-validation approach that evaluate models on many subsets of the data. As such we need to ensure that the subsets of the variables used in the analysis have variation. The <code><a href="../reference/PreprocessSubset.html">PreprocessSubset()</a></code> is the same as the <code><a href="../reference/Preprocess.html">Preprocess()</a></code> function, except that it iteratively performs the same procedure on every subset that is used in the cross-validation.</p>
 <p>To determine subsets used in the cross-validation process, it is necessary to input:</p>
 <ul>
-<li>First row for the first date of treatment <code>TreatmentBeginsAt</code> (we do this as row number to allow time to be input in a flexible manner)</li>
+<li><p>First row for the first date of treatment <code>TreatmentBeginsAt</code> (we do this as row number to allow time to be input in a flexible manner)</p></li>
 <li>
 <p><code>NumberInitialTimePeriods</code>: The number of initial time periods wanted in the training data for the first cross-validation run.</p>
 <ul>
@@ -152,15 +157,16 @@
 </li>
 </ul>
 <p>Assuming that treatment occurs at a discrete time and does not “turn-off,” both the pre-treatment length and post-treatment length are automatically calculated - The length of the post-treat</p>
-<div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="no">TreatmentBeginsAt</span> <span class="kw">&lt;-</span> <span class="fl">19</span> <span class="co"># Here the 18th row is 1988</span>
-<span class="no">PostPeriodLength</span> <span class="kw">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">processed.AllYData</span>) - <span class="no">TreatmentBeginsAt</span> + <span class="fl">1</span>
-<span class="no">PrePeriodLength</span> <span class="kw">&lt;-</span> <span class="no">TreatmentBeginsAt</span>-<span class="fl">1</span>
-<span class="no">NumberInitialTimePeriods</span> <span class="kw">&lt;-</span> <span class="fl">5</span>
-<span class="no">processed.AllYData</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/PreprocessSubset.html">PreprocessSubset</a></span>(<span class="no">processed.AllYData</span>,
-                                       <span class="no">TreatmentBeginsAt</span> ,
-                                       <span class="no">NumberInitialTimePeriods</span>,
-                                       <span class="no">PostPeriodLength</span>,
-                                       <span class="no">PrePeriodLength</span>)</pre></body></html></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">TreatmentBeginsAt</span> <span class="op">&lt;-</span> <span class="fl">19</span> <span class="co"># Here the 18th row is 1988</span>
+<span class="va">PostPeriodLength</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">processed.AllYData</span><span class="op">)</span> <span class="op">-</span> <span class="va">TreatmentBeginsAt</span> <span class="op">+</span> <span class="fl">1</span>
+<span class="va">PrePeriodLength</span> <span class="op">&lt;-</span> <span class="va">TreatmentBeginsAt</span><span class="op">-</span><span class="fl">1</span>
+<span class="va">NumberInitialTimePeriods</span> <span class="op">&lt;-</span> <span class="fl">5</span>
+<span class="va">processed.AllYData</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PreprocessSubset.html">PreprocessSubset</a></span><span class="op">(</span><span class="va">processed.AllYData</span>,
+                                       <span class="va">TreatmentBeginsAt</span> ,
+                                       <span class="va">NumberInitialTimePeriods</span>,
+                                       <span class="va">PostPeriodLength</span>,
+                                       <span class="va">PrePeriodLength</span><span class="op">)</span></code></pre></div>
 </div>
 <div id="use-organizedataandsetup-to-clean-donor-and-placebo-pool-data" class="section level3">
 <h3 class="hasAnchor">
@@ -185,17 +191,19 @@
 <li>
 <code>TrainingPostPeriodLength</code>: The number of time periods wanted in the test data for all cross-validation runs. Ideally this would be the same as the post-treatment length since this is the length of time you are asking your prediction to preform an an out-of-sample prediction over. However for shorter panels this may not be feasible.</li>
 </ul>
-<div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">SCUL.input</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/OrganizeDataAndSetup.html">OrganizeDataAndSetup</a></span> (
-    <span class="kw">time</span> <span class="kw">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">AllYData</span>[, <span class="fl">1</span>]),
-    <span class="kw">y</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html">data.frame</a></span>(<span class="no">AllYData</span>[, <span class="fl">2</span>]),
-    <span class="kw">TreatmentBeginsAt</span> <span class="kw">=</span> <span class="no">TreatmentBeginsAt</span>,
-    <span class="kw">x.DonorPool</span> <span class="kw">=</span> <span class="no">AllXData</span>[, -<span class="fl">1</span>],
-    <span class="kw">CohensDThreshold</span> <span class="kw">=</span> <span class="fl">0.25</span>,
-    <span class="kw">NumberInitialTimePeriods</span> <span class="kw">=</span> <span class="no">NumberInitialTimePeriods</span>,
-    <span class="kw">TrainingPostPeriodLength</span> <span class="kw">=</span> <span class="fl">7</span>,
-    <span class="kw">x.PlaceboPool</span> <span class="kw">=</span> <span class="no">AllXData</span>[, -<span class="fl">1</span>],
-    <span class="kw">OutputFilePath</span><span class="kw">=</span><span class="st">"vignette_output/"</span>
-)</pre></body></html></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">SCUL.input</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/OrganizeDataAndSetup.html">OrganizeDataAndSetup</a></span> <span class="op">(</span>
+    time <span class="op">=</span>  <span class="va">AllYData</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="va">year</span><span class="op">)</span>,
+    y <span class="op">=</span> <span class="va">AllYData</span> <span class="op">%&gt;%</span> <span class="fu">select</span><span class="op">(</span><span class="va">cigsale_6</span><span class="op">)</span>,
+    TreatmentBeginsAt <span class="op">=</span> <span class="va">TreatmentBeginsAt</span>,
+    x.DonorPool <span class="op">=</span> <span class="va">AllXData</span>,
+    CohensDThreshold <span class="op">=</span> <span class="fl">0.25</span>,
+    NumberInitialTimePeriods <span class="op">=</span> <span class="va">NumberInitialTimePeriods</span>,
+    TrainingPostPeriodLength <span class="op">=</span> <span class="fl">7</span>,
+    x.PlaceboPool <span class="op">=</span> <span class="va">AllXData</span>,
+    OutputFilePath<span class="op">=</span><span class="st">"vignette_output/"</span>
+<span class="op">)</span></code></pre></div>
+<p>Note: Using <code>AllYData %&gt;% select(year)</code> keeps the result as a <code>data.frame</code> (<code><a href="https://rdrr.io/r/base/typeof.html">typeof(AllYData %&gt;% select(year))</a></code> returns list), while using <code>AllYData[ ,1]</code> returns a reduced dimension item (<code><a href="https://rdrr.io/r/base/typeof.html">typeof(AllYData[ ,1])</a></code> returns integer). Having integer can mess with the internal functions being used in <code><a href="../reference/Preprocess.html">Preprocess()</a></code> that check for missing values. It is on my to do list to fix these functions to be more flexible. But for now best to ensure that the objects entering <code>SCUL.input()</code> as <code>time</code>, <code>y</code>, <code>x.DonorPool</code>, and <code>x.PlaceboPool</code> are <code>data.frames</code>.</p>
 </div>
 </div>
 <div id="examine-plot-raw-data-using-graphtargetdata" class="section level2">
@@ -204,7 +212,8 @@
 </h2>
 <p><code><a href="../reference/GraphTargetData.html">GraphTargetData()</a></code> will graph any variable against time placing a dashed vertical line in the period before treatment begins. The default is to graph the target variable. A png file is saved in the <code>OutputFilePath</code> designated in the <code><a href="../reference/OrganizeDataAndSetup.html">OrganizeDataAndSetup()</a></code> function.</p>
 <p>This isn’t the most aesthetically appealing figure since it is automatically generated. However it serves as a nice check that your data are being input correctly and that your treatment time is where it should be. Here we can see that California cigarette sales have been declining across time and that the pre and post treatment times are delineated at 1988.</p>
-<div class="sourceCode" id="cb6"><html><body><pre class="r">    <span class="fu"><a href="../reference/GraphTargetData.html">GraphTargetData</a></span>()</pre></body></html></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R">    <span class="fu"><a href="../reference/GraphTargetData.html">GraphTargetData</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="scul-tutorial_files/figure-html/unnamed-chunk-7-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 </div>
@@ -306,7 +315,8 @@ In that case, the synthetic control may have poor out-of-sample predictive perfo
 <h2 class="hasAnchor">
 <a href="#create-a-synthetic-control-group-using-the-scul-function" class="anchor"></a>Create a synthetic control group using the <code>SCUL()</code> function</h2>
 <p>Assuming you’ve set everything up correctly and have a list of elements named <code>SCUL.input</code>, you can simply run the <code><a href="../reference/SCUL.html">SCUL()</a></code> function to run the cross-validated procedure outlined above. We store the output as a list called <code>SCUL.output</code>.</p>
-<div class="sourceCode" id="cb7"><html><body><pre class="r"><span class="no">SCUL.output</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/SCUL.html">SCUL</a></span>()</pre></body></html></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">SCUL.output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SCUL.html">SCUL</a></span><span class="op">(</span><span class="va">plotCV</span> <span class="op">==</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
 <p><code>SCUL.output</code> contains a number of useful things.</p>
 <ul>
 <li>
@@ -318,9 +328,9 @@ In that case, the synthetic control may have poor out-of-sample predictive perfo
 <li>
 <code>y.scul</code>: The counterfactul prediction from SCUL of the target series</li>
 <li>
-<code>CrossValidatedLambda</code>: The median cross-validated lambda from all of the cross-validation runs that is used to create <code>y.scul</code>. For this example, <span class="math inline">\(\lambda\)</span> = 0.02</li>
+<code>CrossValidatedLambda</code>: The median cross-validated lambda from all of the cross-validation runs that is used to create <code>y.scul</code>. For this example, <span class="math inline">\(\lambda\)</span> = 0</li>
 <li>
-<code>CohensD</code>: A unit-free measure of fit between <code>y.actual</code> and <code>y.scul</code>. Discussed more below. For this example the fit is 0.01</li>
+<code>CohensD</code>: A unit-free measure of fit between <code>y.actual</code> and <code>y.scul</code>. Discussed more below. For this example the fit is 0</li>
 <li>
 <code>coef.exact</code>: A matrix of the coefficients for each donor variable which are used to create the synthetic prediction. We present these in a slightly unconventional manner outlined later in the vignette.</li>
 </ul>
@@ -330,7 +340,8 @@ In that case, the synthetic control may have poor out-of-sample predictive perfo
 <a href="#plot-actual-data-and-scul-counterfactual-using-plotactualvscul" class="anchor"></a>Plot actual data and SCUL counterfactual using <code>PlotActualvSCUL()</code>
 </h2>
 <p>Using the <code><a href="../reference/PlotActualvSCUL.html">PlotActualvSCUL()</a></code> function you can plot the observed data against the counterfactual prediction.</p>
-<div class="sourceCode" id="cb8"><html><body><pre class="r"><span class="fu"><a href="../reference/PlotActualvSCUL.html">PlotActualvSCUL</a></span>()</pre></body></html></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="../reference/PlotActualvSCUL.html">PlotActualvSCUL</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
 <p><img src="scul-tutorial_files/figure-html/unnamed-chunk-13-1.png" width="100%" style="display: block; margin: auto;"></p>
 </div>
 <div id="evaluating-synthetic-control-fit" class="section level2">
@@ -362,17 +373,17 @@ ATE estimate
 </td>
 </tr>
 <tr>
-<td style="text-align:left;width: 5cm;  padding-left: 2em;" indentlevel="1">
+<td style="text-align:left;width: 5cm; padding-left: 2em;" indentlevel="1">
 Cross-validation for determining penalty
 </td>
 <td style="text-align:right;width: 2cm; ">
-0.02
+0.00
 </td>
 <td style="text-align:right;width: 2cm; ">
-0.01
+0.00
 </td>
 <td style="text-align:right;width: 2cm; ">
--13.52
+-15.05
 </td>
 </tr>
 <tr grouplength="4">
@@ -381,7 +392,7 @@ Cross-validation for determining penalty
 </td>
 </tr>
 <tr>
-<td style="text-align:left;width: 5cm;  padding-left: 2em;" indentlevel="1">
+<td style="text-align:left;width: 5cm; padding-left: 2em;" indentlevel="1">
 Naive guess 1: Max penalty (remove all donors)
 </td>
 <td style="text-align:right;width: 2cm; ">
@@ -395,7 +406,7 @@ Naive guess 1: Max penalty (remove all donors)
 </td>
 </tr>
 <tr>
-<td style="text-align:left;width: 5cm;  padding-left: 2em;" indentlevel="1">
+<td style="text-align:left;width: 5cm; padding-left: 2em;" indentlevel="1">
 Naive guess 2: Random penalty
 </td>
 <td style="text-align:right;width: 2cm; ">
@@ -409,7 +420,7 @@ Naive guess 2: Random penalty
 </td>
 </tr>
 <tr>
-<td style="text-align:left;width: 5cm;  padding-left: 2em;" indentlevel="1">
+<td style="text-align:left;width: 5cm; padding-left: 2em;" indentlevel="1">
 Naive guess 3: Random penalty
 </td>
 <td style="text-align:right;width: 2cm; ">
@@ -423,7 +434,7 @@ Naive guess 3: Random penalty
 </td>
 </tr>
 <tr>
-<td style="text-align:left;width: 5cm;  padding-left: 2em;" indentlevel="1">
+<td style="text-align:left;width: 5cm; padding-left: 2em;" indentlevel="1">
 Naive guess 4: No penalty (include all donors)
 </td>
 <td style="text-align:right;width: 2cm; ">
@@ -433,15 +444,15 @@ Naive guess 4: No penalty (include all donors)
 0.00
 </td>
 <td style="text-align:right;width: 2cm; ">
--13.38
+-13.35
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<div id="reporting-synthetic-control-weights-i-e-determine-the-influence-of-each-regressor-in-the-prediction-using-plotsharetable" class="section level2">
+<div id="reporting-synthetic-control-weights-i-e--determine-the-influence-of-each-regressor-in-the-prediction-using-plotsharetable" class="section level2">
 <h2 class="hasAnchor">
-<a href="#reporting-synthetic-control-weights-i-e-determine-the-influence-of-each-regressor-in-the-prediction-using-plotsharetable" class="anchor"></a>Reporting synthetic control weights (i.e. determine the influence of each regressor in the prediction) using <code>PlotShareTable()</code>
+<a href="#reporting-synthetic-control-weights-i-e--determine-the-influence-of-each-regressor-in-the-prediction-using-plotsharetable" class="anchor"></a>Reporting synthetic control weights (i.e. determine the influence of each regressor in the prediction) using <code>PlotShareTable()</code>
 </h2>
 <p>Neither the traditional synthetic control weights nor the weights from the SCUL procedure can be directly interpreted as the share of the synthetic prediction composed by each donor series. Traditional synthetic control weights are constrained to sum to one across the donor units. Weights therefore only represent the fraction of the total weight that is given to a particular donor series; they do not reflect the size and variability of the outcome for each unit across time periods. The SCUL weights, which are lasso regression coefficients, are not constrained to sum to one and are not naturally interpreted as the share given to a particular donor series.</p>
 <p>In both methods, the fraction of the synthetic prediction a given donor unit is responsible for changes with the value of the donor unit across time. Suppose, for example, that there are two donor series, A and B, observed in two periods, 1 and 2, and each unit receives a weight equal to <span class="math inline">\(\frac{1}{2}\)</span>. The donor values for the first time period are <span class="math inline">\(y_{A,1} = 10\)</span> and <span class="math inline">\(y_{B,1} = 1\)</span>. The donor values for the second time period are <span class="math inline">\(y_{A,2} = 1\)</span> and <span class="math inline">\(y_{B,2} = 10\)</span>. The resulting synthetic prediction is <span class="math inline">\(y_{1}^* = 5.5\)</span> in period 1 and <span class="math inline">\(y_{2}^* = 5.5\)</span> in period 2. In period 1, unit A represents <span class="math inline">\(100 \times \frac{ \frac{1}{2}\times 10}{5.5} = 91\%\)</span> of the synthetic prediction. In period 2, unit B represents <span class="math inline">\(91\%\)</span> of the synthetic prediction. Despite each donor weight being 50%, neither unit contributes 50% to the synthetic unit in either period.</p>
@@ -466,41 +477,13 @@ Coefficient
 Intercept
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 100.00%">0.28</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 97.58%">0.32</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 100.00%">0.28</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 100.00%">0.33</span>
 </td>
 <td style="text-align:right;">
-<span style="color: green">44.62</span>
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cigsale_17
-</td>
-<td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 60.00%">0.14</span>
-</td>
-<td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 68.57%">0.17</span>
-</td>
-<td style="text-align:right;">
-<span style="color: green">0.21</span>
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cigsale_32
-</td>
-<td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 51.43%">0.11</span>
-</td>
-<td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 62.86%">0.15</span>
-</td>
-<td style="text-align:right;">
-<span style="color: green">0.13</span>
+<span style="color: green">70.75</span>
 </td>
 </tr>
 <tr>
@@ -508,38 +491,38 @@ cigsale_32
 cigsale_54
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 48.57%">0.10</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 41.82%">0.09</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 51.43%">0.11</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 41.82%">0.09</span>
 </td>
 <td style="text-align:right;">
-<span style="color: green">0.15</span>
+<span style="color: green">0.18</span>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-retprice_54
+cigsale_17
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 42.86%">0.08</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 39.39%">0.08</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 25.71%">0.02</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 34.55%">0.06</span>
 </td>
 <td style="text-align:right;">
-<span style="color: red">-0.11</span>
+<span style="color: green">0.16</span>
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-cigsale_23
+cigsale_32
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 42.86%">0.08</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 36.97%">0.07</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 42.86%">0.08</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 32.12%">0.05</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.10</span>
@@ -547,27 +530,13 @@ cigsale_23
 </tr>
 <tr>
 <td style="text-align:left;">
-cigsale_47
+cigsale_23
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 42.86%">0.08</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 34.55%">0.06</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 40.00%">0.07</span>
-</td>
-<td style="text-align:right;">
-<span style="color: red">-0.10</span>
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-cigsale_49
-</td>
-<td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 31.43%">0.04</span>
-</td>
-<td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 34.29%">0.05</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 32.12%">0.05</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.11</span>
@@ -575,44 +544,16 @@ cigsale_49
 </tr>
 <tr>
 <td style="text-align:left;">
-cigsale_20
+retprice_54
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 31.43%">0.04</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 34.55%">0.06</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 31.43%">0.04</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 39.39%">0.08</span>
 </td>
 <td style="text-align:right;">
-<span style="color: green">0.06</span>
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-retprice_46
-</td>
-<td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 25.71%">0.02</span>
-</td>
-<td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.86%">0.01</span>
-</td>
-<td style="text-align:right;">
-<span style="color: red">-0.02</span>
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-retprice_9
-</td>
-<td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.86%">0.01</span>
-</td>
-<td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
-</td>
-<td style="text-align:right;">
-<span style="color: red">-0.02</span>
+<span style="color: red">-0.11</span>
 </td>
 </tr>
 <tr>
@@ -620,10 +561,136 @@ retprice_9
 cigsale_18
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.86%">0.01</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 32.12%">0.05</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.86%">0.01</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 32.12%">0.05</span>
+</td>
+<td style="text-align:right;">
+<span style="color: red">-0.08</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_13
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 29.70%">0.04</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 29.70%">0.04</span>
+</td>
+<td style="text-align:right;">
+<span style="color: red">-0.08</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+retprice_21
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 29.70%">0.04</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 34.55%">0.06</span>
+</td>
+<td style="text-align:right;">
+<span style="color: red">-0.08</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_49
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 27.27%">0.03</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 27.27%">0.03</span>
+</td>
+<td style="text-align:right;">
+<span style="color: green">0.11</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_39
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 27.27%">0.03</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 24.85%">0.02</span>
+</td>
+<td style="text-align:right;">
+<span style="color: red">-0.05</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_20
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 27.27%">0.03</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 24.85%">0.02</span>
+</td>
+<td style="text-align:right;">
+<span style="color: green">0.05</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_21
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 24.85%">0.02</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 27.27%">0.03</span>
+</td>
+<td style="text-align:right;">
+<span style="color: green">0.03</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_55
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.42%">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.42%">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="color: red">-0.03</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_30
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.42%">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.42%">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="color: red">-0.02</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+retprice_46
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.42%">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.42%">0.01</span>
 </td>
 <td style="text-align:right;">
 <span style="color: red">-0.01</span>
@@ -631,13 +698,69 @@ cigsale_18
 </tr>
 <tr>
 <td style="text-align:left;">
-cigsale_31
+cigsale_28
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.86%">0.01</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.42%">0.01</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.86%">0.01</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.42%">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="color: red">-0.02</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_9
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.42%">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.42%">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="color: red">-0.02</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_47
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.42%">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.42%">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="color: red">-0.01</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+retprice_17
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.42%">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.42%">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="color: red">-0.01</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_51
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.01</span>
@@ -651,6 +774,76 @@ retprice_50
 <span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
 </td>
 <td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.42%">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="color: red">-0.01</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_45
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="color: green">0.01</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+retprice_8
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 22.42%">0.01</span>
+</td>
+<td style="text-align:right;">
+<span style="color: green">0.01</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_46
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="color: green">0.01</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+retprice_19
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="color: red">-0.01</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_42
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
 <span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
 </td>
 <td style="text-align:right;">
@@ -659,7 +852,133 @@ retprice_50
 </tr>
 <tr>
 <td style="text-align:left;">
-retprice_40
+retprice_1
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="color: black">0.00</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_27
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="color: green">0.01</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_8
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="color: black">0.00</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_16
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="color: black">0.00</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_56
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="color: black">0.00</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+retprice_18
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="color: black">0.00</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_37
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="color: black">0.00</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_40
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="color: black">0.00</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_31
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="color: black">0.00</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cigsale_10
 </td>
 <td style="text-align:right;">
 <span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
@@ -687,7 +1006,77 @@ retprice_29
 </tr>
 <tr>
 <td style="text-align:left;">
-retprice_51
+retprice_23
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="color: black">0.00</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+retprice_20
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="color: black">0.00</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+retprice_22
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="color: black">0.00</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+retprice_47
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="color: black">0.00</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+retprice_28
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
+</td>
+<td style="text-align:right;">
+<span style="color: black">0.00</span>
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+retprice_49
 </td>
 <td style="text-align:right;">
 <span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.00%">0.00</span>
@@ -719,13 +1108,15 @@ This negative contribution of a donor series is not possible in the traditional 
 <p>This is simple to do because of the structure of our data. Recall that the digits following the <code>_</code> character in each variable name indicate the state FIPS. All we need to do is add a selection that removes any donor variables that have the same state FIPS as the target.</p>
 <p>In our placebo analysis the target loops across every placebo and is indexed by <code>h</code>, so we first extract the relevant substring (last two characters) from the <code>h</code>th placebo unit. We then drop any varaibles that end with this substring.</p>
 <p>This restriction will be passed to the donor pool using the <code>%&gt;%</code> feature so write it using <code>dplyr</code> language.</p>
-<div class="sourceCode" id="cb9"><html><body><pre class="r"> <span class="no">drop_vars_from_same_FIPS</span> <span class="kw">&lt;-</span>
- <span class="st">"select(-ends_with(substring(names(x.PlaceboPool)[h],nchar(names(x.PlaceboPool)[h]) - 2 + 1, nchar(names(x.PlaceboPool)[h]))))"</span></pre></body></html></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"> <span class="va">drop_vars_from_same_FIPS</span> <span class="op">&lt;-</span>
+ <span class="st">"select(-ends_with(substring(names(x.PlaceboPool)[h],nchar(names(x.PlaceboPool)[h]) - 2 + 1, nchar(names(x.PlaceboPool)[h]))))"</span></code></pre></div>
 <p>Note: depending on the structure of your data, you can change this restriction. For example, if you used state abbreviations <em>at the begining</em> of each variable name rather than FIPS codes at the end. Then all you would need to do is to drop any variable that had the same first two characters. This could be done by writing the restriction as <code>"select(-starts_with(substring(names(x.PlaceboPool)[h],1, 2)))"</code></p>
 <p>Now we can run the analysis for each placebo unit.</p>
-<div class="sourceCode" id="cb10"><html><body><pre class="r"><span class="no">SCUL.inference</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/CreatePlaceboDistribution.html">CreatePlaceboDistribution</a></span>(
-  <span class="kw">DonorPoolRestrictionForEachPlacebo</span> <span class="kw">=</span> <span class="no">drop_vars_from_same_FIPS</span>
-)</pre></body></html></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">SCUL.inference</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/CreatePlaceboDistribution.html">CreatePlaceboDistribution</a></span><span class="op">(</span>
+  DonorPoolRestrictionForEachPlacebo <span class="op">=</span> <span class="va">drop_vars_from_same_FIPS</span>
+<span class="op">)</span></code></pre></div>
 <p>We save the output from this procedure as the list <code>SCUL.inference</code>. This list contains</p>
 <ul>
 <li>
@@ -742,11 +1133,12 @@ This negative contribution of a donor series is not possible in the traditional 
 <h4 class="hasAnchor">
 <a href="#using-a-smoke-plot-and-the-smokeplot-function" class="anchor"></a>Using a smoke plot and the <code>SmokePlot()</code> function</h4>
 <p>In the first figure, we compare the pseudo differences between each placebo and its synthetic control. The graph only includes placebo lines that survived the Cohen’s D screen by having a pre-treatment Cohen’s D less than 0.25. The placebo lines in the graph are drawn with some transparency so that the darker areas have a greater density of placebo units than lighter spaces. This shading highlights the deterioration of the counterfactual fit across time and gives the appearance of smoke. As such, we refer to this style of plot as a “smoke plot.” The difference between actual sales of cigarettes sold in California and the SCUL prediction is displayed in green. The pre-treatment difference is small and centered around zero.</p>
-<div class="sourceCode" id="cb11"><html><body><pre class="r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
 <span class="co">###############################################################################################</span>
 <span class="co"># Make Smoke Plot</span>
-<span class="no">smoke_plot</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/SmokePlot.html">SmokePlot</a></span>()
-<span class="no">smoke_plot</span></pre></body></html></div>
+<span class="va">smoke_plot</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SmokePlot.html">SmokePlot</a></span><span class="op">(</span><span class="op">)</span>
+<span class="va">smoke_plot</span></code></pre></div>
 <p><img src="scul-tutorial_files/figure-html/unnamed-chunk-19-1.png" width="100%" style="display: block; margin: auto;"></p>
 <p>The spreading of the placebo distribution as time since treatment is the deterioration of model fit. Since the null distribution has the greatest power to detect small treatment effects when the distribution is less disperse, smaller treatment effects are more “detectable” closer to treatment time rather than farther away.</p>
 </div>
@@ -772,56 +1164,57 @@ This negative contribution of a donor series is not possible in the traditional 
 <li>various labels.</li>
 </ul>
 <p>We add to each density plot the treatment effect estimate (in standard deviation units). This is displayed by the red dashed-line.</p>
-<div class="sourceCode" id="cb12"><html><body><pre class="r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R">
 <span class="co"># Plot null distribution with no restriction on pre-period fit</span>
-<span class="no">NullDist.Full</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/PlotNullDistribution.html">PlotNullDistribution</a></span>(
-    <span class="kw">CohensD</span> <span class="kw">=</span> <span class="fl">999</span>,
-    <span class="kw">StartTime</span> <span class="kw">=</span> <span class="no">TreatmentBeginsAt</span>,
-    <span class="kw">EndTime</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">SCUL.output</span>$<span class="no">y.actual</span>),
-    <span class="kw">height</span> <span class="kw">=</span> <span class="fl">2</span>,
-    <span class="kw">AdjustmentParm</span> <span class="kw">=</span> <span class="fl">1</span>,
-    <span class="kw">BandwidthParm</span> <span class="kw">=</span> <span class="fl">.25</span>,
-    <span class="kw">title_label</span> <span class="kw">=</span> <span class="st">"Placebo distribution compared\n to ATE estimate in\n pre-period standard deviations"</span>,
-    <span class="kw">y_label</span>  <span class="kw">=</span> <span class="st">" "</span>,
-    <span class="kw">x_label</span>  <span class="kw">=</span>  <span class="st">""</span>,
-    <span class="kw">subtitle_label</span>  <span class="kw">=</span>  <span class="st">"No Cohen's D restriction"</span>,
-    <span class="kw">rejection_label</span>  <span class="kw">=</span>  <span class="st">""</span>
-) +
-  <span class="fu">geom_vline</span>(
-        <span class="kw">xintercept</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="no">Results.y.StandardizedDiff</span>[<span class="no">TreatmentBeginsAt</span>:<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">Results.y.StandardizedDiff</span>),]),
-        <span class="kw">linetype</span> <span class="kw">=</span> <span class="st">"dashed"</span>,
-        <span class="kw">size</span> <span class="kw">=</span> <span class="fl">1</span>,
-        <span class="kw">color</span> <span class="kw">=</span> <span class="st">"red"</span>)
+<span class="va">NullDist.Full</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PlotNullDistribution.html">PlotNullDistribution</a></span><span class="op">(</span>
+    CohensD <span class="op">=</span> <span class="fl">999</span>,
+    StartTime <span class="op">=</span> <span class="va">TreatmentBeginsAt</span>,
+    EndTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">SCUL.output</span><span class="op">$</span><span class="va">y.actual</span><span class="op">)</span>,
+    height <span class="op">=</span> <span class="fl">2</span>,
+    AdjustmentParm <span class="op">=</span> <span class="fl">1</span>,
+    BandwidthParm <span class="op">=</span> <span class="fl">.25</span>,
+    title_label <span class="op">=</span> <span class="st">"Placebo distribution compared\n to ATE estimate in\n pre-period standard deviations"</span>,
+    y_label  <span class="op">=</span> <span class="st">" "</span>,
+    x_label  <span class="op">=</span>  <span class="st">""</span>,
+    subtitle_label  <span class="op">=</span>  <span class="st">"No Cohen's D restriction"</span>,
+    rejection_label  <span class="op">=</span>  <span class="st">""</span>
+<span class="op">)</span> <span class="op">+</span>
+  <span class="fu">geom_vline</span><span class="op">(</span>
+        xintercept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">Results.y.StandardizedDiff</span><span class="op">[</span><span class="va">TreatmentBeginsAt</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">Results.y.StandardizedDiff</span><span class="op">)</span>,<span class="op">]</span><span class="op">)</span>,
+        linetype <span class="op">=</span> <span class="st">"dashed"</span>,
+        size <span class="op">=</span> <span class="fl">1</span>,
+        color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span>
 
 <span class="co"># Plot null distribution 0.25 cohen's D restriction on pre-period fit</span>
-<span class="no">NullDist.25</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/PlotNullDistribution.html">PlotNullDistribution</a></span>(
-    <span class="kw">CohensD</span> <span class="kw">=</span> <span class="fl">0.25</span>,
-    <span class="kw">StartTime</span> <span class="kw">=</span> <span class="no">TreatmentBeginsAt</span>,
-    <span class="kw">EndTime</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">SCUL.output</span>$<span class="no">y.actual</span>),
-    <span class="kw">height</span> <span class="kw">=</span> <span class="fl">2</span>,
-    <span class="kw">AdjustmentParm</span> <span class="kw">=</span> <span class="fl">1</span>,
-    <span class="kw">BandwidthParm</span> <span class="kw">=</span> <span class="fl">.25</span>,
-    <span class="kw">y_label</span>  <span class="kw">=</span> <span class="st">""</span>,
-    <span class="kw">x_label</span>  <span class="kw">=</span>  <span class="st">"Distribution of standardized difference\n for placebo donor pool"</span>,
-    <span class="kw">subtitle_label</span>  <span class="kw">=</span>  <span class="st">"0.25 Cohen's D restriction"</span>,
-    <span class="kw">rejection_label</span>  <span class="kw">=</span>  <span class="st">""</span>,
-    <span class="kw">title_label</span> <span class="kw">=</span> <span class="st">" "</span>,
+<span class="va">NullDist.25</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PlotNullDistribution.html">PlotNullDistribution</a></span><span class="op">(</span>
+    CohensD <span class="op">=</span> <span class="fl">0.25</span>,
+    StartTime <span class="op">=</span> <span class="va">TreatmentBeginsAt</span>,
+    EndTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">SCUL.output</span><span class="op">$</span><span class="va">y.actual</span><span class="op">)</span>,
+    height <span class="op">=</span> <span class="fl">2</span>,
+    AdjustmentParm <span class="op">=</span> <span class="fl">1</span>,
+    BandwidthParm <span class="op">=</span> <span class="fl">.25</span>,
+    y_label  <span class="op">=</span> <span class="st">""</span>,
+    x_label  <span class="op">=</span>  <span class="st">"Distribution of standardized difference\n for placebo donor pool"</span>,
+    subtitle_label  <span class="op">=</span>  <span class="st">"0.25 Cohen's D restriction"</span>,
+    rejection_label  <span class="op">=</span>  <span class="st">""</span>,
+    title_label <span class="op">=</span> <span class="st">" "</span>,
 
-) +
-  <span class="fu">geom_vline</span>(
-        <span class="kw">xintercept</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span>(<span class="no">Results.y.StandardizedDiff</span>[<span class="no">TreatmentBeginsAt</span>:<span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">Results.y.StandardizedDiff</span>),]),
-        <span class="kw">linetype</span> <span class="kw">=</span> <span class="st">"dashed"</span>,
-        <span class="kw">size</span> <span class="kw">=</span> <span class="fl">1</span>,
-        <span class="kw">color</span> <span class="kw">=</span> <span class="st">"red"</span>)
+<span class="op">)</span> <span class="op">+</span>
+  <span class="fu">geom_vline</span><span class="op">(</span>
+        xintercept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">Results.y.StandardizedDiff</span><span class="op">[</span><span class="va">TreatmentBeginsAt</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">Results.y.StandardizedDiff</span><span class="op">)</span>,<span class="op">]</span><span class="op">)</span>,
+        linetype <span class="op">=</span> <span class="st">"dashed"</span>,
+        size <span class="op">=</span> <span class="fl">1</span>,
+        color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span>
 
 <span class="co"># Plot n</span>
 <span class="co"># Combine the three plots</span>
-<span class="no">combined_plot</span> <span class="kw">&lt;-</span> <span class="fu">plot_grid</span>(
-    <span class="no">NullDist.Full</span>,<span class="no">NullDist.25</span>,
-    <span class="kw">ncol</span> <span class="kw">=</span> <span class="fl">1</span>)
+<span class="va">combined_plot</span> <span class="op">&lt;-</span> <span class="fu">plot_grid</span><span class="op">(</span>
+    <span class="va">NullDist.Full</span>,<span class="va">NullDist.25</span>,
+    ncol <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>
 
 <span class="co"># Display the plot</span>
-<span class="no">combined_plot</span></pre></body></html></div>
+<span class="va">combined_plot</span></code></pre></div>
 <p><img src="scul-tutorial_files/figure-html/unnamed-chunk-20-1.png" width="50%" style="display: block; margin: auto;"></p>
 <p>In general, a more compact null distribution is desirable because wider null distributions are less able to differentiate small treatment effects from statistical noise. Thus, synthetic control methods have the greatest power to detect small effect sizes in the time periods closest to treatment, and when the synthetic control method also provides a satisfactory fit for the placebo pool used to compose the null distribution.</p>
 <p>Maximizing statistical power in these ways is not without trade-offs. Dynamic treatment effects that grow over time may not be large enough to be detectable in the periods immediately following treatment. Using a smaller Cohen’s D threshold can improve power by eliminating noisy placebo units, but this also may eliminate target units that do not meet the pre-treatment fit quality standard.</p>
@@ -837,23 +1230,24 @@ This negative contribution of a donor series is not possible in the traditional 
 <li>
 <code>StartTime</code> and <code>EndTime</code>: These form the beginning and end time periods over which the average pseudo treatment effect is calculated. This is useful if you want to consider smaller intervals of time than the entire post-treatment period.</li>
 </ul>
-<div class="sourceCode" id="cb13"><html><body><pre class="r"><span class="co">#########################################################################################################</span>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="co">#########################################################################################################</span>
 <span class="co"># Calculate an average post-treatment p-value</span>
-<span class="fu"><a href="../reference/PValue.html">PValue</a></span>(
-    <span class="kw">CohensD</span> <span class="kw">=</span> <span class="fl">999</span>,
-    <span class="kw">StartTime</span> <span class="kw">=</span> <span class="no">SCUL.input</span>$<span class="no">TreatmentBeginsAt</span>,
-    <span class="kw">EndTime</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">Results.y.StandardizedDiff</span>)
-)
+<span class="fu"><a href="../reference/PValue.html">PValue</a></span><span class="op">(</span>
+    CohensD <span class="op">=</span> <span class="fl">999</span>,
+    StartTime <span class="op">=</span> <span class="va">SCUL.input</span><span class="op">$</span><span class="va">TreatmentBeginsAt</span>,
+    EndTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">Results.y.StandardizedDiff</span><span class="op">)</span>
+<span class="op">)</span>
 <span class="co">#&gt;   p.value.high</span>
-<span class="co">#&gt; 1         0.13</span>
+<span class="co">#&gt; 1         0.21</span>
 
-<span class="fu"><a href="../reference/PValue.html">PValue</a></span>(
-    <span class="kw">CohensD</span> <span class="kw">=</span> <span class="fl">.25</span>,
-    <span class="kw">StartTime</span> <span class="kw">=</span> <span class="no">SCUL.input</span>$<span class="no">TreatmentBeginsAt</span>,
-    <span class="kw">EndTime</span> <span class="kw">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span>(<span class="no">Results.y.StandardizedDiff</span>)
-)
+<span class="fu"><a href="../reference/PValue.html">PValue</a></span><span class="op">(</span>
+    CohensD <span class="op">=</span> <span class="fl">.25</span>,
+    StartTime <span class="op">=</span> <span class="va">SCUL.input</span><span class="op">$</span><span class="va">TreatmentBeginsAt</span>,
+    EndTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">Results.y.StandardizedDiff</span><span class="op">)</span>
+<span class="op">)</span>
 <span class="co">#&gt;   p.value.high</span>
-<span class="co">#&gt; 1         0.07</span></pre></body></html></div>
+<span class="co">#&gt; 1         0.04</span></code></pre></div>
 <p>As could also be seen in the first density plot, when we allow all units in the placebo pool (i.e., no Cohen’s D restriction) to contribute to the null distribution estimate, our treatment effect estimate does not appear sufficiently rare. It has a p-value of 0.4. However, when we include only those placebos where the SCUL procedure found a suitable counterfactual (judged by Cohen’s D less than or equal to 0.25), our treatment effect estimate is extremely rare with a p-value of 0.02.</p>
 </div>
 </div>
@@ -909,17 +1303,17 @@ ATE estimate
 </td>
 </tr>
 <tr>
-<td style="text-align:left;width: 5cm;  padding-left: 2em;" indentlevel="1">
+<td style="text-align:left;width: 5cm; padding-left: 2em;" indentlevel="1">
 Cross-validation for determining penalty
 </td>
 <td style="text-align:left;width: 2cm; ">
-0.02
+0
 </td>
 <td style="text-align:right;width: 2cm; ">
-0.015
+0.002
 </td>
 <td style="text-align:right;width: 2cm; ">
-13.522
+-15.053
 </td>
 </tr>
 <tr grouplength="1">
@@ -928,7 +1322,7 @@ Cross-validation for determining penalty
 </td>
 </tr>
 <tr>
-<td style="text-align:left;width: 5cm;  padding-left: 2em;" indentlevel="1">
+<td style="text-align:left;width: 5cm; padding-left: 2em;" indentlevel="1">
 </td>
 <td style="text-align:left;width: 2cm; ">
 NA
@@ -937,7 +1331,7 @@ NA
 0.155
 </td>
 <td style="text-align:right;width: 2cm; ">
-14.933
+-14.933
 </td>
 </tr>
 </tbody>
@@ -965,10 +1359,10 @@ Coefficient
 21
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 94.42%">0.4848</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 100.00%">0.4848</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 100.00%">0.5211</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 88.62%">0.4159</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.3229</span>
@@ -979,10 +1373,10 @@ Coefficient
 34
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 51.11%">0.2028</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 53.44%">0.2028</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 49.82%">0.1944</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 64.15%">0.2677</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.3486</span>
@@ -993,10 +1387,10 @@ Coefficient
 23
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 44.25%">0.1582</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 46.07%">0.1582</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 42.61%">0.1475</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 46.40%">0.1602</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.1925</span>
@@ -1007,10 +1401,10 @@ Coefficient
 5
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 34.24%">0.0930</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 35.31%">0.0930</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 33.12%">0.0857</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 34.12%">0.0858</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0839</span>
@@ -1021,10 +1415,10 @@ Coefficient
 37
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.38%">0.0028</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.41%">0.0028</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.31%">0.0023</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.56%">0.0037</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0024</span>
@@ -1035,10 +1429,10 @@ Coefficient
 19
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.32%">0.0024</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.35%">0.0024</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.34%">0.0025</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.48%">0.0032</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0026</span>
@@ -1049,10 +1443,10 @@ Coefficient
 38
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.31%">0.0023</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.33%">0.0023</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.25%">0.0019</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.40%">0.0027</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0021</span>
@@ -1063,10 +1457,10 @@ Coefficient
 4
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.31%">0.0023</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.33%">0.0023</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.32%">0.0024</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.36%">0.0025</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0023</span>
@@ -1077,10 +1471,10 @@ Coefficient
 11
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.29%">0.0022</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.31%">0.0022</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.25%">0.0019</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.38%">0.0026</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0020</span>
@@ -1091,10 +1485,10 @@ Coefficient
 24
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.28%">0.0021</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.30%">0.0021</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.26%">0.0020</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.33%">0.0023</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0014</span>
@@ -1105,10 +1499,10 @@ Coefficient
 20
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.28%">0.0021</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.30%">0.0021</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.26%">0.0020</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.36%">0.0025</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0021</span>
@@ -1119,10 +1513,10 @@ Coefficient
 15
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.28%">0.0021</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.30%">0.0021</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.22%">0.0017</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.30%">0.0021</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0016</span>
@@ -1133,10 +1527,10 @@ Coefficient
 9
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.26%">0.0020</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.28%">0.0020</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.25%">0.0019</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.26%">0.0019</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0018</span>
@@ -1147,10 +1541,10 @@ Coefficient
 10
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.26%">0.0020</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.28%">0.0020</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.20%">0.0016</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.38%">0.0026</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0014</span>
@@ -1161,10 +1555,10 @@ Coefficient
 36
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.25%">0.0019</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.26%">0.0019</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.18%">0.0015</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.30%">0.0021</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0014</span>
@@ -1175,10 +1569,10 @@ Coefficient
 18
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.25%">0.0019</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.26%">0.0019</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.18%">0.0015</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.33%">0.0023</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0014</span>
@@ -1189,10 +1583,10 @@ Coefficient
 12
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.25%">0.0019</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.26%">0.0019</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.22%">0.0017</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.30%">0.0021</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0018</span>
@@ -1203,10 +1597,10 @@ Coefficient
 8
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.25%">0.0019</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.26%">0.0019</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.25%">0.0019</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.31%">0.0022</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0021</span>
@@ -1217,10 +1611,10 @@ Coefficient
 26
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.25%">0.0019</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.26%">0.0019</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.18%">0.0015</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.30%">0.0021</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0014</span>
@@ -1231,10 +1625,10 @@ Coefficient
 29
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.25%">0.0019</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.26%">0.0019</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.15%">0.0013</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.20%">0.0015</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0013</span>
@@ -1245,10 +1639,10 @@ Coefficient
 30
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.25%">0.0019</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.26%">0.0019</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.14%">0.0012</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.35%">0.0024</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0014</span>
@@ -1259,10 +1653,10 @@ Coefficient
 28
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.23%">0.0018</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.25%">0.0018</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.18%">0.0015</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.28%">0.0020</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0016</span>
@@ -1273,10 +1667,10 @@ Coefficient
 39
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.23%">0.0018</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.25%">0.0018</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.20%">0.0016</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.30%">0.0021</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0015</span>
@@ -1287,10 +1681,10 @@ Coefficient
 6
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.22%">0.0017</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.23%">0.0017</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.20%">0.0016</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.28%">0.0020</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0012</span>
@@ -1301,10 +1695,10 @@ Coefficient
 7
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.22%">0.0017</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.23%">0.0017</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.14%">0.0012</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.23%">0.0017</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0013</span>
@@ -1315,10 +1709,10 @@ Coefficient
 14
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.22%">0.0017</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.23%">0.0017</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.17%">0.0014</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.28%">0.0020</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0014</span>
@@ -1329,10 +1723,10 @@ Coefficient
 31
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.22%">0.0017</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.23%">0.0017</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.17%">0.0014</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.30%">0.0021</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0017</span>
@@ -1343,10 +1737,10 @@ Coefficient
 17
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.22%">0.0017</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.23%">0.0017</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.12%">0.0011</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.30%">0.0021</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0014</span>
@@ -1357,10 +1751,10 @@ Coefficient
 1
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.20%">0.0016</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.21%">0.0016</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.12%">0.0011</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.28%">0.0020</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0014</span>
@@ -1371,10 +1765,10 @@ Coefficient
 16
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.20%">0.0016</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.21%">0.0016</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.17%">0.0014</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.25%">0.0018</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0016</span>
@@ -1385,10 +1779,10 @@ Coefficient
 32
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.20%">0.0016</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.21%">0.0016</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.11%">0.0010</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.26%">0.0019</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0012</span>
@@ -1399,10 +1793,10 @@ Coefficient
 2
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.20%">0.0016</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.21%">0.0016</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.11%">0.0010</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.25%">0.0018</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0012</span>
@@ -1413,10 +1807,10 @@ Coefficient
 33
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.20%">0.0016</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.21%">0.0016</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.17%">0.0014</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.20%">0.0015</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0015</span>
@@ -1427,10 +1821,10 @@ Coefficient
 27
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.18%">0.0015</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.20%">0.0015</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.14%">0.0012</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.28%">0.0020</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0014</span>
@@ -1441,10 +1835,10 @@ Coefficient
 35
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.17%">0.0014</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.18%">0.0014</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.12%">0.0011</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.18%">0.0014</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0010</span>
@@ -1455,10 +1849,10 @@ Coefficient
 13
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.15%">0.0013</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.17%">0.0013</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.11%">0.0010</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.26%">0.0019</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0007</span>
@@ -1469,10 +1863,10 @@ Coefficient
 25
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.09%">0.0009</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.10%">0.0009</span>
 </td>
 <td style="text-align:right;">
-<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.08%">0.0008</span>
+<span style="display: inline-block; direction: rtl; border-radius: 4px; padding-right: 2px; background-color: #3399FF; width: 20.13%">0.0011</span>
 </td>
 <td style="text-align:right;">
 <span style="color: green">0.0010</span>
@@ -1508,14 +1902,15 @@ Coefficient
 <div id="session-info" class="section level1">
 <h1 class="hasAnchor">
 <a href="#session-info" class="anchor"></a>Session-info</h1>
-<div class="sourceCode" id="cb14"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span>()
-<span class="co">#&gt; R version 3.6.1 (2019-07-05)</span>
-<span class="co">#&gt; Platform: x86_64-apple-darwin15.6.0 (64-bit)</span>
-<span class="co">#&gt; Running under: macOS Catalina 10.15.4</span>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span><span class="op">(</span><span class="op">)</span>
+<span class="co">#&gt; R version 4.0.3 (2020-10-10)</span>
+<span class="co">#&gt; Platform: x86_64-apple-darwin17.0 (64-bit)</span>
+<span class="co">#&gt; Running under: macOS Big Sur 10.16</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; Matrix products: default</span>
-<span class="co">#&gt; BLAS:   /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRblas.0.dylib</span>
-<span class="co">#&gt; LAPACK: /Library/Frameworks/R.framework/Versions/3.6/Resources/lib/libRlapack.dylib</span>
+<span class="co">#&gt; BLAS:   /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRblas.dylib</span>
+<span class="co">#&gt; LAPACK: /Library/Frameworks/R.framework/Versions/4.0/Resources/lib/libRlapack.dylib</span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; locale:</span>
 <span class="co">#&gt; [1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8</span>
@@ -1524,75 +1919,77 @@ Coefficient
 <span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; other attached packages:</span>
-<span class="co">#&gt;  [1] Synth_1.1-5         formattable_0.2.0.1 cowplot_1.0.0      </span>
-<span class="co">#&gt;  [4] kableExtra_1.1.0    knitr_1.28          pBrackets_1.0      </span>
-<span class="co">#&gt;  [7] glmnet_3.0-2        Matrix_1.2-17       forcats_0.5.0      </span>
-<span class="co">#&gt; [10] stringr_1.4.0       dplyr_0.8.5         purrr_0.3.4        </span>
-<span class="co">#&gt; [13] readr_1.3.1         tidyr_1.0.2         tibble_3.0.1       </span>
-<span class="co">#&gt; [16] ggplot2_3.3.0       tidyverse_1.3.0     scul_0.1.1.0       </span>
+<span class="co">#&gt;  [1] Synth_1.1-5         formattable_0.2.0.1 cowplot_1.1.0      </span>
+<span class="co">#&gt;  [4] kableExtra_1.3.4    knitr_1.31          pBrackets_1.0      </span>
+<span class="co">#&gt;  [7] glmnet_4.0-2        Matrix_1.2-18       forcats_0.5.0      </span>
+<span class="co">#&gt; [10] stringr_1.4.0       dplyr_1.0.2         purrr_0.3.4        </span>
+<span class="co">#&gt; [13] readr_1.4.0         tidyr_1.1.2         tibble_3.0.4       </span>
+<span class="co">#&gt; [16] ggplot2_3.3.2       tidyverse_1.3.0     scul_0.1.1.0       </span>
 <span class="co">#&gt; [19] pacman_0.5.1       </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; loaded via a namespace (and not attached):</span>
-<span class="co">#&gt;  [1] nlme_3.1-140         fs_1.4.1             lubridate_1.7.8     </span>
-<span class="co">#&gt;  [4] webshot_0.5.2        httr_1.4.1           rprojroot_1.3-2     </span>
-<span class="co">#&gt;  [7] numDeriv_2016.8-1.1  tools_3.6.1          backports_1.1.6     </span>
-<span class="co">#&gt; [10] R6_2.4.1             rpart_4.1-15         DBI_1.1.0           </span>
-<span class="co">#&gt; [13] colorspace_1.4-1     nnet_7.3-12          withr_2.2.0         </span>
-<span class="co">#&gt; [16] tidyselect_1.0.0     compiler_3.6.1       cli_2.0.2           </span>
-<span class="co">#&gt; [19] rvest_0.3.5          xml2_1.3.2           desc_1.2.0          </span>
-<span class="co">#&gt; [22] labeling_0.3         scales_1.1.0         pkgdown_1.5.1       </span>
-<span class="co">#&gt; [25] digest_0.6.25        rmarkdown_2.1        pkgconfig_2.0.3     </span>
-<span class="co">#&gt; [28] htmltools_0.4.0      highr_0.8            dbplyr_1.4.3        </span>
-<span class="co">#&gt; [31] htmlwidgets_1.5.1    rlang_0.4.6          readxl_1.3.1        </span>
-<span class="co">#&gt; [34] rstudioapi_0.11      farver_2.0.3         shape_1.4.4         </span>
-<span class="co">#&gt; [37] generics_0.0.2       jsonlite_1.6.1       ModelMetrics_1.2.2.2</span>
-<span class="co">#&gt; [40] magrittr_1.5         Rcpp_1.0.4.6         munsell_0.5.0       </span>
-<span class="co">#&gt; [43] fansi_0.4.1          lifecycle_0.2.0      stringi_1.4.6       </span>
-<span class="co">#&gt; [46] pROC_1.16.2          yaml_2.2.1           MASS_7.3-51.4       </span>
-<span class="co">#&gt; [49] plyr_1.8.6           recipes_0.1.12       grid_3.6.1          </span>
-<span class="co">#&gt; [52] crayon_1.3.4         lattice_0.20-38      haven_2.2.0         </span>
-<span class="co">#&gt; [55] splines_3.6.1        hms_0.5.3            pillar_1.4.3        </span>
-<span class="co">#&gt; [58] reshape2_1.4.4       codetools_0.2-16     stats4_3.6.1        </span>
-<span class="co">#&gt; [61] reprex_0.3.0         glue_1.4.0           evaluate_0.14       </span>
-<span class="co">#&gt; [64] data.table_1.12.8    modelr_0.1.7         vctrs_0.2.4         </span>
-<span class="co">#&gt; [67] foreach_1.5.0        cellranger_1.1.0     gtable_0.3.0        </span>
-<span class="co">#&gt; [70] kernlab_0.9-29       assertthat_0.2.1     xfun_0.13           </span>
-<span class="co">#&gt; [73] gower_0.2.1          prodlim_2019.11.13   broom_0.5.6         </span>
-<span class="co">#&gt; [76] class_7.3-15         survival_2.44-1.1    viridisLite_0.3.0   </span>
-<span class="co">#&gt; [79] timeDate_3043.102    optimx_2020-2.2      iterators_1.0.12    </span>
-<span class="co">#&gt; [82] memoise_1.1.0        lava_1.6.7           ellipsis_0.3.0      </span>
-<span class="co">#&gt; [85] caret_6.0-86         ipred_0.9-9</span></pre></body></html></div>
+<span class="co">#&gt;  [1] nlme_3.1-149         fs_1.5.0             lubridate_1.7.9.2   </span>
+<span class="co">#&gt;  [4] webshot_0.5.2        httr_1.4.2           rprojroot_2.0.2     </span>
+<span class="co">#&gt;  [7] numDeriv_2016.8-1.1  tools_4.0.3          backports_1.2.0     </span>
+<span class="co">#&gt; [10] R6_2.5.0             rpart_4.1-15         DBI_1.1.0           </span>
+<span class="co">#&gt; [13] colorspace_2.0-0     nnet_7.3-14          withr_2.3.0         </span>
+<span class="co">#&gt; [16] tidyselect_1.1.0     compiler_4.0.3       textshaping_0.3.4   </span>
+<span class="co">#&gt; [19] cli_2.2.0            rvest_0.3.6          xml2_1.3.2          </span>
+<span class="co">#&gt; [22] desc_1.2.0           labeling_0.4.2       scales_1.1.1        </span>
+<span class="co">#&gt; [25] pkgdown_1.6.1        systemfonts_1.0.1    digest_0.6.27       </span>
+<span class="co">#&gt; [28] svglite_2.0.0        rmarkdown_2.7        pkgconfig_2.0.3     </span>
+<span class="co">#&gt; [31] htmltools_0.5.1.1    highr_0.8            dbplyr_2.0.0        </span>
+<span class="co">#&gt; [34] htmlwidgets_1.5.2    rlang_0.4.10         readxl_1.3.1        </span>
+<span class="co">#&gt; [37] rstudioapi_0.13      farver_2.0.3         shape_1.4.5         </span>
+<span class="co">#&gt; [40] generics_0.1.0       jsonlite_1.7.2       ModelMetrics_1.2.2.2</span>
+<span class="co">#&gt; [43] magrittr_2.0.1       Rcpp_1.0.5           munsell_0.5.0       </span>
+<span class="co">#&gt; [46] fansi_0.4.1          lifecycle_0.2.0      stringi_1.5.3       </span>
+<span class="co">#&gt; [49] pROC_1.16.2          yaml_2.2.1           MASS_7.3-53         </span>
+<span class="co">#&gt; [52] plyr_1.8.6           recipes_0.1.15       grid_4.0.3          </span>
+<span class="co">#&gt; [55] ggrepel_0.9.0        crayon_1.3.4         lattice_0.20-41     </span>
+<span class="co">#&gt; [58] haven_2.3.1          splines_4.0.3        hms_0.5.3           </span>
+<span class="co">#&gt; [61] pillar_1.4.7         reshape2_1.4.4       codetools_0.2-16    </span>
+<span class="co">#&gt; [64] stats4_4.0.3         reprex_0.3.0         glue_1.4.2          </span>
+<span class="co">#&gt; [67] evaluate_0.14        data.table_1.13.2    modelr_0.1.8        </span>
+<span class="co">#&gt; [70] vctrs_0.3.5          foreach_1.5.1        cellranger_1.1.0    </span>
+<span class="co">#&gt; [73] gtable_0.3.0         kernlab_0.9-29       assertthat_0.2.1    </span>
+<span class="co">#&gt; [76] xfun_0.21            gower_0.2.2          prodlim_2019.11.13  </span>
+<span class="co">#&gt; [79] broom_0.7.2          viridisLite_0.3.0    ragg_1.1.2          </span>
+<span class="co">#&gt; [82] class_7.3-17         survival_3.2-7       timeDate_3043.102   </span>
+<span class="co">#&gt; [85] optimx_2020-4.2      iterators_1.0.13     memoise_1.1.0       </span>
+<span class="co">#&gt; [88] lava_1.6.8.1         ellipsis_0.3.1       caret_6.0-86        </span>
+<span class="co">#&gt; [91] ipred_0.9-9</span></code></pre></div>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1 class="hasAnchor">
 <a href="#references" class="anchor"></a>References</h1>
-<div id="refs" class="references">
-<div id="ref-Abadie2010">
-<p>Abadie, Alberto, Alexis Diamond, and Jens Hainmueller. 2010. “Synthetic Control Methods for Comparative Case Studies: Estimating the Effect of California’s Tobacco Control Program.” <em>Journal of the American Statistical Association</em> 105 (490): 493–505. <a href="https://doi.org/10.1198/jasa.2009.ap08746">https://doi.org/10.1198/jasa.2009.ap08746</a>.</p>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-Abadie2010" class="csl-entry">
+Abadie, Alberto, Alexis Diamond, and Jens Hainmueller. 2010. <span>“<span class="nocase">Synthetic Control Methods for Comparative Case Studies: Estimating the Effect of California’s Tobacco Control Program</span>.”</span> <em>Journal of the American Statistical Association</em> 105 (490): 493–505. <a href="https://doi.org/10.1198/jasa.2009.ap08746">https://doi.org/10.1198/jasa.2009.ap08746</a>.
 </div>
-<div id="ref-AlbertoAbadie2020">
-<p>Alberto Abadie. 2020. “Using Synthetic Controls: Feasibility, Data Requirements, and Methodological Aspects.” <em>Journal of Economic Literature</em> Forthcoming.</p>
+<div id="ref-AlbertoAbadie2020" class="csl-entry">
+Alberto Abadie. 2020. <span>“<span class="nocase">Using Synthetic Controls: Feasibility, Data Requirements, and Methodological Aspects</span>.”</span> <em>Journal of Economic Literature</em> Forthcoming.
 </div>
-<div id="ref-Cavallo2013">
-<p>Cavallo, Eduardo, Sebastian Galiani, Ilan Noy, and Juan Pantano. 2013. “Catastrophic Natural Disasters and Economic Growth.” <em>Review of Economics and Statistics</em> 95 (5): 1549–61. <a href="https://doi.org/10.1162/REST_a_00413">https://doi.org/10.1162/REST_a_00413</a>.</p>
+<div id="ref-Cavallo2013" class="csl-entry">
+Cavallo, Eduardo, Sebastian Galiani, Ilan Noy, and Juan Pantano. 2013. <span>“<span class="nocase">Catastrophic Natural Disasters and Economic Growth</span>.”</span> <em>Review of Economics and Statistics</em> 95 (5): 1549–61. <a href="https://doi.org/10.1162/REST_a_00413">https://doi.org/10.1162/REST_a_00413</a>.
 </div>
-<div id="ref-Cochran1968">
-<p>Cochran, W. G. 1968. “The Effectiveness of Adjustment by Subclassification in Removing Bias in Observational Studies.” <em>Biometrics</em> 24 (2): 295. <a href="https://doi.org/10.2307/2528036">https://doi.org/10.2307/2528036</a>.</p>
+<div id="ref-Cochran1968" class="csl-entry">
+Cochran, W. G. 1968. <span>“<span class="nocase">The Effectiveness of Adjustment by Subclassification in Removing Bias in Observational Studies</span>.”</span> <em>Biometrics</em> 24 (2): 295. <a href="https://doi.org/10.2307/2528036">https://doi.org/10.2307/2528036</a>.
 </div>
-<div id="ref-Dube2015">
-<p>Dube, Arindrajit, and Ben Zipperer. 2015. “Pooling Multiple Case Studies Using Synthetic Controls: An Application to Minimum Wage Policies.” <em>IZA Discussion Paper No. 8944</em>.</p>
+<div id="ref-Dube2015" class="csl-entry">
+Dube, Arindrajit, and Ben Zipperer. 2015. <span>“<span class="nocase">Pooling Multiple Case Studies Using Synthetic Controls: An Application to Minimum Wage Policies</span>.”</span> <em>IZA Discussion Paper No. 8944</em>.
 </div>
-<div id="ref-Ho2007">
-<p>Ho, Daniel E., Kosuke Imai, Gary King, and Elizabeth A. Stuart. 2007. “Matching as Nonparametric Preprocessing for Reducing Model Dependence in Parametric Causal Inference.” <em>Political Analysis</em> 15 (3): 199–236. <a href="https://doi.org/10.1093/pan/mpl013">https://doi.org/10.1093/pan/mpl013</a>.</p>
+<div id="ref-Ho2007" class="csl-entry">
+Ho, Daniel E., Kosuke Imai, Gary King, and Elizabeth A. Stuart. 2007. <span>“<span class="nocase">Matching as Nonparametric Preprocessing for Reducing Model Dependence in Parametric Causal Inference</span>.”</span> <em>Political Analysis</em> 15 (3): 199–236. <a href="https://doi.org/10.1093/pan/mpl013">https://doi.org/10.1093/pan/mpl013</a>.
 </div>
-<div id="ref-Hyndman2020">
-<p>Hyndman, Rob J, and George Athanasopoulos. 2020. <em>Forecasting: principles and practice</em>. 2nd ed. Melbourne, Australia: OTexts. <a href="OTexts.com/fpp2">OTexts.com/fpp2</a>.</p>
+<div id="ref-Hyndman2020" class="csl-entry">
+Hyndman, Rob J, and George Athanasopoulos. 2020. <em><span class="nocase">Forecasting: principles and practice</span></em>. 2nd ed. Melbourne, Australia: OTexts. <a href="https://OTexts.com/fpp2">OTexts.com/fpp2</a>.
 </div>
-<div id="ref-Kellogg2020">
-<p>Kellogg, Maxwell, Magne Mogstad, Guillaume Pouliot, and Alexander Torgovitsky. 2020. “Combining Matching and Synthetic Controls to Trade off Biases from Extrapolation and Interpolation.” <em>National Bureau of Economic Research</em>. <a href="https://doi.org/10.3386/w26624">https://doi.org/10.3386/w26624</a>.</p>
+<div id="ref-Kellogg2020" class="csl-entry">
+Kellogg, Maxwell, Magne Mogstad, Guillaume Pouliot, and Alexander Torgovitsky. 2020. <span>“<span class="nocase">Combining Matching and Synthetic Controls to Trade off Biases from Extrapolation and Interpolation</span>.”</span> <em>National Bureau of Economic Research</em>. <a href="https://doi.org/10.3386/w26624">https://doi.org/10.3386/w26624</a>.
 </div>
-<div id="ref-King2006">
-<p>King, Gary, and Langche Zeng. 2006. “The Dangers of Extreme Counterfactuals.” <em>Political Analysis</em> 14 (2): 131–59. <a href="https://doi.org/10.1093/pan/mpj004">https://doi.org/10.1093/pan/mpj004</a>.</p>
+<div id="ref-King2006" class="csl-entry">
+King, Gary, and Langche Zeng. 2006. <span>“<span class="nocase">The Dangers of Extreme Counterfactuals</span>.”</span> <em>Political Analysis</em> 14 (2): 131–59. <a href="https://doi.org/10.1093/pan/mpj004">https://doi.org/10.1093/pan/mpj004</a>.
 </div>
 </div>
 </div>
@@ -1613,7 +2010,7 @@ Coefficient
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

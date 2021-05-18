@@ -52,13 +52,14 @@ PlotNullDistribution <- function(
 
   #########################################################################################################
   # Create a trimmed distribution
-  trim <-  data.frame(SCUL.inference$y.placebo.StandardizedDifference.Full)[,data.frame(SCUL.inference$y.placebo.CohensD) <= CohensD ]
+  trim <-  SCUL.inference$y.placebo.StandardizedDifference.Full[ , SCUL.inference$y.placebo.CohensD <= CohensD]
 
-  trim.CohensD<-trim[StartTime:EndTime,]
+  trim.CohensD <- trim[StartTime:EndTime,]
 
-  test<-data.frame(colMeans(trim.CohensD, na.rm = TRUE))
+  test <- data.frame(colMeans(trim.CohensD, na.rm = TRUE))
 
   names(test) <- c("value")
+
 
   ####################
   # Where is 5% Absolute value

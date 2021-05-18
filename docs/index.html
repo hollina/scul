@@ -60,7 +60,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/hollina/scul">
-    <span class="fa fa-github"></span>
+    <span class="fas fa-github"></span>
      
   </a>
 </li>
@@ -76,9 +76,9 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="synthetic-control-using-lasso-scul" class="section level1">
+<div id="synthetic-control-using-lasso-scul-" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
-<a href="#synthetic-control-using-lasso-scul" class="anchor"></a>Synthetic Control Using Lasso (scul) <img src="reference/figures/logo_large.png" align="right" alt="" width="120">
+<a href="#synthetic-control-using-lasso-scul-" class="anchor"></a>Synthetic Control Using Lasso (scul) <img src="reference/figures/logo_large.png" align="right" alt="" width="120">
 </h1></div>
 <!-- badges: start -->
 
@@ -87,9 +87,9 @@
 <div id="installation" class="section level2">
 <h2 class="hasAnchor">
 <a href="#installation" class="anchor"></a>Installation</h2>
-<div class="sourceCode" id="cb1"><pre class="r"># Install development version from GitHub (CRAN coming soon) using these two lines of code
-if (!require("devtools")) install.packages("devtools")
-devtools::install_github("hollina/scul")`</pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install development version from GitHub (CRAN coming soon) using these two lines of code</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">require</span>(<span class="st">"devtools"</span>)) <span class="fu">install.packages</span>(<span class="st">"devtools"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"hollina/scul"</span>)<span class="st">`</span></span></code></pre></div>
 </div>
 <div id="tutorialmore-details" class="section level2">
 <h2 class="hasAnchor">
@@ -102,7 +102,7 @@ devtools::install_github("hollina/scul")`</pre></div>
 <a href="#what-is-a-synthetic-control" class="anchor"></a>What is a synthetic control?</h2>
 <p>The synthetic control methodology is a strategy for estimating causal treatment effects for idiosyncratic historical events. In the typical application developed by Abadie, Diamond, and Hainmueller (2010), researchers observe time series outcomes for both a treated unit and a number of untreated units. A weighted average of the untreated series is used as a counterfactual estimate of the treated series, which is referred to as a synthetic comparison group. Weights are chosen to minimize discrepancies between the synthetic comparison group and the treated unit in the pre-treatment time period. Treatment effect estimates are usually the difference between observed outcomes and the synthetic counterfactual. Statistical inference is normally organized around a placebo analysis; in which, pseudo-treatment effects are estimated for many untreated placebo units, and the distribution of pseudo-estimates represents the null distribution of no treatment effect.</p>
 <p>A useful way to think about synthetic controls is as a procedure that attempts to <em>match</em> donor series to target series based on the unobserved factors that determine the data generating process. When framed in this manner identification assumptions and strategies for model selection/inference become more salient.</p>
-<p>Recent methodological work has proposed a number of innovative strategies for estimating synthetic control weights (Arkhangelsky et al. 2018; Doudchenko and Imbens 2017; Powell 2019). In a similar vein, we construct donor weights using a method we call <strong>Synthetic Control Using Lasso (SCUL)</strong>.</p>
+<p>Recent methodological work has proposed a number of innovative strategies for estimating synthetic control weights (Arkhangelsky et al. 2018; Doudchenko and Imbens 2017; Powell 2019). In a similar vein, we construct donor weights using a method we call <strong>Synthetic Control Using Lasso (SCUL)</strong>.</p>
 </div>
 <div id="what-is-scul" class="section level2">
 <h2 class="hasAnchor">
@@ -122,9 +122,9 @@ devtools::install_github("hollina/scul")`</pre></div>
 <div id="what-are-the-contributions-of-scul" class="section level2">
 <h2 class="hasAnchor">
 <a href="#what-are-the-contributions-of-scul" class="anchor"></a>What are the contributions of SCUL?</h2>
-<div id="clarifies-idenficiation-assumptions-for-synthetic-control-methods" class="section level3">
+<div id="1-clarifies-idenficiation-assumptions-for-synthetic-control-methods" class="section level3">
 <h3 class="hasAnchor">
-<a href="#clarifies-idenficiation-assumptions-for-synthetic-control-methods" class="anchor"></a>1. Clarifies idenficiation assumptions for synthetic control methods</h3>
+<a href="#1-clarifies-idenficiation-assumptions-for-synthetic-control-methods" class="anchor"></a>1. Clarifies idenficiation assumptions for synthetic control methods</h3>
 <p>We outline two simple identification assumptions required for a synthetic control design to identify causal treatment parameters:</p>
 <ol>
 <li>conditional independence of treatment exposure and potential outcomes after matching on an underlying factor structure</li>
@@ -132,9 +132,9 @@ devtools::install_github("hollina/scul")`</pre></div>
 </ol>
 <p>While neither of these assumptions is directly testable, our working paper offers perspectives and strategies that may help in interpreting the validity of such assumptions in applied work.</p>
 </div>
-<div id="provides-recommendations-for-normally-ad-hoc-choices" class="section level3">
+<div id="2-provides-recommendations-for-normally-ad-hoc-choices" class="section level3">
 <h3 class="hasAnchor">
-<a href="#provides-recommendations-for-normally-ad-hoc-choices" class="anchor"></a>2. Provides recommendations for normally ad hoc choices</h3>
+<a href="#2-provides-recommendations-for-normally-ad-hoc-choices" class="anchor"></a>2. Provides recommendations for normally ad hoc choices</h3>
 <p>Our recommendations for decisions that commonly appear in synthetic control studies include:</p>
 <ol>
 <li>using the same model selection procedure for both target and placebo products</li>
@@ -147,20 +147,20 @@ devtools::install_github("hollina/scul")`</pre></div>
 </ol>
 <p>We implement versions of the recommendations in our <a href="https://hollina.github.io/scul/articles/scul-tutorial.html">tutorial</a> and outline each in more detail in our working paper.</p>
 </div>
-<div id="uses-machine-learning-approach-that-allows-for-high-dimensional-donor-pool-and-automates-model-selection" class="section level3">
+<div id="3-uses-machine-learning-approach-that-allows-for-high-dimensional-donor-pool-and-automates-model-selection" class="section level3">
 <h3 class="hasAnchor">
-<a href="#uses-machine-learning-approach-that-allows-for-high-dimensional-donor-pool-and-automates-model-selection" class="anchor"></a>3. Uses machine-learning approach that allows for high-dimensional donor pool and automates model selection</h3>
+<a href="#3-uses-machine-learning-approach-that-allows-for-high-dimensional-donor-pool-and-automates-model-selection" class="anchor"></a>3. Uses machine-learning approach that allows for high-dimensional donor pool and automates model selection</h3>
 <p>Lasso regressions penalize specifications with numerious variables and large coeficients. This drives the value of many coefficients to zero and allows for the inclusion of very large donor pools. A benefit of this is that—so long as a donor is theoreticlally valid— a researcher will not need to decide whether to include one donor over another. A cost of this is the concern that the procedure could overfit the data. SCUL weights are created using cross-validated lasso regressions that ensure the weights do not “overfit” the data and that favor out-of-sample prediction.</p>
 <p>By automating model selection and allowing for a large number of donors, we reduce “researcher degrees of freedom.” It is easy to imagine that the best synthetic prediction could be created for each target series, but less time would be spent perfecting the model for each placebo series. If the automated model selection results in better fit for placebo series, we also improve the statistical power. This occurs if better fit in the pre-treatment period results in less deterioration (i.e., better fit) in the post-period. This improves statistical power because statistical inference in done by comparing deviations of the treated series to the distribution of placebo deviations. Therefore reducing the spread of the placebo null-distribution allows for smaller deviations of the treated unit to be considered statistically rare.</p>
 </div>
-<div id="includes-a-wide-variety-of-donor-types" class="section level3">
+<div id="4-includes-a-wide-variety-of-donor-types" class="section level3">
 <h3 class="hasAnchor">
-<a href="#includes-a-wide-variety-of-donor-types" class="anchor"></a>4. Includes a wide variety of donor types</h3>
+<a href="#4-includes-a-wide-variety-of-donor-types" class="anchor"></a>4. Includes a wide variety of donor types</h3>
 <p>We frame synthetic controls as a way of matching on unobserved underlying factors that form the data generating process. When viewed in this context, using donor units from a wide range of variable types makes sense because different variable types may help pin down different underlying factors/features of the data generating process for the treated unit. As such <strong>we use a wide range of donor variables</strong> to construct our synthetic control groups, not just the same variable type as the target variable as is common practice.</p>
 </div>
-<div id="allows-for-extrapolation-and-negative-weights" class="section level3">
+<div id="5-allows-for-extrapolation-and-negative-weights" class="section level3">
 <h3 class="hasAnchor">
-<a href="#allows-for-extrapolation-and-negative-weights" class="anchor"></a>5. Allows for extrapolation and negative weights</h3>
+<a href="#5-allows-for-extrapolation-and-negative-weights" class="anchor"></a>5. Allows for extrapolation and negative weights</h3>
 <p>The traditional synthetic control method restricts weights to be non-negative and to sum to one. These restrictions force the synthetic control group to remain within the support (i.e., convex hull) of the donor pool, preventing extrapolation. This can certainly be a desirable property. However there are some situations where these restrictions that prevent extrapolation can inhibit a synthetic control group from finding a perfect donor series.</p>
 <ul>
 <li>Case 1: When the target series is outside the the support of the donor pool (i.e. you need extrapolation to match the target series</li>
@@ -247,7 +247,7 @@ devtools::install_github("hollina/scul")`</pre></div>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

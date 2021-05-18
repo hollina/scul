@@ -104,7 +104,7 @@ to create null distribution that can be used for inference in later steps." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/hollina/scul">
-    <span class="fa fa-github"></span>
+    <span class="fas fa-github"></span>
      
   </a>
 </li>
@@ -132,17 +132,18 @@ to create null distribution that can be used for inference in later steps." />
 to create null distribution that can be used for inference in later steps.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>CreatePlaceboDistribution</span>(
-  <span class='kw'>x.PlaceboPool</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>x.PlaceboPool</span>,
-  <span class='kw'>TreatmentBeginsAt</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>TreatmentBeginsAt</span>,
-  <span class='kw'>PostPeriodLength</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span>(<span class='no'>SCUL.input</span>$<span class='no'>y</span>) - <span class='no'>SCUL.input</span>$<span class='no'>TreatmentBeginsAt</span> + <span class='fl'>1</span>,
-  <span class='kw'>PrePeriodLength</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>TreatmentBeginsAt</span> - <span class='fl'>1</span>,
-  <span class='kw'>NumberInitialTimePeriods</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>NumberInitialTimePeriods</span>,
-  <span class='kw'>OutputFilePath</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>OutputFilePath</span>,
-  <span class='kw'>CohensDThreshold</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>CohensDThreshold</span>,
-  <span class='kw'>TrainingPostPeriodLength</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>TrainingPostPeriodLength</span>,
-  <span class='kw'>DonorPoolRestrictionForEachPlacebo</span> <span class='kw'>=</span> <span class='st'>""</span>
-)</pre>
+    <pre class="usage"><span class='fu'>CreatePlaceboDistribution</span><span class='op'>(</span>
+  x.PlaceboPool <span class='op'>=</span> <span class='va'>SCUL.input</span><span class='op'>$</span><span class='va'>x.PlaceboPool</span>,
+  TreatmentBeginsAt <span class='op'>=</span> <span class='va'>SCUL.input</span><span class='op'>$</span><span class='va'>TreatmentBeginsAt</span>,
+  PostPeriodLength <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>SCUL.input</span><span class='op'>$</span><span class='va'>y</span><span class='op'>)</span> <span class='op'>-</span> <span class='va'>SCUL.input</span><span class='op'>$</span><span class='va'>TreatmentBeginsAt</span> <span class='op'>+</span> <span class='fl'>1</span>,
+  PrePeriodLength <span class='op'>=</span> <span class='va'>SCUL.input</span><span class='op'>$</span><span class='va'>TreatmentBeginsAt</span> <span class='op'>-</span> <span class='fl'>1</span>,
+  NumberInitialTimePeriods <span class='op'>=</span> <span class='va'>SCUL.input</span><span class='op'>$</span><span class='va'>NumberInitialTimePeriods</span>,
+  OutputFilePath <span class='op'>=</span> <span class='va'>SCUL.input</span><span class='op'>$</span><span class='va'>OutputFilePath</span>,
+  CohensDThreshold <span class='op'>=</span> <span class='va'>SCUL.input</span><span class='op'>$</span><span class='va'>CohensDThreshold</span>,
+  TrainingPostPeriodLength <span class='op'>=</span> <span class='va'>SCUL.input</span><span class='op'>$</span><span class='va'>TrainingPostPeriodLength</span>,
+  DonorPoolRestrictionForEachPlacebo <span class='op'>=</span> <span class='st'>""</span>,
+  cvOption <span class='op'>=</span> <span class='st'>"lambda.1se"</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -193,6 +194,14 @@ The placebo pool is indexed by `h`:
 For a restriction based on the first two characters: "select(-starts_with(substring(names(x.PlaceboPool)[h],1, 2)))"
 For a restriction based on the last two characters: "select(-ends_with(substring(names(x.PlaceboPool)[h],nchar(names(x.PlaceboPool)[h]) - 2 + 1, nchar(names(x.PlaceboPool)[h]))))"</p></td>
     </tr>
+    <tr>
+      <th>cvOption</th>
+      <td><p>Do you want to use the median CV lambda (cvOption = lambda.median),
+one that produces the minimum MSE (cvOption = lambda.min), or the largest
+lambda that produces a MSE within one standard error of the minimum MSE
+(cvOption = lambda.1se).
+Default is lambda.1se</p></td>
+    </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
@@ -214,7 +223,7 @@ For a restriction based on the last two characters: "select(-ends_with(substring
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

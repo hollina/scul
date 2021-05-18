@@ -109,13 +109,17 @@ SCUL <- function(
         x.testing <-x.DonorPool.PreTreatment[BeginingOfTestData:EndOfTestData,]
         y.testing <-y.PreTreatment[BeginingOfTestData:EndOfTestData,]
 
+        # When using the non-default lambda path (i.e., extending it to 100. we get a warning)
         # Create a predicted y value for the entire pre-treatment time period for each lambda in the the exact grid of lambdas from the training data
-        prediction <- predict(fit,
+        prediction <- suppressWarnings(
+                        predict(fit,
                               newx = x.DonorPool.PreTreatment,
                               x = x.training,
                               y = y.training,
                               s = lambdapath,
-                              exact = TRUE)
+                              exact = TRUE,
+                              ties = min)
+                        )
         # Squared error
         squared_error <- (prediction[BeginingOfTestData:EndOfTestData,] - y.testing)^2
 
@@ -142,7 +146,7 @@ SCUL <- function(
 
         # Plot CV
         if (plotCV == TRUE) {
-          plot.cv(lambdapath = lambdapath,
+         plot.cv(lambdapath = lambdapath,
                   mse = cvMSE,
                   se = cvSE,
                   lambda = lambda,
@@ -172,7 +176,8 @@ SCUL <- function(
 
       # Extract the exact coefficients used
       coef.exact = coef(x = x.DonorPool.PreTreatment,
-                        y = y.PreTreatment,EntirePretreatmentFit,
+                        y = y.PreTreatment,
+                        EntirePretreatmentFit,
                         s = CrossValidatedLambda,
                         exact = TRUE)
 
@@ -198,7 +203,8 @@ SCUL <- function(
     CrossValidatedLambda = CrossValidatedLambda,
     TreatmentBeginsAt = TreatmentBeginsAt,
     CohensD = MeanCohensD,
-    coef.exact = coef.exact
+    coef.exact = coef.exact,
+    lambda = lambda
   )
   # Return list
   return(OutputDataSCUL)

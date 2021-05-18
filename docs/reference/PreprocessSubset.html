@@ -105,7 +105,7 @@ It drops any columns that violate these conditions." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/hollina/scul">
-    <span class="fa fa-github"></span>
+    <span class="fas fa-github"></span>
      
   </a>
 </li>
@@ -134,14 +134,14 @@ dataset for the later SCUL procedure have variation.
 It drops any columns that violate these conditions.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>PreprocessSubset</span>(
-  <span class='no'>z</span>,
-  <span class='no'>TreatmentBeginsAt</span>,
-  <span class='kw'>NumberInitialTimePeriods</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span>(<span class='no'>z</span>) - <span class='no'>TreatmentBeginsAt</span> + <span class='fl'>1</span>,
-  <span class='kw'>PostPeriodLength</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span>(<span class='no'>z</span>) - <span class='no'>TreatmentBeginsAt</span> + <span class='fl'>1</span>,
-  <span class='kw'>PrePeriodLength</span> <span class='kw'>=</span> <span class='no'>TreatmentBeginsAt</span> - <span class='fl'>1</span>,
-  <span class='kw'>TrainingPostPeriodLength</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span>(<span class='no'>z</span>) - <span class='no'>TreatmentBeginsAt</span> + <span class='fl'>1</span>
-)</pre>
+    <pre class="usage"><span class='fu'>PreprocessSubset</span><span class='op'>(</span>
+  <span class='va'>z</span>,
+  <span class='va'>TreatmentBeginsAt</span>,
+  NumberInitialTimePeriods <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>z</span><span class='op'>)</span> <span class='op'>-</span> <span class='va'>TreatmentBeginsAt</span> <span class='op'>+</span> <span class='fl'>1</span>,
+  PostPeriodLength <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>z</span><span class='op'>)</span> <span class='op'>-</span> <span class='va'>TreatmentBeginsAt</span> <span class='op'>+</span> <span class='fl'>1</span>,
+  PrePeriodLength <span class='op'>=</span> <span class='va'>TreatmentBeginsAt</span> <span class='op'>-</span> <span class='fl'>1</span>,
+  TrainingPostPeriodLength <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>z</span><span class='op'>)</span> <span class='op'>-</span> <span class='va'>TreatmentBeginsAt</span> <span class='op'>+</span> <span class='fl'>1</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -191,7 +191,7 @@ It drops any columns that violate these conditions.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>

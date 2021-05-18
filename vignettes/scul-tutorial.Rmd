@@ -59,7 +59,8 @@ head(cigarette_sales[,1:6])
 We will break this dataset into two: one containing data on the target product and another containing all other data that will be used to as the donor pool for our synthetic counterfactual. In each dataset we will leave the first column, which indexes time. We will not include the retail price in California as a potential donor variable as this is endogenous.
 
 ```{r}
-AllYData <- cigarette_sales[, 1:2]
+AllYData <- cigarette_sales %>% 
+  select(c("year", "cigsale_6"))
 AllXData <- cigarette_sales %>%
   select(-c("year", "cigsale_6", "retprice_6"))
 ```
@@ -129,17 +130,19 @@ In this function you need to specify:
 
 ```{r}
 SCUL.input <- OrganizeDataAndSetup (
-    time =  data.frame(AllYData[, 1]),
-    y = data.frame(AllYData[, 2]),
+    time =  AllYData %>% select(year),
+    y = AllYData %>% select(cigsale_6),
     TreatmentBeginsAt = TreatmentBeginsAt,
-    x.DonorPool = AllXData[, -1],
+    x.DonorPool = AllXData,
     CohensDThreshold = 0.25,
     NumberInitialTimePeriods = NumberInitialTimePeriods,
     TrainingPostPeriodLength = 7,
-    x.PlaceboPool = AllXData[, -1],
+    x.PlaceboPool = AllXData,
     OutputFilePath="vignette_output/"
 )
 ```
+
+Note: Using `AllYData %>% select(year)` keeps the result as a `data.frame` (`typeof(AllYData %>% select(year))` returns `r typeof(AllYData %>% select(year))`), while using `AllYData[ ,1]` returns a reduced dimension item (`typeof(AllYData[ ,1])` returns `r typeof(AllYData[ ,1])`). Having `r typeof(AllYData[ ,1])` can mess with the internal functions being used in `Preprocess()` that check for missing values. It is on my to do list to fix these functions to be more flexible. But for now best to ensure that the objects entering `SCUL.input()` as `time`, `y`, `x.DonorPool`, and `x.PlaceboPool` are `data.frames`. 
 
 ## Examine plot raw data using `GraphTargetData()`
 `GraphTargetData()` will graph any variable against time placing a dashed vertical line in the period before treatment begins. The default is to graph the target variable. A png file is saved in the `OutputFilePath` designated in the  `OrganizeDataAndSetup()` function.
@@ -474,7 +477,7 @@ TrainingPostPeriodLength <- 7
   #title(main = "Example of rolling origin cross-validation procedure",line = -.8)
   text(-3.75, 1.5, "Example of rolling-origin k-fold cross-validation",cex=1.5,adj=0)
 
-  dev.off()
+ # dev.off()
 ```
 
 The SCUL procedure automatically chooses the penalty parameter using this procedure.
@@ -487,7 +490,7 @@ The procedure preforms as many cross-validation runs as possible given the `PreP
 Assuming you've set everything up correctly and have a list of elements named `SCUL.input`, you can simply run the `SCUL()` function to run the cross-validated procedure outlined above. We store the output as a list called `SCUL.output`.
 
 ```{r, warning = FALSE, message=FALSE, results = 'hide'}
-SCUL.output <- SCUL()
+SCUL.output <- SCUL(plotCV == TRUE)
 ```
 
 `SCUL.output` contains a number of useful things.
@@ -512,10 +515,10 @@ PlotActualvSCUL()
 
 ```{r, echo = FALSE}
 # Calculate pre-treatment sd
-PreTreatmentSD <- sd(unlist(SCUL.output$y.actual[1:(SCUL.input$TreatmentBeginsAt-1),]))
+PreTreatmentSD <- sd(SCUL.output$y.actual[1:(SCUL.input$TreatmentBeginsAt-1)])
 
 # Store Cohen's D in each period for cross-validated lambda
-StandardizedDiff <- abs(SCUL.output$y.actual-SCUL.output$y.scul)/PreTreatmentSD
+StandardizedDiff <- data.frame(abs(SCUL.output$y.actual - SCUL.output$y.scul)/PreTreatmentSD)
 names(StandardizedDiff) <- c("scul.cv")
 
 # Store Cohen's D in each period for max lambda
@@ -525,12 +528,12 @@ StandardizedDiff$naive_prediction_3 <- abs(data_to_plot_scul_vary_lambda$naive_p
 StandardizedDiff$naive_prediction_4 <- abs(data_to_plot_scul_vary_lambda$naive_prediction_4 - data_to_plot_scul_vary_lambda$actual_y)/PreTreatmentSD
 
 # Show Cohen's D for each of these
-CohensD <- data.frame(colMeans(StandardizedDiff[1:(TreatmentBeginsAt-1),]))
+CohensD <- colMeans(StandardizedDiff[1:(TreatmentBeginsAt-1),])
 
 
 # Calculate treatment effect for each of these
 
-TreatmentEffect <- SCUL.output$y.actual-SCUL.output$y.scul
+TreatmentEffect <- data.frame(SCUL.output$y.actual-SCUL.output$y.scul)
 names(TreatmentEffect) <- c("scul.cv")
 
 TreatmentEffect$naive_prediction_1 <-
@@ -547,11 +550,12 @@ TreatmentEffect$naive_prediction_4 <-
   data_to_plot_scul_vary_lambda$naive_prediction_4
 
 
+TreatmentEffect <- data.frame(TreatmentEffect)
 AvgTreatmentEffect <- data.frame(colMeans(TreatmentEffect[TreatmentBeginsAt:nrow(StandardizedDiff),]))
 
 # For target variable
 Results.y.CohensD <- SCUL.output$CohensD
-Results.y.StandardizedDiff <- (SCUL.output$y.actual-SCUL.output$y.scul)/sd(unlist(SCUL.output$y.actual[1:(SCUL.input$TreatmentBeginsAt-1),]))
+Results.y.StandardizedDiff <- (SCUL.output$y.actual-SCUL.output$y.scul)/sd(SCUL.output$y.actual[1:(SCUL.input$TreatmentBeginsAt-1)])
 Results.y <- SCUL.output$y.scul
 ```
 There is no guarantee that the lasso regressions (or any other approach) can find a weighted mixture of donor units that closely mimics the treated unit during the pre-period.
@@ -713,7 +717,7 @@ We add to each density plot the treatment effect estimate (in standard deviation
 NullDist.Full <- PlotNullDistribution(
     CohensD = 999,
     StartTime = TreatmentBeginsAt,
-    EndTime = nrow(SCUL.output$y.actual),
+    EndTime = length(SCUL.output$y.actual),
     height = 2,
     AdjustmentParm = 1,
     BandwidthParm = .25,
@@ -733,7 +737,7 @@ NullDist.Full <- PlotNullDistribution(
 NullDist.25 <- PlotNullDistribution(
     CohensD = 0.25,
     StartTime = TreatmentBeginsAt,
-    EndTime = nrow(SCUL.output$y.actual),
+    EndTime = length(SCUL.output$y.actual),
     height = 2,
     AdjustmentParm = 1,
     BandwidthParm = .25,
@@ -911,16 +915,18 @@ gaps<- dataprep.out$Y1plot-(
   dataprep.out$Y0plot%*%synth.out$solution.w
 )
 
-StandardizedDiff$traditional_scm <- abs(dataprep.out$Y1plot-(
+
+TreatmentEffect$traditional_scm <- (dataprep.out$Y1plot-(
   dataprep.out$Y0plot%*%synth.out$solution.w
-))/PreTreatmentSD
+))
 
 # Show Cohen's D for each of these
-CohensD <- data.frame(colMeans(StandardizedDiff[1:(TreatmentBeginsAt-1),]))
+CohensD <- data.frame(colMeans(abs(TreatmentEffect[1:(TreatmentBeginsAt-1),]))/PreTreatmentSD)
 
 
 # Calculate treatment effect for each of these
-TreatmentEffect <- data.frame(colMeans(StandardizedDiff[TreatmentBeginsAt:nrow(StandardizedDiff),])*PreTreatmentSD)
+AvgTreatmentEffect <- data.frame(colMeans(TreatmentEffect[TreatmentBeginsAt:nrow(StandardizedDiff),]))
+
 
 ## also there are three convenience functions to summarize results.
 ## to get summary tables for all information
@@ -953,15 +959,16 @@ Both have very similar properties. Small deviations during the pre-period and la
 
 ```{r, fig.height=5, fig.width=8, warning = FALSE, fig.align = "center", echo = FALSE, out.width = '100%'}
 
-StandardizedDiff<-cbind(StandardizedDiff,SCUL.input$time)
-colnames(StandardizedDiff)[7] <- "time"
+TreatmentEffect<-cbind(TreatmentEffect,SCUL.input$time)
+names(TreatmentEffect)[length(names(TreatmentEffect))] <- "time"
+
 # create smoke plot
 difference_plot <- ggplot() +
   theme_classic() +
-    geom_line(data = StandardizedDiff, aes(x = time, y = -scul.cv), alpha = 1, size = 2., color = "black") +
-    geom_line(data = StandardizedDiff, aes(x = time, y = -scul.cv), alpha = 1, size = 1.75, color = "#4dac26") +
-     geom_line(data = StandardizedDiff, aes(x = time, y = -traditional_scm), alpha = 1, size = 2., color = "black") +
-    geom_line(data = StandardizedDiff, aes(x = time, y = -traditional_scm), alpha = 1, size = 1.75, color = "orange", linetype = "dashed") +
+    geom_line(data = TreatmentEffect, aes(x = time, y = scul.cv), alpha = 1, size = 2., color = "black") +
+    geom_line(data = TreatmentEffect, aes(x = time, y = scul.cv), alpha = 1, size = 1.75, color = "#4dac26") +
+     geom_line(data = TreatmentEffect, aes(x = time, y = traditional_scm), alpha = 1, size = 2., color = "black") +
+    geom_line(data = TreatmentEffect, aes(x = time, y = traditional_scm), alpha = 1, size = 1.75, color = "orange", linetype = "dashed") +
     geom_vline(
         xintercept = SCUL.input$time[TreatmentBeginsAt,1],
         linetype = "dashed",
@@ -990,7 +997,7 @@ The table below displays the average treatment effect across the two models. The
 ```{r, echo = FALSE, warning = FALSE, message=FALSE}
 table_for_hux_scm <- cbind(
   (CohensD),
-  (TreatmentEffect)
+  (AvgTreatmentEffect)
 )
 table_for_hux_scm <- table_for_hux_scm[-(2:5),]
 

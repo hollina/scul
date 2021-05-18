@@ -105,7 +105,7 @@ This is a simple example of one such way." />
       <ul class="nav navbar-nav navbar-right">
         <li>
   <a href="https://github.com/hollina/scul">
-    <span class="fa fa-github"></span>
+    <span class="fas fa-github"></span>
      
   </a>
 </li>
@@ -134,17 +134,17 @@ ways to use the placebo distribution to calculate a mean value (e.g., mean p-val
 This is a simple example of one such way.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>PValue</span>(
-  <span class='kw'>x.PlaceboPool.full</span> <span class='kw'>=</span> <span class='no'>SCUL.inference</span>$<span class='no'>y.placebo.StandardizedDifference.Full</span>,
-  <span class='kw'>x.PlaceboPool.CohensD</span> <span class='kw'>=</span> <span class='no'>SCUL.inference</span>$<span class='no'>y.placebo.CohensD</span>,
-  <span class='kw'>TreatmentBeginsAt</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>TreatmentBeginsAt</span>,
-  <span class='kw'>OutputFilePath</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>OutputFilePath</span>,
-  <span class='kw'>CohensD</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>CohensDThreshold</span>,
-  <span class='kw'>y.actual</span> <span class='kw'>=</span> <span class='no'>SCUL.output</span>$<span class='no'>y.actual</span>,
-  <span class='kw'>y.scul</span> <span class='kw'>=</span> <span class='no'>SCUL.output</span>$<span class='no'>y.scul</span>,
-  <span class='kw'>StartTime</span> <span class='kw'>=</span> <span class='no'>SCUL.input</span>$<span class='no'>TreatmentBeginsAt</span>,
-  <span class='kw'>EndTime</span> <span class='kw'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span>(<span class='no'>SCUL.output</span>$<span class='no'>y.scul</span>)
-)</pre>
+    <pre class="usage"><span class='fu'>PValue</span><span class='op'>(</span>
+  x.PlaceboPool.full <span class='op'>=</span> <span class='va'>SCUL.inference</span><span class='op'>$</span><span class='va'>y.placebo.StandardizedDifference.Full</span>,
+  x.PlaceboPool.CohensD <span class='op'>=</span> <span class='va'>SCUL.inference</span><span class='op'>$</span><span class='va'>y.placebo.CohensD</span>,
+  TreatmentBeginsAt <span class='op'>=</span> <span class='va'>SCUL.input</span><span class='op'>$</span><span class='va'>TreatmentBeginsAt</span>,
+  OutputFilePath <span class='op'>=</span> <span class='va'>SCUL.input</span><span class='op'>$</span><span class='va'>OutputFilePath</span>,
+  CohensD <span class='op'>=</span> <span class='va'>SCUL.input</span><span class='op'>$</span><span class='va'>CohensDThreshold</span>,
+  y.actual <span class='op'>=</span> <span class='va'>SCUL.output</span><span class='op'>$</span><span class='va'>y.actual</span>,
+  y.scul <span class='op'>=</span> <span class='va'>SCUL.output</span><span class='op'>$</span><span class='va'>y.scul</span>,
+  StartTime <span class='op'>=</span> <span class='va'>SCUL.input</span><span class='op'>$</span><span class='va'>TreatmentBeginsAt</span>,
+  EndTime <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>SCUL.output</span><span class='op'>$</span><span class='va'>y.scul</span><span class='op'>)</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -209,7 +209,7 @@ fit is determined to be "poor". The difference is in standard deviation units. D
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.5.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
 </div>
 
       </footer>
