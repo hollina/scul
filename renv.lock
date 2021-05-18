@@ -9,6 +9,11 @@
     ]
   },
   "Packages": {
+  "scul": {
+	  "Package": "scul",
+	  "Version": "0.2.0.0",
+	  "Source": "../scul_0.2.0.0.tar.gz"
+	},
     "BH": {
       "Package": "BH",
       "Version": "1.75.0-0",
