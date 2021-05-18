@@ -56,6 +56,8 @@
 
 
 
+
+
 <!-- mathjax -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script>
@@ -67,9 +69,16 @@
 
 
 
+
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -83,7 +92,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">scul</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0.0</span>
       </span>
     </div>
 
@@ -128,14 +137,14 @@
     <p>Plot output from the SCUL procedure in levels, differences, and standardized difference</p>
     </div>
 
-    <pre class="usage"><span class='fu'>PlotActualvSCUL</span><span class='op'>(</span>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>PlotActualvSCUL</span><span class='op'>(</span>
   y.actual <span class='op'>=</span> <span class='va'>SCUL.output</span><span class='op'>$</span><span class='va'>y.actual</span>,
   y.scul <span class='op'>=</span> <span class='va'>SCUL.output</span><span class='op'>$</span><span class='va'>y.scul</span>,
   time <span class='op'>=</span> <span class='va'>SCUL.output</span><span class='op'>$</span><span class='va'>time</span>,
   OutputFilePath <span class='op'>=</span> <span class='va'>SCUL.input</span><span class='op'>$</span><span class='va'>OutputFilePath</span>,
   TreatmentBeginsAt <span class='op'>=</span> <span class='va'>SCUL.output</span><span class='op'>$</span><span class='va'>TreatmentBeginsAt</span>,
   save.figure <span class='op'>=</span> <span class='cn'>FALSE</span>
-<span class='op'>)</span></pre>
+<span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -181,11 +190,11 @@
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://alexjhollingsworth.com'>Alex Hollingsworth</a>.</p>
+  <p><p>Developed by <a href="https://alexjhollingsworth.com" class="external-link">Alex Hollingsworth</a>.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.9001.</p></p>
 </div>
 
       </footer>
@@ -193,6 +202,8 @@
 
   
 
+
+  
 
   </body>
 </html>

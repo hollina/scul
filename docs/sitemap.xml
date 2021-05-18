@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://hollina.github.io/scul/404.html</loc>
+  </url>
+  <url>
+    <loc>https://hollina.github.io/scul/LICENSE-text.html</loc>
+  </url>
+  <url>
+    <loc>https://hollina.github.io/scul/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>https://hollina.github.io/scul/articles/index.html</loc>
+  </url>
+  <url>
+    <loc>https://hollina.github.io/scul/articles/scul-tutorial.html</loc>
+  </url>
+  <url>
+    <loc>https://hollina.github.io/scul/authors.html</loc>
+  </url>
+  <url>
     <loc>https://hollina.github.io/scul/index.html</loc>
   </url>
   <url>
@@ -46,12 +64,12 @@
     <loc>https://hollina.github.io/scul/reference/getOptcv.scul.html</loc>
   </url>
   <url>
+    <loc>https://hollina.github.io/scul/reference/index.html</loc>
+  </url>
+  <url>
     <loc>https://hollina.github.io/scul/reference/mysd.html</loc>
   </url>
   <url>
     <loc>https://hollina.github.io/scul/reference/plot.cv.html</loc>
-  </url>
-  <url>
-    <loc>https://hollina.github.io/scul/articles/scul-tutorial.html</loc>
   </url>
 </urlset>

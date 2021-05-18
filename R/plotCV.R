@@ -9,16 +9,16 @@
 #' @param lambdapath A grid of lambdas that is used in each cross-validation run as potential options for the optimal penalty parameter.
 #' @param mse A vector of the average mean squared error (average across cross-validation runs) for each given \code{lambda} in the \code{lambdapath} grid.
 #' @param se A vector of the standard error associated with each average mean squared error (average across cross-validation runs) for each given \code{lambda} in the \code{lambdapath} grid.
-#' @param fullMSE A matrix of the mean squared error for each cross-validation run and each given \code{lambda} in the \code{lambdapath} grid.
 #' @param lambda Output from the \code{getOptcv.scul} function. Will have three candidate \code{lambdas}.
 #' @param save.figure Boolean if you want to save figure. Default is to save (save.figure = TRUE).
 #' @param OutputFilePath File path prefix if you are saving the figure. Default is file path set in \code{SCUL.inut} (OutputFilePath = SCUL.input$OutputFilePath).
 #
 #' @import ggrepel
 #' @import ggplot2
+#' @importFrom rlang .data
 #'
 #'@export
-plot.cv <-
+plotCV <-
   function (lambdapath,
             mse,
             se,
@@ -39,15 +39,15 @@ plot.cv <-
                              stringsAsFactors = FALSE)
 
     # Make plot
-    cvPLOT <- ggplot(data = plotdata, aes(x = lambda, y = MSE)) +
+    ggplot(data = plotdata, aes(x = lambda, y = MSE)) +
       geom_vline(data = plotLambda,
                  mapping = aes(xintercept = vals,
                                linetype = ltype,
                                color = lcols),
                  show.legend = FALSE,
                  size = 1, alpha = .75) +
-      geom_errorbar(aes(ymin = MSE - SE, ymax = MSE + SE), width=.25) +
-      geom_point(size = 3) +
+      geom_errorbar(data = plotdata, aes(ymin = MSE - SE, ymax = MSE + SE), width=.25) +
+      geom_point(data = plotdata, aes(x = lambda, y = MSE), size = 3) +
       theme_classic(base_size = 22) +
       labs(title = "Cross-validated mean squared error vs. penalty parameter",
            x = "-Log(Lambda)",

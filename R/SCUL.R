@@ -146,7 +146,7 @@ SCUL <- function(
 
         # Plot CV
         if (plotCV == TRUE) {
-         plot.cv(lambdapath = lambdapath,
+          plotCV(lambdapath = lambdapath,
                   mse = cvMSE,
                   se = cvSE,
                   lambda = lambda,

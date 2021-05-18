@@ -29,6 +29,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -41,7 +43,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">scul</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.2.0.0</span>
       </span>
     </div>
 
@@ -54,12 +56,12 @@
   <a href="../reference/index.html">Functions</a>
 </li>
 <li>
-  <a href="https://doi.org/10.31235/osf.io/fc9xt">Paper</a>
+  <a href="https://doi.org/10.31235/osf.io/fc9xt" class="external-link">Paper</a>
 </li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/hollina/scul">
+  <a href="https://github.com/hollina/scul" class="external-link">
     <span class="fas fa-github"></span>
      
   </a>
@@ -74,17 +76,17 @@
 
       
 
-      </header><script src="scul-tutorial_files/header-attrs-2.7/header-attrs.js"></script><script src="scul-tutorial_files/kePrint-0.0.1/kePrint.js"></script><link href="scul-tutorial_files/lightable-0.0.1/lightable.css" rel="stylesheet">
+      </header><script src="scul-tutorial_files/header-attrs-2.8/header-attrs.js"></script><script src="scul-tutorial_files/kePrint-0.0.1/kePrint.js"></script><link href="scul-tutorial_files/lightable-0.0.1/lightable.css" rel="stylesheet">
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>SCUL Tutorial</h1>
-            <h3 class="subtitle">Overview of R package, extended example using publicly available data, and brief comparison to traditional method</h3>
-                        <h4 class="author">Alex Hollingsworth</h4>
+            <h3 data-toc-skip class="subtitle">Overview of R package, extended example using publicly available data, and brief comparison to traditional method</h3>
+                        <h4 data-toc-skip class="author">Alex Hollingsworth</h4>
             
-            <h4 class="date">2021-05-18</h4>
+            <h4 data-toc-skip class="date">2021-05-18</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/hollina/scul/blob/master/vignettes/scul-tutorial.Rmd"><code>vignettes/scul-tutorial.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/hollina/scul/blob/master/vignettes/scul-tutorial.Rmd" class="external-link"><code>vignettes/scul-tutorial.Rmd</code></a></small>
       <div class="hidden name"><code>scul-tutorial.Rmd</code></div>
 
     </div>
@@ -101,16 +103,16 @@
 <hr>
 <div id="example-data" class="section level1">
 <h1 class="hasAnchor">
-<a href="#example-data" class="anchor"></a>Example data</h1>
+<a href="#example-data" class="anchor" aria-hidden="true"></a>Example data</h1>
 <p>This tutorial uses publicly available data that is similar to the data used in <span class="citation">Abadie, Diamond, and Hainmueller (2010)</span>. The empirical goal of <span class="citation">Abadie, Diamond, and Hainmueller (2010)</span> was to estimate the effects of a California tobacco control policy implemented in 1988.</p>
 <p>When in long form, the data are at the state-year level and range from 1970 to 1997 (28 years). For each state and year there are data on cigarette sales per capita (<code>cigsale</code>) and the retail price of cigarettes (<code>retprice</code>). To be used in the SCUL procedure, the data must be in wide format, where each row is a time-period (e.g., year) and each column is a unit-specific variable. In our data, for each variable the unit is identified by the end of each column name (e.g., variables from the state of California are indicated by <code>_6</code>, which is the FIPS code for California.)</p>
 <p>The dataset should be sorted by whatever variable you use to index time with the earliest date being first and the most recent date being last.</p>
 <p>The <code>cigarette_sales</code> dataset is stored in the <code>data</code> subdirectory of this package. It should be automatically loaded when the <code>scul</code> package is loaded.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/dim.html">dim</a></span><span class="op">(</span><span class="va">cigarette_sales</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/dim.html" class="external-link">dim</a></span><span class="op">(</span><span class="va">cigarette_sales</span><span class="op">)</span>
 <span class="co">#&gt; [1] 28 79</span>
 
-<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">cigarette_sales</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span><span class="op">)</span>
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">cigarette_sales</span><span class="op">[</span>,<span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">]</span><span class="op">)</span>
 <span class="co">#&gt;   year cigsale_6 cigsale_1 retprice_1 cigsale_5 retprice_5</span>
 <span class="co">#&gt; 1 1970     123.0      89.8       39.6     100.3       36.7</span>
 <span class="co">#&gt; 2 1971     121.0      95.4       42.7     104.1       38.8</span>
@@ -121,16 +123,16 @@
 <p>We will break this dataset into two: one containing data on the target product and another containing all other data that will be used to as the donor pool for our synthetic counterfactual. In each dataset we will leave the first column, which indexes time. We will not include the retail price in California as a potential donor variable as this is endogenous.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">AllYData</span> <span class="op">&lt;-</span> <span class="va">cigarette_sales</span> <span class="op">%&gt;%</span> 
-  <span class="fu">select</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"year"</span>, <span class="st">"cigsale_6"</span><span class="op">)</span><span class="op">)</span>
+  <span class="fu">select</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"year"</span>, <span class="st">"cigsale_6"</span><span class="op">)</span><span class="op">)</span>
 <span class="va">AllXData</span> <span class="op">&lt;-</span> <span class="va">cigarette_sales</span> <span class="op">%&gt;%</span>
-  <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"year"</span>, <span class="st">"cigsale_6"</span>, <span class="st">"retprice_6"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+  <span class="fu">select</span><span class="op">(</span><span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"year"</span>, <span class="st">"cigsale_6"</span>, <span class="st">"retprice_6"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
 <div id="pre-processingcleaning-data" class="section level2">
 <h2 class="hasAnchor">
-<a href="#pre-processingcleaning-data" class="anchor"></a>Pre-processing/cleaning data</h2>
+<a href="#pre-processingcleaning-data" class="anchor" aria-hidden="true"></a>Pre-processing/cleaning data</h2>
 <p>Before we begin our analysis, let’s make sure the data are in the right format and trim any problematic variables.</p>
 <div id="clean-data-with-preprocess" class="section level3">
 <h3 class="hasAnchor">
-<a href="#clean-data-with-preprocess" class="anchor"></a>Clean data with <code>Preprocess()</code>
+<a href="#clean-data-with-preprocess" class="anchor" aria-hidden="true"></a>Clean data with <code>Preprocess()</code>
 </h3>
 <p>The <code><a href="../reference/Preprocess.html">Preprocess()</a></code> function takes a matrix or a data-frame and ensures that each column</p>
 <ul>
@@ -144,7 +146,7 @@
 </div>
 <div id="use-preprocesssubset-to-ensure-that-all-subsets-have-variation" class="section level3">
 <h3 class="hasAnchor">
-<a href="#use-preprocesssubset-to-ensure-that-all-subsets-have-variation" class="anchor"></a>Use <code>PreprocessSubset()</code> to ensure that all subsets have variation</h3>
+<a href="#use-preprocesssubset-to-ensure-that-all-subsets-have-variation" class="anchor" aria-hidden="true"></a>Use <code>PreprocessSubset()</code> to ensure that all subsets have variation</h3>
 <p>To avoid over-fitting, we will use a cross-validation approach that evaluate models on many subsets of the data. As such we need to ensure that the subsets of the variables used in the analysis have variation. The <code><a href="../reference/PreprocessSubset.html">PreprocessSubset()</a></code> is the same as the <code><a href="../reference/Preprocess.html">Preprocess()</a></code> function, except that it iteratively performs the same procedure on every subset that is used in the cross-validation.</p>
 <p>To determine subsets used in the cross-validation process, it is necessary to input:</p>
 <ul>
@@ -159,7 +161,7 @@
 <p>Assuming that treatment occurs at a discrete time and does not “turn-off,” both the pre-treatment length and post-treatment length are automatically calculated - The length of the post-treat</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">TreatmentBeginsAt</span> <span class="op">&lt;-</span> <span class="fl">19</span> <span class="co"># Here the 18th row is 1988</span>
-<span class="va">PostPeriodLength</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">processed.AllYData</span><span class="op">)</span> <span class="op">-</span> <span class="va">TreatmentBeginsAt</span> <span class="op">+</span> <span class="fl">1</span>
+<span class="va">PostPeriodLength</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">processed.AllYData</span><span class="op">)</span> <span class="op">-</span> <span class="va">TreatmentBeginsAt</span> <span class="op">+</span> <span class="fl">1</span>
 <span class="va">PrePeriodLength</span> <span class="op">&lt;-</span> <span class="va">TreatmentBeginsAt</span><span class="op">-</span><span class="fl">1</span>
 <span class="va">NumberInitialTimePeriods</span> <span class="op">&lt;-</span> <span class="fl">5</span>
 <span class="va">processed.AllYData</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PreprocessSubset.html">PreprocessSubset</a></span><span class="op">(</span><span class="va">processed.AllYData</span>,
@@ -170,7 +172,7 @@
 </div>
 <div id="use-organizedataandsetup-to-clean-donor-and-placebo-pool-data" class="section level3">
 <h3 class="hasAnchor">
-<a href="#use-organizedataandsetup-to-clean-donor-and-placebo-pool-data" class="anchor"></a>Use <code>OrganizeDataAndSetup()</code> to clean donor and placebo pool data</h3>
+<a href="#use-organizedataandsetup-to-clean-donor-and-placebo-pool-data" class="anchor" aria-hidden="true"></a>Use <code>OrganizeDataAndSetup()</code> to clean donor and placebo pool data</h3>
 <p><code><a href="../reference/OrganizeDataAndSetup.html">OrganizeDataAndSetup()</a></code> creates a list of items called that is called by the later SCUL procedures. We call this list <code>SCUL.input</code>. This function also cleans the donor and placebo pools in using the functions outlined above <code><a href="../reference/PreprocessSubset.html">PreprocessSubset()</a></code> and <code><a href="../reference/Preprocess.html">Preprocess()</a></code>.</p>
 <p>In this function you need to specify:</p>
 <ul>
@@ -203,12 +205,12 @@
     x.PlaceboPool <span class="op">=</span> <span class="va">AllXData</span>,
     OutputFilePath<span class="op">=</span><span class="st">"vignette_output/"</span>
 <span class="op">)</span></code></pre></div>
-<p>Note: Using <code>AllYData %&gt;% select(year)</code> keeps the result as a <code>data.frame</code> (<code><a href="https://rdrr.io/r/base/typeof.html">typeof(AllYData %&gt;% select(year))</a></code> returns list), while using <code>AllYData[ ,1]</code> returns a reduced dimension item (<code><a href="https://rdrr.io/r/base/typeof.html">typeof(AllYData[ ,1])</a></code> returns integer). Having integer can mess with the internal functions being used in <code><a href="../reference/Preprocess.html">Preprocess()</a></code> that check for missing values. It is on my to do list to fix these functions to be more flexible. But for now best to ensure that the objects entering <code>SCUL.input()</code> as <code>time</code>, <code>y</code>, <code>x.DonorPool</code>, and <code>x.PlaceboPool</code> are <code>data.frames</code>.</p>
+<p>Note: Using <code>AllYData %&gt;% select(year)</code> keeps the result as a <code>data.frame</code> (<code>typeof(AllYData %&gt;% select(year))</code> returns list), while using <code>AllYData[ ,1]</code> returns a reduced dimension item (<code>typeof(AllYData[ ,1])</code> returns integer). Having integer can mess with the internal functions being used in <code><a href="../reference/Preprocess.html">Preprocess()</a></code> that check for missing values. It is on my to do list to fix these functions to be more flexible. But for now best to ensure that the objects entering <code>SCUL.input()</code> as <code>time</code>, <code>y</code>, <code>x.DonorPool</code>, and <code>x.PlaceboPool</code> are <code>data.frames</code>.</p>
 </div>
 </div>
 <div id="examine-plot-raw-data-using-graphtargetdata" class="section level2">
 <h2 class="hasAnchor">
-<a href="#examine-plot-raw-data-using-graphtargetdata" class="anchor"></a>Examine plot raw data using <code>GraphTargetData()</code>
+<a href="#examine-plot-raw-data-using-graphtargetdata" class="anchor" aria-hidden="true"></a>Examine plot raw data using <code>GraphTargetData()</code>
 </h2>
 <p><code><a href="../reference/GraphTargetData.html">GraphTargetData()</a></code> will graph any variable against time placing a dashed vertical line in the period before treatment begins. The default is to graph the target variable. A png file is saved in the <code>OutputFilePath</code> designated in the <code><a href="../reference/OrganizeDataAndSetup.html">OrganizeDataAndSetup()</a></code> function.</p>
 <p>This isn’t the most aesthetically appealing figure since it is automatically generated. However it serves as a nice check that your data are being input correctly and that your treatment time is where it should be. Here we can see that California cigarette sales have been declining across time and that the pre and post treatment times are delineated at 1988.</p>
@@ -219,7 +221,7 @@
 </div>
 <div id="what-is-a-synthetic-control-group-in-math" class="section level1">
 <h1 class="hasAnchor">
-<a href="#what-is-a-synthetic-control-group-in-math" class="anchor"></a>What is a synthetic control group? (in math)</h1>
+<a href="#what-is-a-synthetic-control-group-in-math" class="anchor" aria-hidden="true"></a>What is a synthetic control group? (in math)</h1>
 <p>Use <span class="math inline">\(s=0 \ldots S\)</span> to index the units of analysis. For this example the units are state-specific variable, such as cigarette sales per person in California (<code>cigsale_6</code>) or the retail sales price of cigarettes in Alabama (<code>retprice_1</code>). In other settings, the units might be the same outcome or product across geographical territories (e.g., limited to cigarette sales per capita in each state). In general, each <span class="math inline">\(s \in S\)</span> is either a donor unit or treated unit. For simplicity, suppose there is a single treated unit, denoted by <span class="math inline">\(s=0\)</span>, and a number of untreated units, each denoted by an <span class="math inline">\(s&gt;0\)</span>. Let <span class="math inline">\(t=1\ldots T\)</span> index time periods, which are weeks in our application.<br>
 Next, assume that treatment exposure occurs in period <span class="math inline">\(T_0 + 1\)</span>. Finally, set <span class="math inline">\(D_{st}=1[t&gt;T_0]\times 1[s=0]\)</span> to be a binary variable equal to <span class="math inline">\(1\)</span> if unit <span class="math inline">\(s\)</span> is exposed to treatment in period <span class="math inline">\(t\)</span>.</p>
 <p>Let <span class="math inline">\(y(0)_{st}\)</span> and <span class="math inline">\(y(1)_{st}\)</span> represent potential outcomes that record the outcome of unit <span class="math inline">\(s\)</span> in period <span class="math inline">\(t\)</span> under the control and treatment conditions. In our application, <span class="math inline">\(y(0)_{st}\)</span> is the quantity sold in product-state <span class="math inline">\(s\)</span> during period <span class="math inline">\(t\)</span> in the absence of a recreational marijuana law, and <span class="math inline">\(y(1)_{st}\)</span> is the quantity sold in the same product-state under the recreational marijuana law. The difference between the two is <span class="math inline">\(\beta_{st}=y(1)_{st}-y(0)_{st}\)</span>, which is the causal effect of treatment on unit <span class="math inline">\(s\)</span> at time <span class="math inline">\(t\)</span>. The realized outcome is <span class="math inline">\(y_{st}=y(0)_{st}+D_{st} \beta_{st}\)</span>.<br>
@@ -233,7 +235,7 @@ y_{t}^* &amp; =  x_t \omega
 </div>
 <div id="synthetic-control-using-lasso-scul" class="section level1">
 <h1 class="hasAnchor">
-<a href="#synthetic-control-using-lasso-scul" class="anchor"></a>Synthetic Control Using Lasso (SCUL)</h1>
+<a href="#synthetic-control-using-lasso-scul" class="anchor" aria-hidden="true"></a>Synthetic Control Using Lasso (SCUL)</h1>
 <p>One way that synthetic control methods can differ from one another is how they determine <span class="math inline">\(\omega\)</span>. One potential method for choosing weights is a simple regression framework. For example, we could choose synthetic control weights by implementing an ordinary least squares regression on only pre-treatment data, choosing weights that minimize the sum of squared differences between the pre-treatment treated time series and the synthetic control group time series:</p>
 <p><span class="math display">\[\begin{align}
 \widehat{\omega}_{OLS} = arg\ min_{\omega}
@@ -247,10 +249,10 @@ In that case, the synthetic control may have poor out-of-sample predictive perfo
  \widehat{\omega}_{lasso} = arg \ min_{\omega } \left(\sum_{t=1}^{T_0}(y_{0t}-x_t \omega)^2+\lambda|\omega|_1  \right) \label{eq:lasso}
 \end{align}\]</span></p>
 <p>The lasso objective function consists of the same squared prediction error as OLS, but with an additional penalty that rises with the complexity of the vector of weights. In the expression, <span class="math inline">\(|\omega|_1\)</span> is the sum of the absolute values of the coefficients associated with each candidate control series. The penalty means that coefficients that are large in an unconstrained OLS regression shrink toward zero. Coefficients that are relatively small may shrink all the way to zero. Since some coefficients are set to zero, the lasso is able to estimate coefficients that minimize the penalized sum of squares even when the number of independent variables exceeds the number of observations. In addition, the regression framework relaxes the restriction that weights must be non-negative and sum to one. It is straightforward, for example, to add an intercept to the model by including a comparison unit that is simply equal to a constant in every period.</p>
-<p>Our package uses the <code>glmnet</code> package in order to conduct lasso regressions. This is a very fast and flexible package with excellent documentation and a (free!) accompanying textbook, <a href="https://web.stanford.edu/~hastie/StatLearnSparsity/" class="uri">https://web.stanford.edu/~hastie/StatLearnSparsity/</a>. By modifying the options of <code>glmnet</code> within our package a wide-variety of other models could be accommodated.</p>
+<p>Our package uses the <code>glmnet</code> package in order to conduct lasso regressions. This is a very fast and flexible package with excellent documentation and a (free!) accompanying textbook, <a href="https://web.stanford.edu/~hastie/StatLearnSparsity/" class="external-link uri">https://web.stanford.edu/~hastie/StatLearnSparsity/</a>. By modifying the options of <code>glmnet</code> within our package a wide-variety of other models could be accommodated.</p>
 <div id="how-to-choose-lambda" class="section level2">
 <h2 class="hasAnchor">
-<a href="#how-to-choose-lambda" class="anchor"></a>How to choose <span class="math inline">\(\lambda\)</span>
+<a href="#how-to-choose-lambda" class="anchor" aria-hidden="true"></a>How to choose <span class="math inline">\(\lambda\)</span>
 </h2>
 <p>A key choice parameter in the lasso regression method is the penalty parameter, which is represented by <span class="math inline">\(\lambda\)</span> in the above equation. As <span class="math inline">\(\lambda\)</span> increases, each weight in <span class="math inline">\(\widehat{\omega}_{lasso}\)</span> will attenuate and the set of donors with non-zero weight will become more sparse as many weights are driven to zero. At one extreme, the penalty parameter could be so large that every weight is set to zero. At the other extreme, the penalty parameter could be set to zero, which would simply be the OLS estimator.</p>
 <p>We are going to see if there is a sparse weighted combination of the donor pool (i.e., x matrix) that creates a valid counter-factual prediction for our treated unit. We want to create the best possible out-of-sample prediction. It’s quite easy to generate a prediction that over-fits (or even perfectly fits the data in the pre-treatment time period), but this type over over-fitting will likely lead to poor out-of-sample predictions.</p>
@@ -296,15 +298,15 @@ In that case, the synthetic control may have poor out-of-sample predictive perfo
 <p>In general we want to pick the prediction that captures the underlying data generating process <em>before</em> treatment occurs, since we are using this prediction to evaluate a counterfactual as if treatment had not occurred. Treatment (if it has any effect) will impact the underlying data generating process.</p>
 <div id="thoughtful-cross-validation-to-the-rescue" class="section level3">
 <h3 class="hasAnchor">
-<a href="#thoughtful-cross-validation-to-the-rescue" class="anchor"></a>Thoughtful cross-validation to the rescue</h3>
+<a href="#thoughtful-cross-validation-to-the-rescue" class="anchor" aria-hidden="true"></a>Thoughtful cross-validation to the rescue</h3>
 <p>Cross-validation is a simple procedure where a dataset is partitioned into multiple subsets that include training data and test data; multiple analyses are performed on the training data; and the optimal analysis is determined using the test data. In our setting, lasso regressions across a grid of penalty parameters are performed for each subset of training data. The series of optimal weights is stored for each candidate penalty parameter. The test data are then used to evaluate which set of weights (i.e. which penalty parameter) produces the best out-of-sample prediction. Importantly, all data used in the cross-validation.</p>
 <p>In short, cross-validation is an organized way of choosing between penalty parameters where the objective is to find weights that best match the underlying factors during the pre-treatment period <strong>and</strong> that will provide an acceptable out-of-sample prediction. It avoids overfitting. That is, it sets up a situation where we are more likely to find donors and weights that represent the underlying data generating process of interest and less likely to find donors and weights that match on noise.</p>
 </div>
 <div id="scul-uses-rolling-origin-cross-validation" class="section level3">
 <h3 class="hasAnchor">
-<a href="#scul-uses-rolling-origin-cross-validation" class="anchor"></a>SCUL uses rolling-origin cross-validation</h3>
+<a href="#scul-uses-rolling-origin-cross-validation" class="anchor" aria-hidden="true"></a>SCUL uses rolling-origin cross-validation</h3>
 <p>Now we will set up our cross validation. We are going to do rolling forecasting origin cross validation. The main goal of the entire exercise (not just the cross-validation) is to predict the value of the treated variable for all of the post-treatment time periods, say <span class="math inline">\(T_{post}\)</span>. Thus we want to optimize our model for this type of prediction.</p>
-<p>We do this because we do not want to use future observations to predict observations in the past. This can create a variety of issues related to autocorrelation, although there are some instances in which is doesn’t matter. If doing this on your own, you will need to be careful because the default cross-validation procedure used by many statistical procedures does not account for the fact that data may be time series and often uses “leave-one-out” cross-validation. See our working paper, <a href="https://robjhyndman.com/papers/cv-wp.pdf" class="uri">https://robjhyndman.com/papers/cv-wp.pdf</a>, <span class="citation">Hyndman and Athanasopoulos (2020)</span>, or <span class="citation">Kellogg et al. (2020)</span> for more details.</p>
+<p>We do this because we do not want to use future observations to predict observations in the past. This can create a variety of issues related to autocorrelation, although there are some instances in which is doesn’t matter. If doing this on your own, you will need to be careful because the default cross-validation procedure used by many statistical procedures does not account for the fact that data may be time series and often uses “leave-one-out” cross-validation. See our working paper, <a href="https://robjhyndman.com/papers/cv-wp.pdf" class="external-link uri">https://robjhyndman.com/papers/cv-wp.pdf</a>, <span class="citation">Hyndman and Athanasopoulos (2020)</span>, or <span class="citation">Kellogg et al. (2020)</span> for more details.</p>
 <p>In the procedure, we will only examine data from the pre-treatment period. We will also perform as many cross-validation runs as possible with the pre-treatment data being broken up into at least two, contiguous chunks. One chunk with consecutive time periods at least as long as <span class="math inline">\(T_{post}\)</span> and another chunk that follows immediately in time that is exactly as long as <span class="math inline">\(T_{post}\)</span>. We will increase the size of the first chunk by one time period for each cross-validation run and stop when we reach the maximum number of runs we can perform.</p>
 <p>The figure below shows our cross-validation procedure visually. Here all of the data are pre-treatment. The square shapes indicate the training data, the circles indicate the test data, and the X’s indicate data that isn’t used in a particular cross-validation run. We will run one cross validation for each row you see below.</p>
 <p><img src="scul-tutorial_files/figure-html/unnamed-chunk-11-1.png" width="100%" style="display: block; margin: auto;"></p>
@@ -313,7 +315,7 @@ In that case, the synthetic control may have poor out-of-sample predictive perfo
 </div>
 <div id="create-a-synthetic-control-group-using-the-scul-function" class="section level2">
 <h2 class="hasAnchor">
-<a href="#create-a-synthetic-control-group-using-the-scul-function" class="anchor"></a>Create a synthetic control group using the <code>SCUL()</code> function</h2>
+<a href="#create-a-synthetic-control-group-using-the-scul-function" class="anchor" aria-hidden="true"></a>Create a synthetic control group using the <code>SCUL()</code> function</h2>
 <p>Assuming you’ve set everything up correctly and have a list of elements named <code>SCUL.input</code>, you can simply run the <code><a href="../reference/SCUL.html">SCUL()</a></code> function to run the cross-validated procedure outlined above. We store the output as a list called <code>SCUL.output</code>.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span class="va">SCUL.output</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/SCUL.html">SCUL</a></span><span class="op">(</span><span class="va">plotCV</span> <span class="op">==</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
@@ -337,7 +339,7 @@ In that case, the synthetic control may have poor out-of-sample predictive perfo
 </div>
 <div id="plot-actual-data-and-scul-counterfactual-using-plotactualvscul" class="section level2">
 <h2 class="hasAnchor">
-<a href="#plot-actual-data-and-scul-counterfactual-using-plotactualvscul" class="anchor"></a>Plot actual data and SCUL counterfactual using <code>PlotActualvSCUL()</code>
+<a href="#plot-actual-data-and-scul-counterfactual-using-plotactualvscul" class="anchor" aria-hidden="true"></a>Plot actual data and SCUL counterfactual using <code>PlotActualvSCUL()</code>
 </h2>
 <p>Using the <code><a href="../reference/PlotActualvSCUL.html">PlotActualvSCUL()</a></code> function you can plot the observed data against the counterfactual prediction.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
@@ -346,12 +348,12 @@ In that case, the synthetic control may have poor out-of-sample predictive perfo
 </div>
 <div id="evaluating-synthetic-control-fit" class="section level2">
 <h2 class="hasAnchor">
-<a href="#evaluating-synthetic-control-fit" class="anchor"></a>Evaluating synthetic control fit</h2>
+<a href="#evaluating-synthetic-control-fit" class="anchor" aria-hidden="true"></a>Evaluating synthetic control fit</h2>
 <p>There is no guarantee that the lasso regressions (or any other approach) can find a weighted mixture of donor units that closely mimics the treated unit during the pre-period. Therefore, researchers need a practical method of deciding whether a proposed synthetic control is “good enough” for proceeding with the analysis.</p>
 <p>One rule of thumb is that a covariate is out of balance if the Cohen’s D statistic is greater than .25, which means that the imbalance between the groups is more than a quarter of a standard deviation for a particular variable <span class="citation">(Ho et al. 2007; King and Zeng 2006; Cochran 1968)</span>. The specific choice of a Cohen’s D threshold is arbitrary in most applications; in general, the smaller the discrepancy the better. However, the Cohen’s D statistic is a unit-free, standardized metric that is comparable across different variables.</p>
 <p>We apply a modified version of the Cohen’s D to evaluate pre-period fit. Specifically, we let <span class="math inline">\(\sigma_{s} = \frac{1}{T_0}\sum_{t=1}^{T_0}(y_{st} - \overline{y_s})^2\)</span> be the standard deviation of outcome <span class="math inline">\(s\)</span> during the pre-treatment period. The pre-treatment average Cohen’s D statistic for a proposed synthetic control is <span class="math inline">\(D_s = \frac{1}{T_0}\sum_{t=1}^{T_0}|\frac{y_{st} - y^{*}_{st}}{\sigma_{s}}|\)</span>. We compute <span class="math inline">\(D_s\)</span> for each synthetic control candidate in our study. If <span class="math inline">\(D_s &gt; 0.25\)</span>, we do not report a synthetic control estimate for that outcome since the model could not provide a suitable fit. We apply the same standard to the placebo products we use to conduct statistical inference. We describe the consequences of different Cohen’s D inclusion thresholds for statistical power and inference more in our working paper.</p>
 <p>In the table below, we report measures of pre-period fit and treatment effect estimates for five potential synthetic control estimators. Treatment effect estimates are simply the average difference between the actual and counterfactual SCUL prediction. The first prediction is from our SCUL procedure and uses a cross-validated penalty. The last four are the same naive lasso predictions we used earlier. The use the entire pre-treatment time-period and the penalties are therefore not cross-validated.</p>
-<table class="table table table-striped">
+<table class="table table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead><tr>
 <th style="text-align:left;">
 Method
@@ -452,7 +454,7 @@ Naive guess 4: No penalty (include all donors)
 </div>
 <div id="reporting-synthetic-control-weights-i-e--determine-the-influence-of-each-regressor-in-the-prediction-using-plotsharetable" class="section level2">
 <h2 class="hasAnchor">
-<a href="#reporting-synthetic-control-weights-i-e--determine-the-influence-of-each-regressor-in-the-prediction-using-plotsharetable" class="anchor"></a>Reporting synthetic control weights (i.e. determine the influence of each regressor in the prediction) using <code>PlotShareTable()</code>
+<a href="#reporting-synthetic-control-weights-i-e--determine-the-influence-of-each-regressor-in-the-prediction-using-plotsharetable" class="anchor" aria-hidden="true"></a>Reporting synthetic control weights (i.e. determine the influence of each regressor in the prediction) using <code>PlotShareTable()</code>
 </h2>
 <p>Neither the traditional synthetic control weights nor the weights from the SCUL procedure can be directly interpreted as the share of the synthetic prediction composed by each donor series. Traditional synthetic control weights are constrained to sum to one across the donor units. Weights therefore only represent the fraction of the total weight that is given to a particular donor series; they do not reflect the size and variability of the outcome for each unit across time periods. The SCUL weights, which are lasso regression coefficients, are not constrained to sum to one and are not naturally interpreted as the share given to a particular donor series.</p>
 <p>In both methods, the fraction of the synthetic prediction a given donor unit is responsible for changes with the value of the donor unit across time. Suppose, for example, that there are two donor series, A and B, observed in two periods, 1 and 2, and each unit receives a weight equal to <span class="math inline">\(\frac{1}{2}\)</span>. The donor values for the first time period are <span class="math inline">\(y_{A,1} = 10\)</span> and <span class="math inline">\(y_{B,1} = 1\)</span>. The donor values for the second time period are <span class="math inline">\(y_{A,2} = 1\)</span> and <span class="math inline">\(y_{B,2} = 10\)</span>. The resulting synthetic prediction is <span class="math inline">\(y_{1}^* = 5.5\)</span> in period 1 and <span class="math inline">\(y_{2}^* = 5.5\)</span> in period 2. In period 1, unit A represents <span class="math inline">\(100 \times \frac{ \frac{1}{2}\times 10}{5.5} = 91\%\)</span> of the synthetic prediction. In period 2, unit B represents <span class="math inline">\(91\%\)</span> of the synthetic prediction. Despite each donor weight being 50%, neither unit contributes 50% to the synthetic unit in either period.</p>
@@ -1096,12 +1098,12 @@ This negative contribution of a donor series is not possible in the traditional 
 </div>
 <div id="statistical-inference" class="section level2">
 <h2 class="hasAnchor">
-<a href="#statistical-inference" class="anchor"></a>Statistical Inference</h2>
+<a href="#statistical-inference" class="anchor" aria-hidden="true"></a>Statistical Inference</h2>
 <p>To perform statistical inference on our treatment estimates, we construct a rank-based, two-sided p-value using randomization inference <span class="citation">(Cavallo et al. 2013; Dube and Zipperer 2015)</span>. We compare the absolute value of the standardized treatment estimate to the absolute value of the standardized estimate from a number of placebo series. The estimates from the placebo distribution serve as the null distribution that assumes no treatment effect. In our setting, we use the same units compose both our donor pool and candidate placebo time series. In practice, however, the donor and placebo pools need not overlap. We limit the target time series considered, and placebo time series used for inference, to those that have synthetic control estimates that fit the data reasonably well during the pre-treatment period. We standardize using the pre-treatment period standard deviation for each respective time series, so that the respective treatment estimates are unit-free and comparable.</p>
 <p>The first step in this procedure is to estimate a pseudo-treatment effect for each untreated unit in the placebo pool.</p>
 <div id="run-scul-procedure-on-placebo-pool-to-estimate-pseudo-treatment-effects-using-createplacebodistribution" class="section level3">
 <h3 class="hasAnchor">
-<a href="#run-scul-procedure-on-placebo-pool-to-estimate-pseudo-treatment-effects-using-createplacebodistribution" class="anchor"></a>Run SCUL procedure on placebo pool to estimate pseudo-treatment effects using <code>CreatePlaceboDistribution()</code>
+<a href="#run-scul-procedure-on-placebo-pool-to-estimate-pseudo-treatment-effects-using-createplacebodistribution" class="anchor" aria-hidden="true"></a>Run SCUL procedure on placebo pool to estimate pseudo-treatment effects using <code>CreatePlaceboDistribution()</code>
 </h3>
 <p>If you’d like to specify any restrictions on the donor pool in each placebo run, you can do so by modifying the <code>DonorPoolRestrictionForEachPlacebo</code> argument.</p>
 <p>To avoid including an endogenous donor variable, we don’t include the retail cigarette price in california <code>retprice_6</code> as a donor in the <code>SCUL</code> prediction for our target variable. For consistency we should apply a similar restriction for each donor pool for each placebo analysis.</p>
@@ -1128,10 +1130,10 @@ This negative contribution of a donor series is not possible in the traditional 
 </div>
 <div id="visually-compare-standardized-treatment-estimate-against-placebo-distribution" class="section level3">
 <h3 class="hasAnchor">
-<a href="#visually-compare-standardized-treatment-estimate-against-placebo-distribution" class="anchor"></a>Visually compare standardized treatment estimate against placebo distribution</h3>
+<a href="#visually-compare-standardized-treatment-estimate-against-placebo-distribution" class="anchor" aria-hidden="true"></a>Visually compare standardized treatment estimate against placebo distribution</h3>
 <div id="using-a-smoke-plot-and-the-smokeplot-function" class="section level4">
 <h4 class="hasAnchor">
-<a href="#using-a-smoke-plot-and-the-smokeplot-function" class="anchor"></a>Using a smoke plot and the <code>SmokePlot()</code> function</h4>
+<a href="#using-a-smoke-plot-and-the-smokeplot-function" class="anchor" aria-hidden="true"></a>Using a smoke plot and the <code>SmokePlot()</code> function</h4>
 <p>In the first figure, we compare the pseudo differences between each placebo and its synthetic control. The graph only includes placebo lines that survived the Cohen’s D screen by having a pre-treatment Cohen’s D less than 0.25. The placebo lines in the graph are drawn with some transparency so that the darker areas have a greater density of placebo units than lighter spaces. This shading highlights the deterioration of the counterfactual fit across time and gives the appearance of smoke. As such, we refer to this style of plot as a “smoke plot.” The difference between actual sales of cigarettes sold in California and the SCUL prediction is displayed in green. The pre-treatment difference is small and centered around zero.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R">
@@ -1144,7 +1146,7 @@ This negative contribution of a donor series is not possible in the traditional 
 </div>
 <div id="using-a-density-plot-of-the-null-distribution-and-the-plotnulldistribution-function" class="section level4">
 <h4 class="hasAnchor">
-<a href="#using-a-density-plot-of-the-null-distribution-and-the-plotnulldistribution-function" class="anchor"></a>Using a density plot of the null distribution and the <code>PlotNullDistribution()</code> function</h4>
+<a href="#using-a-density-plot-of-the-null-distribution-and-the-plotnulldistribution-function" class="anchor" aria-hidden="true"></a>Using a density plot of the null distribution and the <code>PlotNullDistribution()</code> function</h4>
 <p>This second figure shows the distribution of average treatment effect (average difference between the actual placebo data and scul prediction) for the post-treatment time period. We show two distributions.</p>
 <ul>
 <li>One with no Cohen’s D restriction on the placebo pool</li>
@@ -1170,7 +1172,7 @@ This negative contribution of a donor series is not possible in the traditional 
 <span class="va">NullDist.Full</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PlotNullDistribution.html">PlotNullDistribution</a></span><span class="op">(</span>
     CohensD <span class="op">=</span> <span class="fl">999</span>,
     StartTime <span class="op">=</span> <span class="va">TreatmentBeginsAt</span>,
-    EndTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">SCUL.output</span><span class="op">$</span><span class="va">y.actual</span><span class="op">)</span>,
+    EndTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">SCUL.output</span><span class="op">$</span><span class="va">y.actual</span><span class="op">)</span>,
     height <span class="op">=</span> <span class="fl">2</span>,
     AdjustmentParm <span class="op">=</span> <span class="fl">1</span>,
     BandwidthParm <span class="op">=</span> <span class="fl">.25</span>,
@@ -1181,7 +1183,7 @@ This negative contribution of a donor series is not possible in the traditional 
     rejection_label  <span class="op">=</span>  <span class="st">""</span>
 <span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_vline</span><span class="op">(</span>
-        xintercept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">Results.y.StandardizedDiff</span><span class="op">[</span><span class="va">TreatmentBeginsAt</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">Results.y.StandardizedDiff</span><span class="op">)</span>,<span class="op">]</span><span class="op">)</span>,
+        xintercept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">Results.y.StandardizedDiff</span><span class="op">[</span><span class="va">TreatmentBeginsAt</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Results.y.StandardizedDiff</span><span class="op">)</span>,<span class="op">]</span><span class="op">)</span>,
         linetype <span class="op">=</span> <span class="st">"dashed"</span>,
         size <span class="op">=</span> <span class="fl">1</span>,
         color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span>
@@ -1190,7 +1192,7 @@ This negative contribution of a donor series is not possible in the traditional 
 <span class="va">NullDist.25</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/PlotNullDistribution.html">PlotNullDistribution</a></span><span class="op">(</span>
     CohensD <span class="op">=</span> <span class="fl">0.25</span>,
     StartTime <span class="op">=</span> <span class="va">TreatmentBeginsAt</span>,
-    EndTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html">length</a></span><span class="op">(</span><span class="va">SCUL.output</span><span class="op">$</span><span class="va">y.actual</span><span class="op">)</span>,
+    EndTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/length.html" class="external-link">length</a></span><span class="op">(</span><span class="va">SCUL.output</span><span class="op">$</span><span class="va">y.actual</span><span class="op">)</span>,
     height <span class="op">=</span> <span class="fl">2</span>,
     AdjustmentParm <span class="op">=</span> <span class="fl">1</span>,
     BandwidthParm <span class="op">=</span> <span class="fl">.25</span>,
@@ -1202,7 +1204,7 @@ This negative contribution of a donor series is not possible in the traditional 
 
 <span class="op">)</span> <span class="op">+</span>
   <span class="fu">geom_vline</span><span class="op">(</span>
-        xintercept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">Results.y.StandardizedDiff</span><span class="op">[</span><span class="va">TreatmentBeginsAt</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">Results.y.StandardizedDiff</span><span class="op">)</span>,<span class="op">]</span><span class="op">)</span>,
+        xintercept <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html" class="external-link">mean</a></span><span class="op">(</span><span class="va">Results.y.StandardizedDiff</span><span class="op">[</span><span class="va">TreatmentBeginsAt</span><span class="op">:</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Results.y.StandardizedDiff</span><span class="op">)</span>,<span class="op">]</span><span class="op">)</span>,
         linetype <span class="op">=</span> <span class="st">"dashed"</span>,
         size <span class="op">=</span> <span class="fl">1</span>,
         color <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span>
@@ -1221,7 +1223,7 @@ This negative contribution of a donor series is not possible in the traditional 
 </div>
 <div id="use-pvalue-to-determine-permutation-based-two-sided-p-value" class="section level4">
 <h4 class="hasAnchor">
-<a href="#use-pvalue-to-determine-permutation-based-two-sided-p-value" class="anchor"></a>Use <code>PValue()</code> to determine permutation based two-sided p-value</h4>
+<a href="#use-pvalue-to-determine-permutation-based-two-sided-p-value" class="anchor" aria-hidden="true"></a>Use <code>PValue()</code> to determine permutation based two-sided p-value</h4>
 <p>We construct a two-sided p-value by comparing the rank of the absolute value of the standardized treatment effect for the target series against the absolute value of the estimated standardized pseudo-treatment effect for each untreated unit. The p-value is simply the percentile of the rank. For smaller placebo pools, it may make sense to report a bounded p-value. For example, if there are one treated unit and 49 placebos, then a rank of 2 out of 50 represents a p-value of between .02 and .04</p>
 <p>The <code><a href="../reference/PValue.html">PValue()</a></code> function takes a few inputs</p>
 <ul>
@@ -1236,7 +1238,7 @@ This negative contribution of a donor series is not possible in the traditional 
 <span class="fu"><a href="../reference/PValue.html">PValue</a></span><span class="op">(</span>
     CohensD <span class="op">=</span> <span class="fl">999</span>,
     StartTime <span class="op">=</span> <span class="va">SCUL.input</span><span class="op">$</span><span class="va">TreatmentBeginsAt</span>,
-    EndTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">Results.y.StandardizedDiff</span><span class="op">)</span>
+    EndTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Results.y.StandardizedDiff</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="co">#&gt;   p.value.high</span>
 <span class="co">#&gt; 1         0.21</span>
@@ -1244,7 +1246,7 @@ This negative contribution of a donor series is not possible in the traditional 
 <span class="fu"><a href="../reference/PValue.html">PValue</a></span><span class="op">(</span>
     CohensD <span class="op">=</span> <span class="fl">.25</span>,
     StartTime <span class="op">=</span> <span class="va">SCUL.input</span><span class="op">$</span><span class="va">TreatmentBeginsAt</span>,
-    EndTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html">nrow</a></span><span class="op">(</span><span class="va">Results.y.StandardizedDiff</span><span class="op">)</span>
+    EndTime <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">Results.y.StandardizedDiff</span><span class="op">)</span>
 <span class="op">)</span>
 <span class="co">#&gt;   p.value.high</span>
 <span class="co">#&gt; 1         0.04</span></code></pre></div>
@@ -1255,7 +1257,7 @@ This negative contribution of a donor series is not possible in the traditional 
 </div>
 <div id="comparison-with-traditional-synthetic-control-method" class="section level1">
 <h1 class="hasAnchor">
-<a href="#comparison-with-traditional-synthetic-control-method" class="anchor"></a>Comparison with traditional synthetic control method</h1>
+<a href="#comparison-with-traditional-synthetic-control-method" class="anchor" aria-hidden="true"></a>Comparison with traditional synthetic control method</h1>
 <p>To compose the counterfactual estimate, <span class="math inline">\(\widehat{y(0)}_{st}\)</span>, typical synthetic control methods use a convex weighted average of the same target variable from the untreated units. The set of target variables here is also referred to as the donor pool.</p>
 <p>In the traditional method, each donor receives a single weight, which must be non-negative and between zero and one. The weights for all untreated donor units must sum to one. These restriction combine to create a check against extrapolation from the donor pool. Specifically, no synthetic control estimate can be greater than the largest value of the donor pool. We explore the consequences of these restrictions in more detail in our paper.</p>
 <p>The set of weights across all donor units are chosen such that they minimize an importance weighted combination of</p>
@@ -1281,7 +1283,7 @@ This negative contribution of a donor series is not possible in the traditional 
 <p>Both have very similar properties. Small deviations during the pre-period and large negative deviations in the post-treatment period.</p>
 <p><img src="scul-tutorial_files/figure-html/unnamed-chunk-23-1.png" width="100%" style="display: block; margin: auto;"></p>
 <p>The table below displays the average treatment effect across the two models. They are very similar, 13.5 for SCUL and 14.9 for the traditional method. The table also displays the measure of pre-period fit. Despite using a cross-validation procedure the SCUL estimate produces a better pre-period fit by an order of magnitude (0.015 vs. 0.155).</p>
-<table class="table table table-striped">
+<table class="table table table-striped" style="width: auto !important; margin-left: auto; margin-right: auto;">
 <thead><tr>
 <th style="text-align:left;">
 Method
@@ -1891,7 +1893,7 @@ Coefficient
 </div>
 <div id="when-would-you-want-non-convex-or-negative-weights" class="section level1">
 <h1 class="hasAnchor">
-<a href="#when-would-you-want-non-convex-or-negative-weights" class="anchor"></a>When would you want non-convex or negative weights?</h1>
+<a href="#when-would-you-want-non-convex-or-negative-weights" class="anchor" aria-hidden="true"></a>When would you want non-convex or negative weights?</h1>
 <p>The traditional synthetic control method restricts weights to be non-negative and to sum to one. These restrictions force the synthetic control group to remain within the support (i.e., convex hull) of the donor pool, preventing extrapolation. This can certainly be a desirable property. However there are some situations where these restrictions that prevent extrapolation can inhibit a synthetic control group from finding a perfect donor series.</p>
 <ul>
 <li>Case 1: When the target series is outside the the support of the donor pool (i.e. you need extrapolation to match the target series</li>
@@ -1901,9 +1903,9 @@ Coefficient
 </div>
 <div id="session-info" class="section level1">
 <h1 class="hasAnchor">
-<a href="#session-info" class="anchor"></a>Session-info</h1>
+<a href="#session-info" class="anchor" aria-hidden="true"></a>Session-info</h1>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span><span class="op">(</span><span class="op">)</span>
+<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span>
 <span class="co">#&gt; R version 4.0.3 (2020-10-10)</span>
 <span class="co">#&gt; Platform: x86_64-apple-darwin17.0 (64-bit)</span>
 <span class="co">#&gt; Running under: macOS Big Sur 10.16</span>
@@ -1920,76 +1922,78 @@ Coefficient
 <span class="co">#&gt; </span>
 <span class="co">#&gt; other attached packages:</span>
 <span class="co">#&gt;  [1] Synth_1.1-5         formattable_0.2.0.1 cowplot_1.1.0      </span>
-<span class="co">#&gt;  [4] kableExtra_1.3.4    knitr_1.31          pBrackets_1.0      </span>
+<span class="co">#&gt;  [4] kableExtra_1.3.4    knitr_1.33          pBrackets_1.0      </span>
 <span class="co">#&gt;  [7] glmnet_4.0-2        Matrix_1.2-18       forcats_0.5.0      </span>
 <span class="co">#&gt; [10] stringr_1.4.0       dplyr_1.0.2         purrr_0.3.4        </span>
-<span class="co">#&gt; [13] readr_1.4.0         tidyr_1.1.2         tibble_3.0.4       </span>
-<span class="co">#&gt; [16] ggplot2_3.3.2       tidyverse_1.3.0     scul_0.1.1.0       </span>
+<span class="co">#&gt; [13] readr_1.4.0         tidyr_1.1.2         tibble_3.1.2       </span>
+<span class="co">#&gt; [16] ggplot2_3.3.2       tidyverse_1.3.0     scul_0.2.0.0       </span>
 <span class="co">#&gt; [19] pacman_0.5.1       </span>
 <span class="co">#&gt; </span>
 <span class="co">#&gt; loaded via a namespace (and not attached):</span>
-<span class="co">#&gt;  [1] nlme_3.1-149         fs_1.5.0             lubridate_1.7.9.2   </span>
-<span class="co">#&gt;  [4] webshot_0.5.2        httr_1.4.2           rprojroot_2.0.2     </span>
-<span class="co">#&gt;  [7] numDeriv_2016.8-1.1  tools_4.0.3          backports_1.2.0     </span>
-<span class="co">#&gt; [10] R6_2.5.0             rpart_4.1-15         DBI_1.1.0           </span>
-<span class="co">#&gt; [13] colorspace_2.0-0     nnet_7.3-14          withr_2.3.0         </span>
-<span class="co">#&gt; [16] tidyselect_1.1.0     compiler_4.0.3       textshaping_0.3.4   </span>
-<span class="co">#&gt; [19] cli_2.2.0            rvest_0.3.6          xml2_1.3.2          </span>
-<span class="co">#&gt; [22] desc_1.2.0           labeling_0.4.2       scales_1.1.1        </span>
-<span class="co">#&gt; [25] pkgdown_1.6.1        systemfonts_1.0.1    digest_0.6.27       </span>
-<span class="co">#&gt; [28] svglite_2.0.0        rmarkdown_2.7        pkgconfig_2.0.3     </span>
-<span class="co">#&gt; [31] htmltools_0.5.1.1    highr_0.8            dbplyr_2.0.0        </span>
-<span class="co">#&gt; [34] htmlwidgets_1.5.2    rlang_0.4.10         readxl_1.3.1        </span>
-<span class="co">#&gt; [37] rstudioapi_0.13      farver_2.0.3         shape_1.4.5         </span>
-<span class="co">#&gt; [40] generics_0.1.0       jsonlite_1.7.2       ModelMetrics_1.2.2.2</span>
-<span class="co">#&gt; [43] magrittr_2.0.1       Rcpp_1.0.5           munsell_0.5.0       </span>
-<span class="co">#&gt; [46] fansi_0.4.1          lifecycle_0.2.0      stringi_1.5.3       </span>
-<span class="co">#&gt; [49] pROC_1.16.2          yaml_2.2.1           MASS_7.3-53         </span>
-<span class="co">#&gt; [52] plyr_1.8.6           recipes_0.1.15       grid_4.0.3          </span>
-<span class="co">#&gt; [55] ggrepel_0.9.0        crayon_1.3.4         lattice_0.20-41     </span>
-<span class="co">#&gt; [58] haven_2.3.1          splines_4.0.3        hms_0.5.3           </span>
-<span class="co">#&gt; [61] pillar_1.4.7         reshape2_1.4.4       codetools_0.2-16    </span>
-<span class="co">#&gt; [64] stats4_4.0.3         reprex_0.3.0         glue_1.4.2          </span>
-<span class="co">#&gt; [67] evaluate_0.14        data.table_1.13.2    modelr_0.1.8        </span>
-<span class="co">#&gt; [70] vctrs_0.3.5          foreach_1.5.1        cellranger_1.1.0    </span>
-<span class="co">#&gt; [73] gtable_0.3.0         kernlab_0.9-29       assertthat_0.2.1    </span>
-<span class="co">#&gt; [76] xfun_0.21            gower_0.2.2          prodlim_2019.11.13  </span>
-<span class="co">#&gt; [79] broom_0.7.2          viridisLite_0.3.0    ragg_1.1.2          </span>
-<span class="co">#&gt; [82] class_7.3-17         survival_3.2-7       timeDate_3043.102   </span>
-<span class="co">#&gt; [85] optimx_2020-4.2      iterators_1.0.13     memoise_1.1.0       </span>
-<span class="co">#&gt; [88] lava_1.6.8.1         ellipsis_0.3.1       caret_6.0-86        </span>
-<span class="co">#&gt; [91] ipred_0.9-9</span></code></pre></div>
+<span class="co">#&gt;  [1] colorspace_2.0-0     ellipsis_0.3.2       class_7.3-17        </span>
+<span class="co">#&gt;  [4] rprojroot_2.0.2      fs_1.5.0             rstudioapi_0.13     </span>
+<span class="co">#&gt;  [7] farver_2.0.3         ggrepel_0.9.0        prodlim_2019.11.13  </span>
+<span class="co">#&gt; [10] fansi_0.4.2          lubridate_1.7.9.2    xml2_1.3.2          </span>
+<span class="co">#&gt; [13] codetools_0.2-16     splines_4.0.3        cachem_1.0.5        </span>
+<span class="co">#&gt; [16] jsonlite_1.7.2       pROC_1.16.2          caret_6.0-86        </span>
+<span class="co">#&gt; [19] broom_0.7.2          kernlab_0.9-29       dbplyr_2.0.0        </span>
+<span class="co">#&gt; [22] compiler_4.0.3       httr_1.4.2           backports_1.2.0     </span>
+<span class="co">#&gt; [25] assertthat_0.2.1     fastmap_1.1.0        cli_2.5.0           </span>
+<span class="co">#&gt; [28] htmltools_0.5.1.1    tools_4.0.3          gtable_0.3.0        </span>
+<span class="co">#&gt; [31] glue_1.4.2           reshape2_1.4.4       Rcpp_1.0.5          </span>
+<span class="co">#&gt; [34] cellranger_1.1.0     jquerylib_0.1.4      pkgdown_1.6.1.9001  </span>
+<span class="co">#&gt; [37] vctrs_0.3.8          svglite_2.0.0        nlme_3.1-149        </span>
+<span class="co">#&gt; [40] iterators_1.0.13     timeDate_3043.102    gower_0.2.2         </span>
+<span class="co">#&gt; [43] xfun_0.23            rvest_0.3.6          lifecycle_1.0.0     </span>
+<span class="co">#&gt; [46] MASS_7.3-53          scales_1.1.1         ipred_0.9-9         </span>
+<span class="co">#&gt; [49] ragg_1.1.2           hms_0.5.3            yaml_2.2.1          </span>
+<span class="co">#&gt; [52] memoise_2.0.0        sass_0.4.0           rpart_4.1-15        </span>
+<span class="co">#&gt; [55] stringi_1.6.2        highr_0.9            desc_1.3.0          </span>
+<span class="co">#&gt; [58] foreach_1.5.1        optimx_2020-4.2      lava_1.6.8.1        </span>
+<span class="co">#&gt; [61] shape_1.4.5          rlang_0.4.11         pkgconfig_2.0.3     </span>
+<span class="co">#&gt; [64] systemfonts_1.0.2    evaluate_0.14        lattice_0.20-41     </span>
+<span class="co">#&gt; [67] recipes_0.1.15       htmlwidgets_1.5.2    labeling_0.4.2      </span>
+<span class="co">#&gt; [70] tidyselect_1.1.0     plyr_1.8.6           magrittr_2.0.1      </span>
+<span class="co">#&gt; [73] R6_2.5.0             generics_0.1.0       DBI_1.1.0           </span>
+<span class="co">#&gt; [76] pillar_1.6.1         haven_2.3.1          withr_2.4.2         </span>
+<span class="co">#&gt; [79] survival_3.2-7       nnet_7.3-14          modelr_0.1.8        </span>
+<span class="co">#&gt; [82] crayon_1.4.1         utf8_1.2.1           rmarkdown_2.8       </span>
+<span class="co">#&gt; [85] grid_4.0.3           readxl_1.3.1         data.table_1.13.2   </span>
+<span class="co">#&gt; [88] ModelMetrics_1.2.2.2 reprex_0.3.0         digest_0.6.27       </span>
+<span class="co">#&gt; [91] webshot_0.5.2        numDeriv_2016.8-1.1  textshaping_0.3.4   </span>
+<span class="co">#&gt; [94] stats4_4.0.3         munsell_0.5.0        viridisLite_0.3.0   </span>
+<span class="co">#&gt; [97] bslib_0.2.5.1</span></code></pre></div>
 </div>
 <div id="references" class="section level1 unnumbered">
 <h1 class="hasAnchor">
-<a href="#references" class="anchor"></a>References</h1>
+<a href="#references" class="anchor" aria-hidden="true"></a>References</h1>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-Abadie2010" class="csl-entry">
-Abadie, Alberto, Alexis Diamond, and Jens Hainmueller. 2010. <span>“<span class="nocase">Synthetic Control Methods for Comparative Case Studies: Estimating the Effect of California’s Tobacco Control Program</span>.”</span> <em>Journal of the American Statistical Association</em> 105 (490): 493–505. <a href="https://doi.org/10.1198/jasa.2009.ap08746">https://doi.org/10.1198/jasa.2009.ap08746</a>.
+Abadie, Alberto, Alexis Diamond, and Jens Hainmueller. 2010. <span>“<span class="nocase">Synthetic Control Methods for Comparative Case Studies: Estimating the Effect of California’s Tobacco Control Program</span>.”</span> <em>Journal of the American Statistical Association</em> 105 (490): 493–505. <a href="https://doi.org/10.1198/jasa.2009.ap08746" class="external-link">https://doi.org/10.1198/jasa.2009.ap08746</a>.
 </div>
 <div id="ref-AlbertoAbadie2020" class="csl-entry">
 Alberto Abadie. 2020. <span>“<span class="nocase">Using Synthetic Controls: Feasibility, Data Requirements, and Methodological Aspects</span>.”</span> <em>Journal of Economic Literature</em> Forthcoming.
 </div>
 <div id="ref-Cavallo2013" class="csl-entry">
-Cavallo, Eduardo, Sebastian Galiani, Ilan Noy, and Juan Pantano. 2013. <span>“<span class="nocase">Catastrophic Natural Disasters and Economic Growth</span>.”</span> <em>Review of Economics and Statistics</em> 95 (5): 1549–61. <a href="https://doi.org/10.1162/REST_a_00413">https://doi.org/10.1162/REST_a_00413</a>.
+Cavallo, Eduardo, Sebastian Galiani, Ilan Noy, and Juan Pantano. 2013. <span>“<span class="nocase">Catastrophic Natural Disasters and Economic Growth</span>.”</span> <em>Review of Economics and Statistics</em> 95 (5): 1549–61. <a href="https://doi.org/10.1162/REST_a_00413" class="external-link">https://doi.org/10.1162/REST_a_00413</a>.
 </div>
 <div id="ref-Cochran1968" class="csl-entry">
-Cochran, W. G. 1968. <span>“<span class="nocase">The Effectiveness of Adjustment by Subclassification in Removing Bias in Observational Studies</span>.”</span> <em>Biometrics</em> 24 (2): 295. <a href="https://doi.org/10.2307/2528036">https://doi.org/10.2307/2528036</a>.
+Cochran, W. G. 1968. <span>“<span class="nocase">The Effectiveness of Adjustment by Subclassification in Removing Bias in Observational Studies</span>.”</span> <em>Biometrics</em> 24 (2): 295. <a href="https://doi.org/10.2307/2528036" class="external-link">https://doi.org/10.2307/2528036</a>.
 </div>
 <div id="ref-Dube2015" class="csl-entry">
 Dube, Arindrajit, and Ben Zipperer. 2015. <span>“<span class="nocase">Pooling Multiple Case Studies Using Synthetic Controls: An Application to Minimum Wage Policies</span>.”</span> <em>IZA Discussion Paper No. 8944</em>.
 </div>
 <div id="ref-Ho2007" class="csl-entry">
-Ho, Daniel E., Kosuke Imai, Gary King, and Elizabeth A. Stuart. 2007. <span>“<span class="nocase">Matching as Nonparametric Preprocessing for Reducing Model Dependence in Parametric Causal Inference</span>.”</span> <em>Political Analysis</em> 15 (3): 199–236. <a href="https://doi.org/10.1093/pan/mpl013">https://doi.org/10.1093/pan/mpl013</a>.
+Ho, Daniel E., Kosuke Imai, Gary King, and Elizabeth A. Stuart. 2007. <span>“<span class="nocase">Matching as Nonparametric Preprocessing for Reducing Model Dependence in Parametric Causal Inference</span>.”</span> <em>Political Analysis</em> 15 (3): 199–236. <a href="https://doi.org/10.1093/pan/mpl013" class="external-link">https://doi.org/10.1093/pan/mpl013</a>.
 </div>
 <div id="ref-Hyndman2020" class="csl-entry">
-Hyndman, Rob J, and George Athanasopoulos. 2020. <em><span class="nocase">Forecasting: principles and practice</span></em>. 2nd ed. Melbourne, Australia: OTexts. <a href="https://OTexts.com/fpp2">OTexts.com/fpp2</a>.
+Hyndman, Rob J, and George Athanasopoulos. 2020. <em><span class="nocase">Forecasting: principles and practice</span></em>. 2nd ed. Melbourne, Australia: OTexts. <a href="https://OTexts.com/fpp2" class="external-link">OTexts.com/fpp2</a>.
 </div>
 <div id="ref-Kellogg2020" class="csl-entry">
-Kellogg, Maxwell, Magne Mogstad, Guillaume Pouliot, and Alexander Torgovitsky. 2020. <span>“<span class="nocase">Combining Matching and Synthetic Controls to Trade off Biases from Extrapolation and Interpolation</span>.”</span> <em>National Bureau of Economic Research</em>. <a href="https://doi.org/10.3386/w26624">https://doi.org/10.3386/w26624</a>.
+Kellogg, Maxwell, Magne Mogstad, Guillaume Pouliot, and Alexander Torgovitsky. 2020. <span>“<span class="nocase">Combining Matching and Synthetic Controls to Trade off Biases from Extrapolation and Interpolation</span>.”</span> <em>National Bureau of Economic Research</em>. <a href="https://doi.org/10.3386/w26624" class="external-link">https://doi.org/10.3386/w26624</a>.
 </div>
 <div id="ref-King2006" class="csl-entry">
-King, Gary, and Langche Zeng. 2006. <span>“<span class="nocase">The Dangers of Extreme Counterfactuals</span>.”</span> <em>Political Analysis</em> 14 (2): 131–59. <a href="https://doi.org/10.1093/pan/mpj004">https://doi.org/10.1093/pan/mpj004</a>.
+King, Gary, and Langche Zeng. 2006. <span>“<span class="nocase">The Dangers of Extreme Counterfactuals</span>.”</span> <em>Political Analysis</em> 14 (2): 131–59. <a href="https://doi.org/10.1093/pan/mpj004" class="external-link">https://doi.org/10.1093/pan/mpj004</a>.
 </div>
 </div>
 </div>
@@ -2006,11 +2010,13 @@ King, Gary, and Langche Zeng. 2006. <span>“<span class="nocase">The Dangers of
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://alexjhollingsworth.com">Alex Hollingsworth</a>.</p>
+  <p></p>
+<p>Developed by <a href="https://alexjhollingsworth.com" class="external-link external-link">Alex Hollingsworth</a>.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link external-link">pkgdown</a> 1.6.1.9001.</p>
 </div>
 
       </footer>
@@ -2018,6 +2024,8 @@ King, Gary, and Langche Zeng. 2006. <span>“<span class="nocase">The Dangers of
 
   
 
+
+  
 
   </body>
 </html>
