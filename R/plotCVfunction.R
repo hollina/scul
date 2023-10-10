@@ -12,17 +12,19 @@
 #' @param lambda Output from the \code{getOptcv.scul} function. Will have three candidate \code{lambdas}.
 #' @param save.figure Boolean if you want to save figure. Default is to save (save.figure = TRUE).
 #' @param OutputFilePath File path prefix if you are saving the figure. Default is file path set in \code{SCUL.inut} (OutputFilePath = SCUL.input$OutputFilePath).
-#
+#' @param minLambdas Vector of lambdas that minimize MSE in each CV run
+#'
 #' @import ggrepel
 #' @import ggplot2
 #' @importFrom rlang .data
 #'
 #'@export
-plotCV <-
+plotCVfunction <-
   function (lambdapath,
             mse,
             se,
             lambda,
+            minLambdas,
             save.figure = TRUE,
             OutputFilePath = SCUL.input$OutputFilePath){
 
@@ -39,7 +41,7 @@ plotCV <-
                              stringsAsFactors = FALSE)
 
     # Make plot
-    ggplot(data = plotdata, aes(x = lambda, y = MSE)) +
+    cvPLOT <-  ggplot(data = plotdata, aes(x = lambda, y = MSE)) +
       geom_vline(data = plotLambda,
                  mapping = aes(xintercept = vals,
                                linetype = ltype,
@@ -57,7 +59,13 @@ plotCV <-
                                      label = Ref,
                                      hjust = 1,
                                      vjust = 0),
-                       data = plotLambda)
+                       data = plotLambda) +
+      geom_rug(data = data.frame(-log(t(minLambdas))) %>% select( ml = 1, everything() ),
+               aes(x = ml),
+               inherit.aes = F,
+               sides="b",
+               size = 4,
+               alpha = .1)
 
     if (save.figure == TRUE) {
       # Save graph

@@ -28,10 +28,12 @@
 #'         lambda that produces a MSE within one standard error of the minimum MSE
 #'         (cvOption = lambda.1se).
 #'         Default is lambda.1se
+#'
 #' @return list  A list of standardized placbo effect sizes
 #' @import glmnet
 #' @import stats
 #' @import lubridate
+#' @import progress
 #'
 #' @export
 
@@ -52,7 +54,7 @@ CreatePlaceboDistribution <- function(
   ####################
   # Extract relevant information from placebo data #
   x.PlaceboPool.StandardizedDiff<-data.frame(matrix(ncol=ncol(x.PlaceboPool),nrow=nrow(x.PlaceboPool)))
-  x.PlaceboPool.CohensD<-data.frame(matrix(ncol(x.PlaceboPool),nrow=1))
+  x.PlaceboPool.CohensD<-data.frame(matrix(ncol=ncol(x.PlaceboPool),nrow=1))
 
   ###################
   # Set up variables that are constant across all runs
@@ -63,87 +65,77 @@ CreatePlaceboDistribution <- function(
   # Determine stopping point
   # StoppingPoint <- NumberInitialTimePeriods+MaxCrossValidations-1
 
+
   # Set up progress bar
-  progressBar   <- txtProgressBar(1, ncol(x.PlaceboPool), width = 40, style=3)
-  initTime <- numeric(ncol(x.PlaceboPool))
-  endTime <- numeric(ncol(x.PlaceboPool))
+  pb <- progress_bar$new(
+    format = "[:bar] :percent complete in :elapsed | eta: :eta",
+    total = ncol(x.PlaceboPool), clear = FALSE, width= 60)
+
   ###################
   # Loop over each placebo. Calculate a diff and a % diff. Then store in dataframe.
-  for (h in 1:ncol(x.PlaceboPool)){
+    for (h in 1:ncol(x.PlaceboPool)){
 
-    initTime[h] <- Sys.time()
+      #################
+      # Create a matrix with pre-treatment values for a given placebo run
+      # Here h is the target and -h is the donor pool
 
-    #################
-    # Create a matrix with pre-treatment values for a given placebo run
-    # Here h is the target and -h is the donor pool
+      # Extract the target and save as another variable
+      y.PlaceboPool.PreTreatment <- as.matrix(x.PlaceboPool[(1:TreatmentBeginsAt-1),h])
+      y.PlaceboPool.PostTreatment <- as.matrix(x.PlaceboPool[(TreatmentBeginsAt:PostPeriodLength),h])
+      y.PlaceboPool <- as.matrix(x.PlaceboPool[, h])
 
-    # Extract the target and save as another variable
-    y.PlaceboPool.PreTreatment <- as.matrix(x.PlaceboPool[(1:TreatmentBeginsAt-1),h])
-    y.PlaceboPool.PostTreatment <- as.matrix(x.PlaceboPool[(TreatmentBeginsAt:PostPeriodLength),h])
-    y.PlaceboPool <- as.matrix(x.PlaceboPool[, h])
+      # Remove the target variable and any variables from the same state as the target
+      x.PlaceboPoolWithoutTarget <- x.PlaceboPool[,-h]
 
-    # Remove the target variable and any variables from the same state as the target
-    x.PlaceboPoolWithoutTarget <- x.PlaceboPool[,-h]
+      # If there is a restriction, apply it
+      if (nchar(DonorPoolRestrictionForEachPlacebo) > 0){
+        full_statement <- paste("x.PlaceboPoolWithoutTarget %>% ", DonorPoolRestrictionForEachPlacebo)
+        x.PlaceboPoolRestricted <- eval(parse(text = full_statement))
+      }
+      # If there is not a restriction, leave the donor pool for the placebo as is
+      if (nchar(DonorPoolRestrictionForEachPlacebo) == 0){
+        x.PlaceboPoolRestricted <- x.PlaceboPoolWithoutTarget
+      }
 
-    # If there is a restriction, apply it
-    if (nchar(DonorPoolRestrictionForEachPlacebo) > 0){
-      full_statement <- paste("x.PlaceboPoolWithoutTarget %>% ", DonorPoolRestrictionForEachPlacebo)
-      x.PlaceboPoolRestricted <- eval(parse(text = full_statement))
+      # Split into pre and post period
+      x.PlaceboPool.PreTreatment <- as.matrix(x.PlaceboPoolRestricted [(1:TreatmentBeginsAt-1),])
+      x.PlaceboPool.PostTreatment <- as.matrix(x.PlaceboPoolRestricted [(TreatmentBeginsAt:PostPeriodLength),])
+
+      # We don't need the time variable for this, but it's required for SCUL.
+      time <- data.frame(time = 1:nrow(y.PlaceboPool))
+
+      ###################
+      # Run SCUL Procedure
+      placeboSCUL <- SCUL(
+        PostPeriodLength = PostPeriodLength,
+        PrePeriodLength = PrePeriodLength,
+        NumberInitialTimePeriods = NumberInitialTimePeriods,
+        OutputFilePath = OutputFilePath,
+        x.DonorPool.PreTreatment = x.PlaceboPool.PreTreatment,
+        y.PreTreatment = y.PlaceboPool.PreTreatment,
+        x.DonorPool = x.PlaceboPoolRestricted,
+        time = time,
+        y.actual = y.PlaceboPool,
+        TreatmentBeginsAt = TreatmentBeginsAt,
+        TrainingPostPeriodLength = TrainingPostPeriodLength,
+        cvOption = cvOption,
+        plotCV = FALSE
+      )
+
+      # Calculate the standard deviation of the outcome variable in the pre-treatment period
+      PreTreatmentSD <-sd(y.PlaceboPool.PreTreatment)
+
+      # Take the absolute value of the difference between the predicition and the actual data divided by the standard deviation
+      x.PlaceboPool.StandardizedDiff[,h] <- (placeboSCUL$y.scul - placeboSCUL$y.actual)/PreTreatmentSD
+      colnames(x.PlaceboPool.StandardizedDiff)[h] <- h
+
+      # Calculate the mean pre-treatment cohen's D
+      x.PlaceboPool.CohensD[1, h] <- placeboSCUL$CohensD
+
+      # Display Progress bar
+      pb$tick()
     }
-    # If there is not a restriction, leave the donor pool for the placebo as is
-    if (nchar(DonorPoolRestrictionForEachPlacebo) == 0){
-      x.PlaceboPoolRestricted <- x.PlaceboPoolWithoutTarget
-    }
 
-    # Split into pre and post period
-    x.PlaceboPool.PreTreatment <- as.matrix(x.PlaceboPoolRestricted [(1:TreatmentBeginsAt-1),])
-    x.PlaceboPool.PostTreatment <- as.matrix(x.PlaceboPoolRestricted [(TreatmentBeginsAt:PostPeriodLength),])
-
-    # We don't need the time variable for this, but it's required for SCUL.
-    time <- data.frame(time = 1:nrow(y.PlaceboPool))
-
-    ###################
-    # Run SCUL Procedure
-    placeboSCUL <- SCUL(
-      PostPeriodLength = PostPeriodLength,
-      PrePeriodLength = PrePeriodLength,
-      NumberInitialTimePeriods = NumberInitialTimePeriods,
-      OutputFilePath = OutputFilePath,
-      x.DonorPool.PreTreatment = x.PlaceboPool.PreTreatment,
-      y.PreTreatment = y.PlaceboPool.PreTreatment,
-      x.DonorPool = x.PlaceboPoolRestricted,
-      time = time,
-      y.actual = y.PlaceboPool,
-      TreatmentBeginsAt = TreatmentBeginsAt,
-      TrainingPostPeriodLength = TrainingPostPeriodLength,
-      cvOption = cvOption,
-      plotCV = FALSE
-    )
-
-    # Calculate the standard deviation of the outcome variable in the pre-treatment period
-    PreTreatmentSD <-sd(y.PlaceboPool.PreTreatment)
-
-    # Take the absolute value of the difference between the predicition and the actual data divided by the standard deviation
-    x.PlaceboPool.StandardizedDiff[,h] <- (placeboSCUL$y.scul - placeboSCUL$y.actual)/PreTreatmentSD
-    colnames(x.PlaceboPool.StandardizedDiff)[h] <- h
-
-    # Calculate the mean pre-treatment cohen's D
-    x.PlaceboPool.CohensD[1, h] <- placeboSCUL$CohensD
-
-    # Display Progress bar
-    setTxtProgressBar(progressBar, h)
-    endTime[h] <- Sys.time()
-
-    elapsedTime <- round(lubridate::seconds_to_period(sum(endTime - initTime)), 0)
-
-    # Estimated remaining time based on the
-    # mean time that took to run the previous iterations
-    estTime <- ncol(x.PlaceboPool) * (mean(endTime[endTime != 0] - initTime[initTime != 0])) - elapsedTime
-    remaininingTime <- round(lubridate::seconds_to_period(estTime), 0)
-
-    cat(paste(" // Elapsed time:", elapsedTime,
-              " // Est. time remaining:", remaininingTime), "")
-  }
 
   x.PlaceboPool.StandardizedDiff.trimmed <- x.PlaceboPool.StandardizedDiff[ , x.PlaceboPool.CohensD <= CohensDThreshold]
 

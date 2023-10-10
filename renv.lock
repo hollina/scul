@@ -9,11 +9,6 @@
     ]
   },
   "Packages": {
-  "scul": {
-	  "Package": "scul",
-	  "Version": "0.2.0.0",
-	  "Source": "../scul_0.2.0.0.tar.gz"
-	},
     "BH": {
       "Package": "BH",
       "Version": "1.75.0-0",
@@ -797,10 +792,10 @@
     },
     "remotes": {
       "Package": "remotes",
-      "Version": "2.2.0",
+      "Version": "2.3.0",
       "Source": "Repository",
       "Repository": "RSPM",
-      "Hash": "430a0908aee75b1fcba0e62857cab0ce"
+      "Hash": "92ea77818b3bb83c699008451af32b86"
     },
     "renv": {
       "Package": "renv",
@@ -893,10 +888,10 @@
     },
     "shape": {
       "Package": "shape",
-      "Version": "1.4.5",
+      "Version": "1.4.6",
       "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "58510f25472de6fd363d76698d29709e"
+      "Repository": "RSPM",
+      "Hash": "9067f962730f58b14d8ae54ca885509f"
     },
     "stringi": {
       "Package": "stringi",

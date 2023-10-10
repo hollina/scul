@@ -4,7 +4,7 @@
 \alias{getOptcv.scul}
 \title{Extract cross-validated \code{lamdas}}
 \usage{
-getOptcv.scul(lambdapath, mse, se, fullMSE)
+getOptcv.scul(lambdapath, mse, se, fullMSE, medianLambda)
 }
 \arguments{
 \item{lambdapath}{A grid of lambdas that is used in each cross-validation run as potential options for the optimal penalty parameter.}
@@ -14,6 +14,8 @@ getOptcv.scul(lambdapath, mse, se, fullMSE)
 \item{se}{A vector of the standard error associated with each average mean squared error (average across cross-validation runs) for each given \code{lambda} in the \code{lambdapath} grid.}
 
 \item{fullMSE}{A matrix of the mean squared error for each cross-validation run and each given \code{lambda} in the \code{lambdapath} grid.}
+
+\item{medianLambda}{A single \code{lambda} that is the median minimum lambda that minimizes the CV path.}
 }
 \description{
 This is a simple adaptation of the \code{getOptcv.glmnet} function from  \code{glmnet}.

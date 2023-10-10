@@ -27,7 +27,7 @@
 #'         one that produces the minimum MSE (cvOption = lambda.min), or the largest
 #'         lambda that produces a MSE within one standard error of the minimum MSE
 #'         (cvOption = lambda.1se).
-#'         Default is lambda.1se
+#'         Default is lambda.median.
 #' @param plotCV Create a plot of the cross-validated mean squared error against -log(lambda) of the penalty
 #'               parameter. Default is to not plot CV curve (plotCV == FALSE).
 #'
@@ -47,7 +47,7 @@ SCUL <- function(
                   y.actual = SCUL.input$y,
                   TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
                   TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength,
-                  cvOption = "lambda.1se",
+                  cvOption = "lambda.median",
                   plotCV = FALSE
 ){
   # Determine the maximum number of rolling-origin k-fold cross validations that can occur
@@ -77,16 +77,20 @@ SCUL <- function(
       }
 
       ### Now calculate the lambda sequence
-      epsilon <- .0001 # default used in glmnet
+      epsilon = .01 # ifelse(nrow(sx) < nvars, 0.01, 1e-04) # default used in glmnet
 
-      lambdapath <- round(exp(seq(log(max(MaxLambdaList)), log(max(MaxLambdaList)*epsilon),
+      lambdapath <- round(exp(seq(log(max(MaxLambdaList)), log(min(MaxLambdaList)*epsilon),
                                   length.out = MaxLambdasInGrid)), digits = 10)
       # Initialize a matrix of 0's, that is # of lambdas in grid by max # of C.V. runs
       # MinimumLambdaRolling <- matrix(0, MaxLambdasInGrid, MaxCrossValidations)
 
       # Initialize a matrix of 0's, that is # of lambdas in grid by max # of C.V. runs
-      MinimumLambdaRollingMSE <- matrix(0, MaxLambdasInGrid, MaxCrossValidations)
-
+      #if (cvPath != lambda.median) {
+        MinimumLambdaRollingMSE <- matrix(0, MaxLambdasInGrid, MaxCrossValidations)
+      #}
+      #if (cvPath == lambda.median) {
+        MinimumLambdaRollingMSE.median <- matrix(0, 1, MaxCrossValidations)
+      #}
       # Preform lasso for each cross-validation run and store test MSE for each run for each lambda in grid
       for (i in NumberInitialTimePeriods:StoppingPoint){
         #i <- NumberInitialTimePeriods
@@ -97,7 +101,7 @@ SCUL <- function(
         y.training <-y.PreTreatment[1:i] # this had me switch row and column. Why?
 
         # Run a lasso with only the training data. It will run on for a grid of lambdas by default
-        fit = glmnet(x.training, y.training, lambda = lambdapath)
+        fit = glmnet(x.training, y.training)
 
         # Determine when the testing data begins for this CV run
         BeginingOfTestData = i +1
@@ -111,49 +115,64 @@ SCUL <- function(
 
         # When using the non-default lambda path (i.e., extending it to 100. we get a warning)
         # Create a predicted y value for the entire pre-treatment time period for each lambda in the the exact grid of lambdas from the training data
-        prediction <- suppressWarnings(
-                        predict(fit,
+        #if (cvPath != lambda.median) {
+          prediction <- predict(fit,
                               newx = x.DonorPool.PreTreatment,
                               x = x.training,
                               y = y.training,
                               s = lambdapath,
-                              exact = TRUE,
-                              ties = min)
-                        )
+                              exact = TRUE)
+        #}
+        #if (cvPath == lambda.median) {
+          prediction.median <- predict(fit,
+                                newx = x.DonorPool.PreTreatment,
+                                x = x.training,
+                                y = y.training,
+                                s = fit$lambda,
+                                exact = TRUE)
+        #}
         # Squared error
-        squared_error <- (prediction[BeginingOfTestData:EndOfTestData,] - y.testing)^2
+          squared_error <- (prediction[BeginingOfTestData:EndOfTestData,] - y.testing)^2
+          squared_error.median <- (prediction.median[BeginingOfTestData:EndOfTestData,] - y.testing)^2
 
         # Mean squared error
         mse <- colMeans(squared_error)
-
-        # Save MSE
-        MinimumLambdaRollingMSE[ , j ] <- mse
-
+        mse.median <- colMeans(squared_error.median)
+        #if (cvPath != lambda.median) {
+          # Save MSE
+          MinimumLambdaRollingMSE[ , j ] <- mse
+        #}
+        #if (cvPath == lambda.median) {
+          # Save MSE
+          MinimumLambdaRollingMSE.median[ j ] <- fit$lambda[which.min(mse.median)]
+        #}
       }
-
+        medianLambda = median(MinimumLambdaRollingMSE.median)
+      #if (cvPath != lambda.median) {
         # Take mean of MSE to get mean MSE for each lambda across all CV runs
         cvMSE <- rowMeans(MinimumLambdaRollingMSE)
 
-        # Calculate standard error of MSE
-        # length of y.testing*number of runs is N for SE calculation.
-        cvSE <- sqrt(cvMSE/(TrainingPostPeriodLength*MaxCrossValidations-1))
+        # Calculate standard error of MSE for each lambda
+        cvSE <- apply(MinimumLambdaRollingMSE, 1, sd)
 
         # Extract 1) lambda that minimizes cvMSE, 2) max lambda that prodcuses an MSE within one standard error of the minimum 3) and median min lambda.
         lambda <- getOptcv.scul(lambdapath = lambdapath,
                       mse = cvMSE,
                       se = cvSE,
-                      fullMSE = MinimumLambdaRollingMSE)
+                      fullMSE = MinimumLambdaRollingMSE,
+                      medianLambda = medianLambda)
 
         # Plot CV
-        if (plotCV == TRUE) {
-          plotCV(lambdapath = lambdapath,
-                  mse = cvMSE,
-                  se = cvSE,
-                  lambda = lambda,
-                  save.figure = TRUE,
-                  OutputFilePath = OutputFilePath)
-        }
-
+          if (plotCV == TRUE) {
+            plotCVfunction(lambdapath = lambdapath,
+                           mse = cvMSE,
+                           se = cvSE,
+                           minLambdas = MinimumLambdaRollingMSE.median,
+                           lambda = lambda,
+                           save.figure = TRUE,
+                           OutputFilePath = OutputFilePath)
+          }
+      #}
 
       # Based on options, pick cross validated lambda
        CrossValidatedLambda <- switch(cvOption,

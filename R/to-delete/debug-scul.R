@@ -60,7 +60,7 @@ time<-SCUL.input$time
 y.actual<-SCUL.input$y
 TreatmentBeginsAt<-SCUL.input$TreatmentBeginsAt
 TrainingPostPeriodLength<-SCUL.input$TrainingPostPeriodLength
-cvOption<-"lambda.1se"
+cvOption<-"lambda.median"
 
 # Determine the maximum number of rolling-origin k-fold cross validations that can occur
 MaxCrossValidations <- PrePeriodLength-NumberInitialTimePeriods-TrainingPostPeriodLength+1
@@ -89,16 +89,20 @@ for (i in NumberInitialTimePeriods:StoppingPoint){
 }
 
 ### Now calculate the lambda sequence
-epsilon <- .0001 # default used in glmnet
+epsilon = .01 # ifelse(nrow(sx) < nvars, 0.01, 1e-04) # default used in glmnet
 
-lambdapath <- round(exp(seq(log(max(MaxLambdaList)), log(max(MaxLambdaList)*epsilon),
+lambdapath <- round(exp(seq(log(max(MaxLambdaList)), log(min(MaxLambdaList)*epsilon),
                             length.out = MaxLambdasInGrid)), digits = 10)
 # Initialize a matrix of 0's, that is # of lambdas in grid by max # of C.V. runs
 # MinimumLambdaRolling <- matrix(0, MaxLambdasInGrid, MaxCrossValidations)
 
 # Initialize a matrix of 0's, that is # of lambdas in grid by max # of C.V. runs
+#if (cvPath != lambda.median) {
 MinimumLambdaRollingMSE <- matrix(0, MaxLambdasInGrid, MaxCrossValidations)
-
+#}
+#if (cvPath == lambda.median) {
+MinimumLambdaRollingMSE.median <- matrix(0, 1, MaxCrossValidations)
+#}
 # Preform lasso for each cross-validation run and store test MSE for each run for each lambda in grid
 for (i in NumberInitialTimePeriods:StoppingPoint){
   #i <- NumberInitialTimePeriods
@@ -109,7 +113,7 @@ for (i in NumberInitialTimePeriods:StoppingPoint){
   y.training <-y.PreTreatment[1:i] # this had me switch row and column. Why?
 
   # Run a lasso with only the training data. It will run on for a grid of lambdas by default
-  fit = glmnet(x.training, y.training, lambda = lambdapath)
+  fit = glmnet(x.training, y.training)
 
   # Determine when the testing data begins for this CV run
   BeginingOfTestData = i +1
@@ -121,82 +125,112 @@ for (i in NumberInitialTimePeriods:StoppingPoint){
   x.testing <-x.DonorPool.PreTreatment[BeginingOfTestData:EndOfTestData,]
   y.testing <-y.PreTreatment[BeginingOfTestData:EndOfTestData,]
 
+  # When using the non-default lambda path (i.e., extending it to 100. we get a warning)
   # Create a predicted y value for the entire pre-treatment time period for each lambda in the the exact grid of lambdas from the training data
-  prediction <- suppressWarnings(predict(fit,
+  #if (cvPath != lambda.median) {
+  prediction <- predict(fit,
                         newx = x.DonorPool.PreTreatment,
                         x = x.training,
                         y = y.training,
                         s = lambdapath,
-                        exact = TRUE))
+                        exact = TRUE)
+  #}
+  #if (cvPath == lambda.median) {
+  prediction.median <- predict(fit,
+                               newx = x.DonorPool.PreTreatment,
+                               x = x.training,
+                               y = y.training,
+                               s = fit$lambda,
+                               exact = TRUE)
+  #}
   # Squared error
   squared_error <- (prediction[BeginingOfTestData:EndOfTestData,] - y.testing)^2
+  squared_error.median <- (prediction.median[BeginingOfTestData:EndOfTestData,] - y.testing)^2
 
   # Mean squared error
   mse <- colMeans(squared_error)
-
+  #if (cvPath != lambda.median) {
   # Save MSE
   MinimumLambdaRollingMSE[ , j ] <- mse
-
+  #}
+  #if (cvPath == lambda.median) {
+  # Save MSE
+  MinimumLambdaRollingMSE.median[ j ] <- fit$lambda[which.min(mse)]
+  #}
 }
-
+medianLambda = median(MinimumLambdaRollingMSE.median)
+#if (cvPath != lambda.median) {
 # Take mean of MSE to get mean MSE for each lambda across all CV runs
 cvMSE <- rowMeans(MinimumLambdaRollingMSE)
 
-# Calculate standard error of MSE
-# length of y.testing*number of runs is N for SE calculation.
-cvSE <- sqrt(cvMSE/(TrainingPostPeriodLength*MaxCrossValidations-1))
+# Calculate standard error of MSE for each lambda
+cvSE <- apply(MinimumLambdaRollingMSE, 1, sd)
 
 # Extract 1) lambda that minimizes cvMSE, 2) max lambda that prodcuses an MSE within one standard error of the minimum 3) and median min lambda.
 lambda <- getOptcv.scul(lambdapath = lambdapath,
                         mse = cvMSE,
                         se = cvSE,
-                        fullMSE = MinimumLambdaRollingMSE)
+                        fullMSE = MinimumLambdaRollingMSE,
+                        medianLambda = medianLambda)
 
 
-# Create a dataframe of the data we want to plot
-plotdata <- data.frame(cbind(lambdapath, cvMSE, cvSE))
-names(plotdata) <- c("lambda", "MSE", "SE") # Add names
-plotdata$lambda <- -log(plotdata$lambda) # Take the negative of the penalty parameter
+lambdapath <- lambdapath
+                          mse <- cvMSE
+                          se <- cvSE
+                          lambda <- lambda
+                          save.figure = TRUE
+               minLambdas <-MinimumLambdaRollingMSE.median
+                         OutputFilePath <- '/Users/hollinal/Desktop/'
 
-# Create a mini-dataframe of the optimal lambdas
-plotLambda <- data.frame(Ref = c("Min MSE", "Median Lambda", "1 SE"),
-                         vals = c(-log(lambda$lambda.min), -log(lambda$lambda.median), -log(lambda$lambda.1se)),
-                         lcols = c("red", "blue", "black"),
-                         ltype = c('solid', 'dashed', 'longdash'),
-                         stringsAsFactors = FALSE)
+  # Create a dataframe of the data we want to plot
+  plotdata <- data.frame(cbind(lambdapath, mse, se))
+  names(plotdata) <- c("lambda", "MSE", "SE") # Add names
+  plotdata$lambda <- -log(plotdata$lambda) # Take the negative of the penalty parameter
 
-# Make plot
-ggplot(data = plotdata, aes(x = lambda, y = MSE)) +
-  geom_vline(data = plotLambda,
-             mapping = aes(xintercept = vals,
-                           linetype = ltype,
-                           color = lcols),
-             show.legend = FALSE,
-             size = 1, alpha = .75) +
-  geom_errorbar(data = plotdata, aes(ymin = MSE - SE, ymax = MSE + SE), width=.25) +
-  geom_point(data = plotdata, aes(x = lambda, y = MSE), size = 3) +
-  theme_classic(base_size = 22) +
-  labs(title = "Cross-validated mean squared error vs. penalty parameter",
-       x = "-Log(Lambda)",
-       y = "Mean squared error") +
-  geom_label_repel(mapping = aes(x = vals,
-                                 y = max(plotdata$MSE + plotdata$SE),
-                                 label = Ref,
-                                 hjust = 1,
-                                 vjust = 0),
-                   data = plotLambda)
+  # Create a mini-dataframe of the optimal lambdas
+  plotLambda <- data.frame(Ref = c("Min MSE", "Median Lambda", "1 SE"),
+                           vals = c(-log(lambda$lambda.min), -log(lambda$lambda.median), -log(lambda$lambda.1se)),
+                           lcols = c("red", "blue", "black"),
+                           ltype = c('solid', 'dashed', 'longdash'),
+                           stringsAsFactors = FALSE)
 
+  # Make plot
+  cvPLOT <-  ggplot(data = plotdata, aes(x = lambda, y = MSE)) +
+    geom_vline(data = plotLambda,
+               mapping = aes(xintercept = vals,
+                             linetype = ltype,
+                             color = lcols),
+               show.legend = FALSE,
+               size = 1, alpha = .75) +
+    geom_errorbar(data = plotdata, aes(ymin = MSE - SE, ymax = MSE + SE), width=.25) +
+    geom_point(data = plotdata, aes(x = lambda, y = MSE), size = 3) +
+    theme_classic(base_size = 22) +
+    labs(title = "Cross-validated mean squared error vs. penalty parameter",
+         x = "-Log(Lambda)",
+         y = "Mean squared error") +
+    geom_label_repel(mapping = aes(x = vals,
+                                   y = max(plotdata$MSE + plotdata$SE),
+                                   label = Ref,
+                                   hjust = 1,
+                                   vjust = 0),
+                     data = plotLambda) +
+    geom_rug(data = data.frame(-log(t(minLambdas))) %>% select( medianLambda = 1, everything() ),
+             aes(x = medianLambda),
+             inherit.aes = F,
+             sides="b",
+             size = 4,
+             alpha = .1)
 # Plot CV
-plotCV = TRUE
-if (plotCV == TRUE) {
-  plotCV(lambdapath = lambdapath,
-          mse = cvMSE,
-          se = cvSE,
-          lambda = lambda,
-          save.figure = TRUE,
-         OutputFilePath = '/Users/hollinal/Desktop/')
-}
-
+# plotCV = TRUE
+# if (plotCV == TRUE) {
+#   plotCVfunction(lambdapath = lambdapath,
+#           mse = cvMSE,
+#           se = cvSE,
+#           lambda = lambda,
+#           save.figure = TRUE,
+#          OutputFilePath = '/Users/hollinal/Desktop/')
+# }
+#
 
 # Based on options, pick cross validated lambda
 CrossValidatedLambda <- switch(cvOption,
@@ -258,6 +292,130 @@ SCUL.output <- list(
   drop_vars_from_same_FIPS <-
     "select(-ends_with(substring(names(x.PlaceboPool)[h],nchar(names(x.PlaceboPool)[h]) - 2 + 1, nchar(names(x.PlaceboPool)[h]))))"
 
+  #######################################################
+  pacman::p_load(parallel, doParallel, progress, foreach)
+
+  x.PlaceboPool <- SCUL.input$x.PlaceboPool
+  TreatmentBeginsAt <- SCUL.input$TreatmentBeginsAt
+  PostPeriodLength <- nrow(SCUL.input$y)-SCUL.input$TreatmentBeginsAt+1
+  PrePeriodLength <- SCUL.input$TreatmentBeginsAt-1
+  NumberInitialTimePeriods <- SCUL.input$NumberInitialTimePeriods
+  OutputFilePath <- SCUL.input$OutputFilePath
+  CohensDThreshold <- SCUL.input$CohensDThreshold
+  TrainingPostPeriodLength <- SCUL.input$TrainingPostPeriodLength
+  DonorPoolRestrictionForEachPlacebo <- ""
+  cvOption <- "lambda.1se"
+  parallel <- TRUE
+
+  ####################
+  # Extract relevant information from placebo data #
+  x.PlaceboPool.StandardizedDiff<-data.frame(matrix(ncol=ncol(x.PlaceboPool),nrow=nrow(x.PlaceboPool)))
+  x.PlaceboPool.CohensD<-data.frame(matrix(ncol=ncol(x.PlaceboPool),nrow=1))
+
+
+
+  # https://stackoverflow.com/questions/5423760/how-do-you-create-a-progress-bar-when-using-the-foreach-function-in-r
+  numCores <- detectCores() - 1
+  cl <- makeCluster(numCores)
+  registerDoParallel(cl)
+
+  # Progress combine function
+  # https://gist.github.com/kvasilopoulos/d49499ea854541924a8a4cc43a77fed0
+  f <- function(iterator){
+    pb <- txtProgressBar(min = 1, max = iterator - 1, style = 3)
+    count <- 0
+    function(...) {
+      count <<- count + length(list(...)) - 1
+      setTxtProgressBar(pb, count)
+      flush.console()
+      cbind(...) # this can feed into .combine option of foreach
+    }
+  }
+
+
+  ###################
+  # Loop over each placebo. Calculate a diff and a % diff. Then store in dataframe.
+  #for (h in 1:ncol(x.PlaceboPool)){
+  foreach(h = 1:ncol(x.PlaceboPool), .combine = f(ncol(x.PlaceboPool))) %dopar% {
+    #summary(rnorm(1e6))[3]
+    #}
+    # initTime[h] <- Sys.time()
+    # h <- 1
+    #################
+    # Create a matrix with pre-treatment values for a given placebo run
+    # Here h is the target and -h is the donor pool
+
+    # Extract the target and save as another variable
+    y.PlaceboPool.PreTreatment <- as.matrix(x.PlaceboPool[(1:TreatmentBeginsAt-1),h])
+    y.PlaceboPool.PostTreatment <- as.matrix(x.PlaceboPool[(TreatmentBeginsAt:PostPeriodLength),h])
+    y.PlaceboPool <- as.matrix(x.PlaceboPool[, h])
+
+    # Remove the target variable and any variables from the same state as the target
+    x.PlaceboPoolWithoutTarget <- x.PlaceboPool[,-h]
+
+    # If there is a restriction, apply it
+    if (nchar(DonorPoolRestrictionForEachPlacebo) > 0){
+      full_statement <- paste("x.PlaceboPoolWithoutTarget %>% ", DonorPoolRestrictionForEachPlacebo)
+      x.PlaceboPoolRestricted <- eval(parse(text = full_statement))
+    }
+    # If there is not a restriction, leave the donor pool for the placebo as is
+    if (nchar(DonorPoolRestrictionForEachPlacebo) == 0){
+      x.PlaceboPoolRestricted <- x.PlaceboPoolWithoutTarget
+    }
+
+    # Split into pre and post period
+    x.PlaceboPool.PreTreatment <- as.matrix(x.PlaceboPoolRestricted [(1:TreatmentBeginsAt-1),])
+    x.PlaceboPool.PostTreatment <- as.matrix(x.PlaceboPoolRestricted [(TreatmentBeginsAt:PostPeriodLength),])
+
+    # We don't need the time variable for this, but it's required for SCUL.
+    time <- data.frame(time = 1:nrow(y.PlaceboPool))
+
+    ###################
+    # Run SCUL Procedure
+    placeboSCUL <- scul::SCUL(
+      PostPeriodLength = PostPeriodLength,
+      PrePeriodLength = PrePeriodLength,
+      NumberInitialTimePeriods = NumberInitialTimePeriods,
+      OutputFilePath = OutputFilePath,
+      x.DonorPool.PreTreatment = x.PlaceboPool.PreTreatment,
+      y.PreTreatment = y.PlaceboPool.PreTreatment,
+      x.DonorPool = x.PlaceboPoolRestricted,
+      time = time,
+      y.actual = y.PlaceboPool,
+      TreatmentBeginsAt = TreatmentBeginsAt,
+      TrainingPostPeriodLength = TrainingPostPeriodLength,
+      cvOption = cvOption,
+      plotCV = FALSE
+    )
+
+    # Calculate the standard deviation of the outcome variable in the pre-treatment period
+    PreTreatmentSD <- sd(y.PlaceboPool.PreTreatment)
+
+    # Take the absolute value of the difference between the predicition and the actual data divided by the standard deviation
+    x.PlaceboPool.StandardizedDiff[,h] <- (placeboSCUL$y.scul - placeboSCUL$y.actual)/PreTreatmentSD
+    colnames(x.PlaceboPool.StandardizedDiff)[h] <- h
+
+    # Calculate the mean pre-treatment cohen's D
+    x.PlaceboPool.CohensD[1, h] <- placeboSCUL$CohensD
+
+    # Display Progress bar
+    #setTxtProgressBar(progressBar, h)
+    #endTime[h] <- Sys.time()
+
+    #elapsedTime <- round(lubridate::seconds_to_period(sum(endTime - initTime)), 0)
+
+    # Estimated remaining time based on the
+    # mean time that took to run the previous iterations
+    #estTime <- ncol(x.PlaceboPool) * (mean(endTime[endTime != 0] - initTime[initTime != 0])) - elapsedTime
+    #remaininingTime <- round(lubridate::seconds_to_period(estTime), 0)
+
+    #cat(paste(" // Elapsed time:", elapsedTime,
+    #         " // Est. time remaining:", remaininingTime), "")
+    # pbTracker(pb,h,numCores)
+    print(h)
+  }
+  stopCluster(cl)
+  ##########################################################################
 SCUL.inference <- CreatePlaceboDistribution(
     DonorPoolRestrictionForEachPlacebo = drop_vars_from_same_FIPS
   )

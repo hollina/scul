@@ -16,7 +16,7 @@ SCUL(
   y.actual = SCUL.input$y,
   TreatmentBeginsAt = SCUL.input$TreatmentBeginsAt,
   TrainingPostPeriodLength = SCUL.input$TrainingPostPeriodLength,
-  cvOption = "lambda.1se",
+  cvOption = "lambda.median",
   plotCV = FALSE
 )
 }
@@ -57,7 +57,7 @@ Default is to begin this at SCUL.input$TreatmentBeginsAt.}
 one that produces the minimum MSE (cvOption = lambda.min), or the largest
 lambda that produces a MSE within one standard error of the minimum MSE
 (cvOption = lambda.1se).
-Default is lambda.1se}
+Default is lambda.median.}
 
 \item{plotCV}{Create a plot of the cross-validated mean squared error against -log(lambda) of the penalty
 parameter. Default is to not plot CV curve (plotCV == FALSE).}

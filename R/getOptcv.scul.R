@@ -10,10 +10,11 @@
 #' @param mse A vector of the average mean squared error (average across cross-validation runs) for each given \code{lambda} in the \code{lambdapath} grid.
 #' @param se A vector of the standard error associated with each average mean squared error (average across cross-validation runs) for each given \code{lambda} in the \code{lambdapath} grid.
 #' @param fullMSE A matrix of the mean squared error for each cross-validation run and each given \code{lambda} in the \code{lambdapath} grid.
+#' @param medianLambda A single \code{lambda} that is the median minimum lambda that minimizes the CV path.
 #
 #'@export
 getOptcv.scul <-
-  function (lambdapath, mse, se, fullMSE)
+  function (lambdapath, mse, se, fullMSE, medianLambda)
   {
     # What is the minimum MSE
     cvmin = min(mse, na.rm = TRUE)
@@ -30,15 +31,15 @@ getOptcv.scul <-
     id1se = match(lambda.1se, lambdapath)
 
     # Find the column id of the minimum cv in each row. then take the median
-    idmedian <-  median(apply(fullMSE, 1, which.min))
-
+    # idmedian <-  median(apply(fullMSE, 1, which.min))
+    idmedian <- match(which.min(abs(lambdapath - medianLambda)), lambdapath)
     # Find the lambda associated with this median.
-    lambda.median = max(lambdapath[idmedian], na.rm = TRUE)
-    idmedian = match(lambda.median, lambdapath)
+    # lambda.median = max(lambdapath[idmedian], na.rm = TRUE)
+    # idmedian = match(lambda.median, lambdapath)
 
-    index=matrix(c(idmin,id1se, idmedian),3,1,dimnames=list(c("min", "1se", "median"),"Lambda"))
+    index=matrix(c(idmin,id1se,idmedian),3,1,dimnames=list(c("min", "1se", "median"),"Lambda"))
 
     # Return list
-    return(list(lambda.min = lambda.min, lambda.1se = lambda.1se,lambda.median = lambda.median, index = index))
+    return(list(lambda.min = lambda.min, lambda.1se = lambda.1se, lambda.median = medianLambda, index = index))
 
   }
