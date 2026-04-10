@@ -99,9 +99,9 @@ OrganizeDataAndSetup <- function(
                                   TrainingPostPeriodLength
                                   )
   # Create pre treatment datasets
-  y.PreTreatment <- as.matrix(y[(1:TreatmentBeginsAt-1),])
-  x.DonorPool.PreTreatment <- as.matrix(x.DonorPool [(1:TreatmentBeginsAt-1),])
-  x.PlaceboPoolPreTreatment <- as.matrix(x.PlaceboPool [(1:TreatmentBeginsAt-1),])
+  y.PreTreatment <- as.matrix(y[1:(TreatmentBeginsAt-1),])
+  x.DonorPool.PreTreatment <- as.matrix(x.DonorPool [1:(TreatmentBeginsAt-1),])
+  x.PlaceboPoolPreTreatment <- as.matrix(x.PlaceboPool [1:(TreatmentBeginsAt-1),])
 
    # Create post treatment datasets
   y.PostTreatment <- as.matrix(y[(TreatmentBeginsAt:nrow(y)),])
