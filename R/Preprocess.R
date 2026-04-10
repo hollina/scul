@@ -28,7 +28,7 @@ Preprocess <- function(z) {
 
   # Remove any columns if they are constant or nearly constant
   nzv <- caret::nearZeroVar(z)
-  if(length(nzv > 0)) {
+  if(length(nzv) > 0) {
     z <- z[,-nzv]
   }
 
