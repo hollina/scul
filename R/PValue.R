@@ -86,20 +86,20 @@ PValue <-  function(
   for (e in 1:ncol(y.StandardizedDifference.trim)) {
     if (is.na(ColumnPValues[e,1])==FALSE){
       if (ColumnPValues[e,1]<=.1) {
-        ColumnPValues$sym[e] <- ""
+        ColumnPValues$sym[e] <- "*"
       }
       if (ColumnPValues[e,1]<=.05) {
-        ColumnPValues$sym[e] <- ""
+        ColumnPValues$sym[e] <- "**"
       }
       if (ColumnPValues[e,1]<=.01) {
-        ColumnPValues$sym[e] <- ""
+        ColumnPValues$sym[e] <- "***"
       }
     }
   }
 
   ColumnPValues$forExport <- paste0(round(ColumnPValues[,1],digits=2),ColumnPValues[,2])
   for (e in 1:nrow(ColumnPValues)) {
-    if (ColumnPValues[e,3]=="NA"){
+    if (is.na(ColumnPValues[e,3])) {
       ColumnPValues[e,3]<-""
     }
   }
